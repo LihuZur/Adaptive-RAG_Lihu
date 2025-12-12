@@ -54,7 +54,6 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "lm_server_port": llm_server_port,
       "lm_server_model_name": "gpt-4o-mini",
       "prompt_file": "prompts/2wikimultihopqa/no_context_cot_qa_codex.txt",
-      "disable_qm": true,
       "next_model": "[EOQ]",
     },
   },

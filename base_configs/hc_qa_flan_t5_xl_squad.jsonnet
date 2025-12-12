@@ -53,7 +53,6 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "lm_server_port": llm_server_port,
       "lm_server_model_name": "flan-t5-xl",
       "prompt_file": "prompts/squad/no_context_cot_qa_flan_t5.txt",
-      "disable_qm": true,
       "next_model": "[EOQ]",
     },
   },
