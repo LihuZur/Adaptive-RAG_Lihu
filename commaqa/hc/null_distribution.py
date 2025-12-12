@@ -5,7 +5,7 @@ import pickle
 import json
 from pathlib import Path
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 import logging
 
 logger = logging.getLogger(__name__)

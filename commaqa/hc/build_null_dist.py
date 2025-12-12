@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 
 def load_dataset(corpus_name: str, split: str = "dev_500") -> List[Dict[str, Any]]:
     """Load dataset from file."""
-    dataset_path = Path(f"data/{corpus_name}/{split}.jsonl")
+    dataset_path = Path(f"processed_data/{corpus_name}/{split}_subsampled.jsonl")
     
     if not dataset_path.exists():
         raise FileNotFoundError(f"Dataset not found: {dataset_path}")
@@ -206,8 +206,8 @@ def main():
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="data/hc_null_distributions",
-        help="Output directory (default: data/hc_null_distributions)",
+        default="processed_data/hc_null_distributions",
+        help="Output directory (default: processed_data/hc_null_distributions)",
     )
     
     args = parser.parse_args()
