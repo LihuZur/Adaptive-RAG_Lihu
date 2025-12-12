@@ -24,7 +24,7 @@ from typing import List, Dict, Any
 import numpy as np
 import requests
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -52,7 +52,6 @@ def retrieve_bm25_scores(
     retriever_port: int = 8000,
 ) -> List[float]:
     """Retrieve BM25 scores for a query."""
-    print(f"[ENTRY] retrieve_bm25_scores called with query='{query[:50]}...', corpus={corpus_name}")
     url = f"{retriever_host}:{retriever_port}/retrieve"
     
     params = {
@@ -64,15 +63,11 @@ def retrieve_bm25_scores(
     }
     
     try:
-        print(f"[DEBUG] Calling URL: {url}")
-        print(f"[DEBUG] Params: {params}")
         response = requests.post(url, json=params, timeout=30)
         response.raise_for_status()
         
         result = response.json()
-        print(f"[DEBUG] Response keys: {result.keys()}")
         retrieval = result.get("retrieval", [])
-        print(f"[DEBUG] Retrieved {len(retrieval)} items")
         
         scores = []
         for item in retrieval:
@@ -80,16 +75,10 @@ def retrieve_bm25_scores(
                 score = item.get("score", 0.0)
                 scores.append(score)
         
-        print(f"[DEBUG] Extracted {len(scores)} scores")
         return scores
     
     except Exception as e:
-        print(f"[ERROR] Retrieval failed for query '{query[:50]}...': {e}")
-        print(f"[ERROR] URL: {url}")
-        print(f"[ERROR] Response status: {getattr(response, 'status_code', 'N/A')}")
-        print(f"[ERROR] Response text: {getattr(response, 'text', 'N/A')[:500]}")
-        import traceback
-        traceback.print_exc()
+        logger.warning(f"Retrieval failed for query '{query[:50]}...': {e}")
         return []
 
 
@@ -136,19 +125,15 @@ def build_null_distribution(
         
         logger.info(f"Processing query {i+1}/{len(sampled_data)}: {query[:50]}...")
         print(f"[CALLING] About to call retrieve_bm25_scores")
+    for i, item in enumerate(sampled_data):
+        query = item.get("question_text", "") or item.get("question", "")
         
-        scores = retrieve_bm25_scores(
-            query=query,
-            corpus_name=corpus_name,
-            retrieval_count=retrieval_per_query,
-            retriever_host=retriever_host,
-            retriever_port=retriever_port,
-        )
+        if not query.strip():
+            continue
         
-        all_scores.extend(scores)
+        logger.info(f"Processing query {i+1}/{len(sampled_data)}: {query[:50]}...")
         
-        if (i + 1) % 10 == 0:
-            logger.info(f"Collected {len(all_scores)} scores so far")
+        scores = retrieve_bm25_scores(en(all_scores)} scores so far")
     
     if not all_scores:
         raise ValueError("Failed to collect any BM25 scores")
