@@ -59,7 +59,7 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "next_model": "[EOQ]",
     },
   },
-  "reader": prompt_reader_args + {
+  "reader": {
     "name": "multi_para_rc",
     "add_paras": false,
     "add_gold_paras": false,
