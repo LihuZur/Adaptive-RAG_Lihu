@@ -35,7 +35,7 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "name": "hc_retrieve_and_select",
       "retriever_host": retriever_host,
       "retriever_port": retriever_port,
-      "retrieval_count": std.parseInt(bm25_retrieval_count),
+      "retrieval_count": bm25_retrieval_count,
       "gamma": gamma,
       "min_hc": min_hc,
       "null_dist_path": null_dist_path,
