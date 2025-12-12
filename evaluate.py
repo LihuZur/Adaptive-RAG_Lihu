@@ -642,7 +642,8 @@ def main():
     dict_zero_single_multi = {
         'ircot' : 'multi',
         'oner' : 'single',
-        'nor' : 'zero'
+        'nor' : 'zero',
+        'hc' : 'single'
     }
     lst_zero_single_multi = []
     zero_single_multi = dict_zero_single_multi[experiment_name.split('_')[0]]
