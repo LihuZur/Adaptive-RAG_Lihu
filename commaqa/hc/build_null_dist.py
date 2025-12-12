@@ -126,7 +126,7 @@ def build_null_distribution(
     all_scores = []
     
     for i, item in enumerate(sampled_data):
-        query = item.get("question", "")
+        query = item.get("question_text", "") or item.get("question", "")
         
         print(f"[LOOP] Item {i+1}: question='{query[:50] if query else 'EMPTY'}'")
         
