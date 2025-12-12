@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# Load environment variables from .env file
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+fi
+
 # Expected command line argument values.
 valid_systems=("ircot" "ircot_qa" "oner" "oner_qa" "nor_qa" "hc_qa")
 valid_models=("flan-t5-xxl" "flan-t5-xl" "flan-t5-base" "gpt" "none")
