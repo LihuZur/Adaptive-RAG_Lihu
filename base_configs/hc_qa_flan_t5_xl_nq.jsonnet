@@ -1,3 +1,4 @@
+local dataset = "nq";
 local retriever_host = std.extVar("RETRIEVER_HOST");
 local retriever_port = std.extVar("RETRIEVER_PORT");
 local llm_server_host = std.extVar("LLM_SERVER_HOST");
