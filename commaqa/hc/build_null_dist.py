@@ -89,7 +89,7 @@ def build_null_distribution(
     retrieval_per_query: int = 100,
     retriever_host: str = "http://127.0.0.1",
     retriever_port: int = 8000,
-) -> Dict[str, Any]:
+) -> NullDistribution:
     """
     Build null distribution by retrieving documents for random queries.
     
@@ -149,24 +149,22 @@ def build_null_distribution(
     # Convert to numpy array
     scores_array = np.array(all_scores, dtype=np.float32)
     
-    # Compute statistics
-    null_dist = {
-        "scores": scores_array,
-        "mean": float(np.mean(scores_array)),
-        "std": float(np.std(scores_array)),
-        "min": float(np.min(scores_array)),
-        "max": float(np.max(scores_array)),
-        "count": len(scores_array),
-        "corpus_name": corpus_name,
-        "split": split,
-    }
+    # Create NullDistribution object
+    null_dist = NullDistribution(
+        scores=scores_array,
+        mean=float(np.mean(scores_array)),
+        std=float(np.std(scores_array)),
+        min_val=float(np.min(scores_array)),
+        max_val=float(np.max(scores_array)),
+        n_samples=len(scores_array),
+    )
     
     logger.info(f"Null distribution statistics:")
-    logger.info(f"  Count: {null_dist['count']}")
-    logger.info(f"  Mean: {null_dist['mean']:.3f}")
-    logger.info(f"  Std: {null_dist['std']:.3f}")
-    logger.info(f"  Min: {null_dist['min']:.3f}")
-    logger.info(f"  Max: {null_dist['max']:.3f}")
+    logger.info(f"  Count: {null_dist.n_samples}")
+    logger.info(f"  Mean: {null_dist.mean:.3f}")
+    logger.info(f"  Std: {null_dist.std:.3f}")
+    logger.info(f"  Min: {null_dist.min_val:.3f}")
+    logger.info(f"  Max: {null_dist.max_val:.3f}")
     
     return null_dist
 
@@ -236,11 +234,11 @@ def main():
     
     output_path = output_dir / f"{args.corpus_name}_null_dist.pkl"
     
-    with open(output_path, "wb") as f:
-        pickle.dump(null_dist, f)
+    output_path = output_dir / f"{args.corpus_name}_null_dist.pkl"
+    
+    # Use the save method from NullDistribution
+    null_dist.save(str(output_path))
     
     logger.info(f"Saved null distribution to {output_path}")
-
-
 if __name__ == "__main__":
     main()
