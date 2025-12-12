@@ -24,6 +24,8 @@ from typing import List, Dict, Any
 import numpy as np
 import requests
 
+from commaqa.hc.null_distribution import NullDistribution
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
