@@ -52,6 +52,7 @@ def retrieve_bm25_scores(
     retriever_port: int = 8000,
 ) -> List[float]:
     """Retrieve BM25 scores for a query."""
+    print(f"[ENTRY] retrieve_bm25_scores called with query='{query[:50]}...', corpus={corpus_name}")
     url = f"{retriever_host}:{retriever_port}/retrieve"
     
     params = {
@@ -127,10 +128,14 @@ def build_null_distribution(
     for i, item in enumerate(sampled_data):
         query = item.get("question", "")
         
+        print(f"[LOOP] Item {i+1}: question='{query[:50] if query else 'EMPTY'}'")
+        
         if not query.strip():
+            print(f"[SKIP] Empty query, skipping")
             continue
         
         logger.info(f"Processing query {i+1}/{len(sampled_data)}: {query[:50]}...")
+        print(f"[CALLING] About to call retrieve_bm25_scores")
         
         scores = retrieve_bm25_scores(
             query=query,
