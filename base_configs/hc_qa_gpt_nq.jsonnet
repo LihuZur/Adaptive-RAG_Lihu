@@ -52,7 +52,7 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "lm_server_host": llm_server_host,
       "lm_server_port": llm_server_port,
       "lm_server_model_name": "gpt-4o-mini",
-      "prompt_file": "prompts/nq/nor.txt",
+      "prompt_file": "prompts/nq/no_context_cot_qa_codex.txt",
       "disable_qm": true,
       "next_model": "[EOQ]",
     },
