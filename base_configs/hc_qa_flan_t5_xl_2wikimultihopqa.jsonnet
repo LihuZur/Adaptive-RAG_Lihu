@@ -28,9 +28,15 @@ local min_hc = std.parseJson(std.extVar("min_hc"));
 local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "_null_dist.pkl";
 
 {
-  "start_state": "hc_retrieve_and_select",
+  "start_state": "copy_question",
   "end_state": "[EOQ]",
   "models": {
+    "copy_question": {
+      "name": "copy_question",
+      "next_model": "hc_retrieve_and_select",
+      "eoq_after_n_calls": 1,
+      "end_state": "[EOQ]",
+    },
     "hc_retrieve_and_select": {
       "name": "hc_retrieve_and_select",
       "retriever_host": retriever_host,
