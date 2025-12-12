@@ -160,7 +160,7 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
             "document_type": self.document_type,
         }
 
-        url = self.retriever_host.rstrip("/") + ":" + str(self.retriever_port) + "/retrieve"
+        url = self.retriever_host.rstrip("/") + ":" + str(self.retriever_port) + "/retrieve/"
         result = safe_post_request(url, params)
 
         if not result.ok:

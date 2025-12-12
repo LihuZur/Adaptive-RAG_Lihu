@@ -52,7 +52,7 @@ def retrieve_bm25_scores(
     retriever_port: int = 8000,
 ) -> List[float]:
     """Retrieve BM25 scores for a query."""
-    url = f"{retriever_host}:{retriever_port}/retrieve"
+    url = f"{retriever_host}:{retriever_port}/retrieve/"
     
     params = {
         "retrieval_method": "retrieve_from_elasticsearch",
