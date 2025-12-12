@@ -122,9 +122,6 @@ def build_null_distribution(
         if not query.strip():
             print(f"[SKIP] Empty query, skipping")
             continue
-        
-        logger.info(f"Processing query {i+1}/{len(sampled_data)}: {query[:50]}...")
-        print(f"[CALLING] About to call retrieve_bm25_scores")
     for i, item in enumerate(sampled_data):
         query = item.get("question_text", "") or item.get("question", "")
         
@@ -133,7 +130,18 @@ def build_null_distribution(
         
         logger.info(f"Processing query {i+1}/{len(sampled_data)}: {query[:50]}...")
         
-        scores = retrieve_bm25_scores(en(all_scores)} scores so far")
+        scores = retrieve_bm25_scores(
+            query=query,
+            corpus_name=corpus_name,
+            retrieval_count=retrieval_per_query,
+            retriever_host=retriever_host,
+            retriever_port=retriever_port,
+        )
+        
+        all_scores.extend(scores)
+        
+        if (i + 1) % 10 == 0:
+            logger.info(f"Collected {len(all_scores)} scores so far")
     
     if not all_scores:
         raise ValueError("Failed to collect any BM25 scores")
