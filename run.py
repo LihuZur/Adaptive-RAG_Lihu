@@ -807,6 +807,11 @@ instantiation_schemes = {
         "bm25_retrieval_count": ["6"], # gpt: ['3'] flan: ["6"]
         "distractor_count": ['"1"'],
     },
+    "hc_qa": {
+        "bm25_retrieval_count": ["30"],  # Retrieve more candidates for HC selection
+        "gamma": ["0.1"],  # HC search window parameter
+        "min_hc": ["0.0"],  # Minimum HC statistic threshold
+    },
 }
 
 

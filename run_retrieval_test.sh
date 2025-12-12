@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Expected command line argument values.
-valid_systems=("ircot" "ircot_qa" "oner" "oner_qa" "nor_qa")
-valid_models=("flan-t5-xxl" "flan-t5-xl" 'gpt' "none")
+valid_systems=("ircot" "ircot_qa" "oner" "oner_qa" "nor_qa" "hc_qa")
+valid_models=("flan-t5-xxl" "flan-t5-xl" "flan-t5-base" "gpt" "none")
 valid_datasets=("hotpotqa" "2wikimultihopqa" "musique" 'nq' "trivia" "squad")
 
 # Function to check if an argument is valid

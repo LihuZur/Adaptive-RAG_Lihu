@@ -10,6 +10,7 @@ from commaqa.inference.ircot import (
     StepByStepLLMTitleGenParticipant,
     StepByStepExitControllerParticipant,
 )
+from commaqa.inference.hc_retrieval import HCRetrieveAndSelectParticipant
 
 MODEL_NAME_CLASS = {
     "answer_extractor": AnswerExtractor,
@@ -19,6 +20,7 @@ MODEL_NAME_CLASS = {
     "step_by_step_cot_gen": StepByStepCOTGenParticipant,
     "step_by_step_llm_title_gen": StepByStepLLMTitleGenParticipant,
     "step_by_step_exit_controller": StepByStepExitControllerParticipant,
+    "hc_retrieve_and_select": HCRetrieveAndSelectParticipant,
 }
 
 READER_NAME_CLASS: Dict[str, DatasetReader] = {

@@ -28,19 +28,35 @@ def cached_openai_call(  # kwargs doesn't work with caching.
     best_of,
     logprobs,
 ):
-    return openai.Completion.create(
-        prompt=prompt,
-        engine=engine,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        top_p=top_p,
-        frequency_penalty=frequency_penalty,
-        presence_penalty=presence_penalty,
-        stop=stop,
-        n=n,
-        best_of=best_of,
-        logprobs=logprobs,
-    )
+    # Use ChatCompletion API for chat models (gpt-4, gpt-4o, gpt-3.5-turbo variants except instruct)
+    is_chat_model = any(model in engine for model in ["gpt-4", "gpt-3.5-turbo"]) and "instruct" not in engine
+
+    if is_chat_model:
+        return openai.ChatCompletion.create(
+            model=engine,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+            frequency_penalty=frequency_penalty,
+            presence_penalty=presence_penalty,
+            stop=stop,
+            n=n,
+        )
+    else:
+        return openai.Completion.create(
+            prompt=prompt,
+            engine=engine,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+            frequency_penalty=frequency_penalty,
+            presence_penalty=presence_penalty,
+            stop=stop,
+            n=n,
+            best_of=best_of,
+            logprobs=logprobs,
+        )
 
 
 def openai_call(
@@ -56,27 +72,72 @@ def openai_call(
     best_of,
     logprobs,
 ):
-    function = cached_openai_call if temperature == 0 else openai.Completion.create
-    return function(
-        prompt=prompt,
-        engine=engine,
-        temperature=temperature,
-        max_tokens=max_tokens,
-        top_p=top_p,
-        frequency_penalty=frequency_penalty,
-        presence_penalty=presence_penalty,
-        stop=stop,
-        n=n,
-        best_of=best_of,
-        logprobs=logprobs,
-    )
+    # Use ChatCompletion API for chat models
+    is_chat_model = any(model in engine for model in ["gpt-4", "gpt-3.5-turbo"]) and "instruct" not in engine
+
+    if temperature == 0:
+        function = cached_openai_call
+        return function(
+            prompt=prompt,
+            engine=engine,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+            frequency_penalty=frequency_penalty,
+            presence_penalty=presence_penalty,
+            stop=stop,
+            n=n,
+            best_of=best_of,
+            logprobs=logprobs,
+        )
+    elif is_chat_model:
+        return openai.ChatCompletion.create(
+            model=engine,
+            messages=[{"role": "user", "content": prompt}],
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+            frequency_penalty=frequency_penalty,
+            presence_penalty=presence_penalty,
+            stop=stop,
+            n=n,
+        )
+    else:
+        return openai.Completion.create(
+            prompt=prompt,
+            engine=engine,
+            temperature=temperature,
+            max_tokens=max_tokens,
+            top_p=top_p,
+            frequency_penalty=frequency_penalty,
+            presence_penalty=presence_penalty,
+            stop=stop,
+            n=n,
+            best_of=best_of,
+            logprobs=logprobs,
+        )
 
 
 @lru_cache(maxsize=1)
 def get_gpt_tokenizer():
-    from transformers import GPT2Tokenizer
+    """Get tokenizer for counting GPT tokens"""
+    try:
+        import tiktoken
+        # Use tiktoken for accurate GPT token counting
+        encoding = tiktoken.get_encoding("cl100k_base")
 
-    return GPT2Tokenizer.from_pretrained("gpt2")
+        # Create a minimal wrapper with tokenize method
+        class TiktokenWrapper:
+            def __init__(self, enc):
+                self.enc = enc
+            def tokenize(self, text):
+                return self.enc.encode(text)
+
+        return TiktokenWrapper(encoding)
+    except ImportError:
+        # Fallback to GPT-2 tokenizer if tiktoken not available
+        from transformers import GPT2Tokenizer
+        return GPT2Tokenizer.from_pretrained("gpt2")
 
 
 class GPT3Generator:
@@ -117,10 +178,15 @@ class GPT3Generator:
         #         "Using it for other paid models is risky and so is disabled."
         #     )
 
+        # Set context limits based on model
         if "code-davinci" in engine:
             self.model_tokens_limit = 8000
+        elif "gpt-4o" in engine:
+            self.model_tokens_limit = 120000  # GPT-4o/4o-mini: 128K context
+        elif "gpt-4" in engine:
+            self.model_tokens_limit = 120000  # GPT-4: 128K context (for turbo variants)
         else:
-            self.model_tokens_limit = 3500 #2000
+            self.model_tokens_limit = 3500  # GPT-3.5 and others
 
     def generate_text_sequence(self, prompt):
         """
@@ -200,8 +266,15 @@ class GPT3Generator:
 
         output_seq_score = []
 
+        # Check if this is a ChatCompletion response
+        is_chat_response = "message" in response["choices"][0] if response["choices"] else False
+
         for index, choice in enumerate(response["choices"]):
-            if "logprobs" in choice and "token_logprobs" in choice["logprobs"]:
+            # Extract text based on response type
+            if is_chat_response:
+                text = choice["message"]["content"]
+                output_seq_score.append((text, index))
+            elif "logprobs" in choice and "token_logprobs" in choice["logprobs"]:
                 probs = []
                 for prob, tok in zip(choice["logprobs"]["token_logprobs"], choice["logprobs"]["tokens"]):
                     if tok not in self.stop and tok != "<|endoftext|>":
@@ -216,3 +289,4 @@ class GPT3Generator:
                 output_seq_score.append((choice["text"], index))
 
         return sorted(output_seq_score, key=lambda x: x[1])
+
