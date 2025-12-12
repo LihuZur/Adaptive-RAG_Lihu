@@ -24,7 +24,7 @@ from typing import List, Dict, Any
 import numpy as np
 import requests
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -52,7 +52,7 @@ def retrieve_bm25_scores(
     retriever_port: int = 8000,
 ) -> List[float]:
     """Retrieve BM25 scores for a query."""
-    url = f"{retriever_host}:{retriever_port}/retrieve/"
+    url = f"{retriever_host}:{retriever_port}/retrieve"
     
     params = {
         "retrieval_method": "retrieve_from_elasticsearch",
@@ -63,11 +63,15 @@ def retrieve_bm25_scores(
     }
     
     try:
+        logger.debug(f"Calling URL: {url}")
+        logger.debug(f"Params: {params}")
         response = requests.post(url, json=params, timeout=30)
         response.raise_for_status()
         
         result = response.json()
+        logger.debug(f"Response keys: {result.keys()}")
         retrieval = result.get("retrieval", [])
+        logger.debug(f"Retrieved {len(retrieval)} items")
         
         scores = []
         for item in retrieval:
@@ -75,10 +79,14 @@ def retrieve_bm25_scores(
                 score = item.get("score", 0.0)
                 scores.append(score)
         
+        logger.debug(f"Extracted {len(scores)} scores")
         return scores
     
     except Exception as e:
-        logger.warning(f"Retrieval failed for query '{query[:50]}...': {e}")
+        logger.error(f"Retrieval failed for query '{query[:50]}...': {e}")
+        logger.error(f"URL: {url}")
+        logger.error(f"Response status: {getattr(response, 'status_code', 'N/A')}")
+        logger.error(f"Response text: {getattr(response, 'text', 'N/A')[:500]}")
         return []
 
 
