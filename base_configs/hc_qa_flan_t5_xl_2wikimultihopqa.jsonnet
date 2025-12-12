@@ -8,7 +8,7 @@ local dataset_name = "2wikimultihopqa";
 local bm25_retrieval_count = std.extVar("bm25_retrieval_count");
 local gamma = std.parseJson(std.extVar("gamma"));
 local min_hc = std.parseJson(std.extVar("min_hc"));
-local null_dist_path = "data/hc_null_distributions/" + corpus_name + "_null_dist.pkl";
+local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "_null_dist.pkl";
 
 {
   "start_state": "hc_retrieve_and_select",

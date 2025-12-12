@@ -49,7 +49,7 @@ def retrieve_bm25_scores(
     corpus_name: str,
     retrieval_count: int = 100,
     retriever_host: str = "http://127.0.0.1",
-    retriever_port: int = 9200,
+    retriever_port: int = 8000,
 ) -> List[float]:
     """Retrieve BM25 scores for a query."""
     url = f"{retriever_host}:{retriever_port}/retrieve"
@@ -88,7 +88,7 @@ def build_null_distribution(
     num_queries: int = 100,
     retrieval_per_query: int = 100,
     retriever_host: str = "http://127.0.0.1",
-    retriever_port: int = 9200,
+    retriever_port: int = 8000,
 ) -> Dict[str, Any]:
     """
     Build null distribution by retrieving documents for random queries.
@@ -200,8 +200,8 @@ def main():
     parser.add_argument(
         "--retriever_port",
         type=int,
-        default=9200,
-        help="Retriever port (default: 9200)",
+        default=8000,
+        help="Retriever port (default: 8000)",
     )
     parser.add_argument(
         "--output_dir",
