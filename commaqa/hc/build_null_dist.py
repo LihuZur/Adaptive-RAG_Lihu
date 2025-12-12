@@ -63,15 +63,15 @@ def retrieve_bm25_scores(
     }
     
     try:
-        logger.debug(f"Calling URL: {url}")
-        logger.debug(f"Params: {params}")
+        print(f"[DEBUG] Calling URL: {url}")
+        print(f"[DEBUG] Params: {params}")
         response = requests.post(url, json=params, timeout=30)
         response.raise_for_status()
         
         result = response.json()
-        logger.debug(f"Response keys: {result.keys()}")
+        print(f"[DEBUG] Response keys: {result.keys()}")
         retrieval = result.get("retrieval", [])
-        logger.debug(f"Retrieved {len(retrieval)} items")
+        print(f"[DEBUG] Retrieved {len(retrieval)} items")
         
         scores = []
         for item in retrieval:
@@ -79,14 +79,16 @@ def retrieve_bm25_scores(
                 score = item.get("score", 0.0)
                 scores.append(score)
         
-        logger.debug(f"Extracted {len(scores)} scores")
+        print(f"[DEBUG] Extracted {len(scores)} scores")
         return scores
     
     except Exception as e:
-        logger.error(f"Retrieval failed for query '{query[:50]}...': {e}")
-        logger.error(f"URL: {url}")
-        logger.error(f"Response status: {getattr(response, 'status_code', 'N/A')}")
-        logger.error(f"Response text: {getattr(response, 'text', 'N/A')[:500]}")
+        print(f"[ERROR] Retrieval failed for query '{query[:50]}...': {e}")
+        print(f"[ERROR] URL: {url}")
+        print(f"[ERROR] Response status: {getattr(response, 'status_code', 'N/A')}")
+        print(f"[ERROR] Response text: {getattr(response, 'text', 'N/A')[:500]}")
+        import traceback
+        traceback.print_exc()
         return []
 
 
