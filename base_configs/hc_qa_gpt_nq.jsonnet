@@ -3,7 +3,7 @@ local retriever_host = std.extVar("RETRIEVER_HOST");
 local retriever_port = std.extVar("RETRIEVER_PORT");
 local llm_server_host = std.extVar("LLM_SERVER_HOST");
 local llm_server_port = std.extVar("LLM_SERVER_PORT");
-local corpus_name = "nq";
+local corpus_name = "wiki";
 local dataset_name = "nq";
 local valid_qids = {
     "hotpotqa": ["5ab92dba554299131ca422a2","5a7bbc50554299042af8f7d0","5add363c5542990dbb2f7dc8","5a835abe5542996488c2e426","5ae0185b55429942ec259c1b","5a790e7855429970f5fffe3d","5a754ab35542993748c89819","5a89c14f5542993b751ca98a","5abb14bd5542992ccd8e7f07","5a89d58755429946c8d6e9d9","5a88f9d55542995153361218","5a90620755429933b8a20508","5a77acab5542992a6e59df76","5abfb3435542990832d3a1c1","5a8f44ab5542992414482a25","5adfad0c554299603e41835a","5a7fc53555429969796c1b55","5a8ed9f355429917b4a5bddd","5ac2ada5554299657fa2900d","5a758ea55542992db9473680"],
