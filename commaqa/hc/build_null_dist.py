@@ -84,7 +84,7 @@ def retrieve_bm25_scores(
         
         scores = []
         for item in retrieval:
-            if item.get("corpus_name") == corpus_name:
+            if item.get("corpus_name") == actual_corpus:
                 score = item.get("score", 0.0)
                 scores.append(score)
         
