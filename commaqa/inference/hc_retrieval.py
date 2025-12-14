@@ -73,11 +73,16 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
         if source_corpus_name is None:
             raise ValueError("source_corpus_name is required")
 
+        # Type conversion and debug prints
+        print("[HC DEBUG] gamma:", gamma, type(gamma))
+        print("[HC DEBUG] min_hc:", min_hc, type(min_hc))
+        print("[HC DEBUG] retrieval_count:", retrieval_count, type(retrieval_count))
+
         self.retriever_host = retriever_host
         self.retriever_port = retriever_port
-        self.retrieval_count = retrieval_count
-        self.gamma = gamma
-        self.min_hc = min_hc
+        self.retrieval_count = int(retrieval_count)
+        self.gamma = float(gamma)
+        self.min_hc = float(min_hc)
         self.query_source = query_source
         self.source_corpus_name = source_corpus_name
         self.document_type = document_type
