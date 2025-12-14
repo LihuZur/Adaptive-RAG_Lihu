@@ -56,11 +56,22 @@ def retrieve_bm25_scores(
     """Retrieve BM25 scores for a query."""
     url = f"{retriever_host}:{retriever_port}/retrieve"
     
+    # Map dataset names to actual corpus names in Elasticsearch
+    corpus_mapping = {
+        "nq": "wiki",
+        "trivia": "wiki",
+        "squad": "wiki",
+        "hotpotqa": "hotpotqa",
+        "2wikimultihopqa": "2wikimultihopqa",
+        "musique": "musique",
+    }
+    actual_corpus = corpus_mapping.get(corpus_name, corpus_name)
+    
     params = {
         "retrieval_method": "retrieve_from_elasticsearch",
         "query_text": query,
         "max_hits_count": retrieval_count,
-        "corpus_name": corpus_name,
+        "corpus_name": actual_corpus,
         "document_type": "title_paragraph_text",
     }
     
