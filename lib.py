@@ -47,7 +47,7 @@ def get_roscoe_server_address(suffix: str = ""):
 def infer_dataset_from_file_path(file_path: str) -> str:
     matching_datasets = []
     file_path = str(file_path)
-    for dataset in ["hotpotqa", "2wikimultihopqa", "musique", "iirc", 'nq', 'trivia', 'squad', 'temp', 'sciq', 'cpgqa', 'tydiqa', 'sleepqa', 'popqa']:
+    for dataset in ["hotpotqa", "2wikimultihopqa", "musique", "iirc", 'nq', 'trivia', 'squad', 'temp', 'sciq', 'cpgqa', 'tydiqa', 'sleepqa', 'popqa', 'crossentityqa']:
         if dataset.lower() in file_path.lower():
             matching_datasets.append(dataset)
     if not matching_datasets:

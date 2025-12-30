@@ -49,6 +49,11 @@ def timed(func):
 
 dataset_to_prompt_set_to_qids = {
 "squad": {
+"crossentityqa": {
+    "1": [],
+    "2": [],
+    "3": [],
+},
         "1": [
             "5abb14bd5542992ccd8e7f07",
             "5ac2ada5554299657fa2900d",

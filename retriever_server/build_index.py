@@ -213,6 +213,60 @@ def make_musique_documents(elasticsearch_index: str, metadata: Dict = None):
                     yield (document)
                     metadata["idx"] += 1
 
+def make_crossentityqa_documents(elasticsearch_index: str, metadata: Dict = None):
+    # Assumes CrossEntityQA is in ../Downloads/CrossEntityQA or ./CrossEntityQA
+    # Try both locations for robustness
+    import pathlib
+    base_dirs = [
+        os.path.join(os.getcwd(), "CrossEntityQA"),
+        os.path.expanduser(os.path.join("~", "Downloads", "CrossEntityQA")),
+    ]
+    corpus_path = None
+    for base in base_dirs:
+        candidate = os.path.join(base, "corpus.jsonl")
+        if os.path.exists(candidate):
+            corpus_path = candidate
+            break
+    if corpus_path is None:
+        raise FileNotFoundError("Could not find CrossEntityQA/corpus.jsonl in expected locations.")
+
+    metadata = metadata or {"idx": 1}
+    assert "idx" in metadata
+
+    used_full_ids = set()
+    with open(corpus_path, "r") as f:
+        for line in tqdm(f, desc="Indexing CrossEntityQA passages"):
+            if not line.strip():
+                continue
+            instance = json.loads(line)
+            # Expect fields: id, title, text (or paragraph_text), url (optional)
+            title = instance.get("title", "")
+            paragraph_text = instance.get("text") or instance.get("paragraph_text") or ""
+            url = instance.get("url", "")
+            full_id = hash_object(" ".join([title, paragraph_text]))
+            if full_id in used_full_ids:
+                continue
+            used_full_ids.add(full_id)
+            id_ = full_id[:32]
+            paragraph_index = 0
+            is_abstract = True
+            es_paragraph = {
+                "id": id_,
+                "title": title,
+                "paragraph_index": paragraph_index,
+                "paragraph_text": paragraph_text,
+                "url": url,
+                "is_abstract": is_abstract,
+            }
+            document = {
+                "_op_type": "create",
+                "_index": elasticsearch_index,
+                "_id": metadata["idx"],
+                "_source": es_paragraph,
+            }
+            yield (document)
+            metadata["idx"] += 1
+
 def make_wiki_documents(elasticsearch_index: str, metadata: Dict = None):
     raw_glob_filepath = os.path.join("raw_data", "wiki", 'psgs_w100.tsv')
     metadata = metadata or {"idx": 1}
@@ -259,7 +313,7 @@ if __name__ == "__main__":
         "dataset_name",
         help="name of the dataset",
         type=str,
-        choices=("hotpotqa", "iirc", "2wikimultihopqa", "musique", 'nq', 'wiki', 'trivia', 'squad'),
+        choices=("hotpotqa", "iirc", "2wikimultihopqa", "musique", 'nq', 'wiki', 'trivia', 'squad', 'crossentityqa'),
     )
     parser.add_argument(
         "--force",
@@ -326,7 +380,9 @@ if __name__ == "__main__":
     elif args.dataset_name == "musique":
         make_documents = make_musique_documents
     elif args.dataset_name == "wiki":
-        make_documents = make_wiki_documents 
+        make_documents = make_wiki_documents
+    elif args.dataset_name == "crossentityqa":
+        make_documents = make_crossentityqa_documents
     else:
         raise Exception(f"Unknown dataset_name {args.dataset_name}")
 
