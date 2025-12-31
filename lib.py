@@ -68,9 +68,9 @@ def infer_source_target_prefix(config_filepath: str, evaluation_path: str) -> st
 def get_config_file_path_from_name_or_path(experiment_name_or_path: str) -> str:
     if not experiment_name_or_path.endswith(".jsonnet"):
         # It's a name
-        assert (
-            len(experiment_name_or_path.split(os.path.sep)) == 1
-        ), "Experiment name shouldn't contain any path separators."
+        if len(experiment_name_or_path.split(os.path.sep)) != 1:
+            print(f"[ERROR] Experiment name shouldn't contain any path separators: {experiment_name_or_path}")
+            exit(1)
         matching_result = list(Path(".").rglob("**/*" + experiment_name_or_path + ".jsonnet"))
         matching_result = [
             _result
@@ -78,17 +78,26 @@ def get_config_file_path_from_name_or_path(experiment_name_or_path: str) -> str:
             if os.path.splitext(os.path.basename(_result))[0] == experiment_name_or_path
         ]
         matching_result = [i for i in matching_result if 'backup' not in str(i)]
-        #import pdb; pdb.set_trace()
-        assert len(matching_result) == 1 
-        
-        if len(matching_result) != 1:
-            #import pdb; pdb.set_trace()
-            exit(f"Couldn't find one matching path with the given name ({experiment_name_or_path}).")
+        if len(matching_result) == 0:
+            print(f"[ERROR] No config file found for name '{experiment_name_or_path}'. Searched for files named '{experiment_name_or_path}.jsonnet' (excluding backups).\nAvailable config files:")
+            for f in Path(".").rglob("*.jsonnet"):
+                if 'backup' not in str(f):
+                    print(f"  - {f}")
+            exit(1)
+        elif len(matching_result) > 1:
+            print(f"[ERROR] Multiple config files found for name '{experiment_name_or_path}':")
+            for f in matching_result:
+                print(f"  - {f}")
+            print("Please use a more specific name or provide the full path.")
+            exit(1)
         config_filepath = matching_result[0]
     else:
         # It's a path
+        if not os.path.exists(experiment_name_or_path):
+            print(f"[ERROR] Config file path does not exist: {experiment_name_or_path}")
+            exit(1)
         config_filepath = experiment_name_or_path
-    return config_filepath
+    return str(config_filepath)
 
 
 def read_json(file_path: str) -> Dict:
