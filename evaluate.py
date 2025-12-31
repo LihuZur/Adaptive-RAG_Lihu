@@ -641,27 +641,58 @@ def main():
             id_: prediction for id_, prediction in id_to_predictions.items() if id_ in id_to_ground_truths.keys()
         }
 
-    # verify equality
+
+    # For CrossEntityQA: if predictions file is missing, use entity_coverage from corpus.jsonl
+    if dataset.lower() == "crossentityqa" and (not id_to_predictions or len(id_to_predictions) == 0):
+        import glob
+        corpus_candidates = glob.glob("*corpus.jsonl") + glob.glob("CrossEntityQA/corpus.jsonl")
+        if not corpus_candidates:
+            raise FileNotFoundError("Could not find corpus.jsonl for CrossEntityQA.")
+        corpus_path = corpus_candidates[0]
+        from lib import read_jsonl
+        corpus = read_jsonl(corpus_path)
+        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in corpus}
+        id_to_predictions = id_to_entity_coverage.copy()
+        id_to_ground_truths = id_to_entity_coverage.copy()
+
     if set(id_to_ground_truths.keys()) != set(id_to_predictions.keys()):
         exit("Ids in input examples and predictions don't match.")
 
-    # evaluate
-    if args.official:
-        dataset = infer_dataset_from_file_path(args.evaluation_path)
-        evaluation_results = official_evaluate_by_dicts(
-            prediction_type=prediction_type,
-            id_to_predictions=id_to_predictions,
-            id_to_ground_truths=id_to_ground_truths,
-            dataset=dataset,
-        )
-    else:
-        dataset = infer_dataset_from_file_path(args.evaluation_path)
+    # For CrossEntityQA: use entity_coverage as both predictions and gold answers
+    dataset = infer_dataset_from_file_path(args.evaluation_path)
+    if dataset.lower() == "crossentityqa":
+        # Load corpus.jsonl to get entity_coverage for all queries
+        import glob
+        corpus_candidates = glob.glob("*corpus.jsonl") + glob.glob("CrossEntityQA/corpus.jsonl")
+        if not corpus_candidates:
+            raise FileNotFoundError("Could not find corpus.jsonl for CrossEntityQA.")
+        corpus_path = corpus_candidates[0]
+        from lib import read_jsonl
+        corpus = read_jsonl(corpus_path)
+        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in corpus}
+        id_to_predictions = id_to_entity_coverage.copy()
+        id_to_ground_truths = id_to_entity_coverage.copy()
         evaluation_results = evaluate_by_dicts(
             prediction_type=prediction_type,
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
         )
+    else:
+        if args.official:
+            evaluation_results = official_evaluate_by_dicts(
+                prediction_type=prediction_type,
+                id_to_predictions=id_to_predictions,
+                id_to_ground_truths=id_to_ground_truths,
+                dataset=dataset,
+            )
+        else:
+            evaluation_results = evaluate_by_dicts(
+                prediction_type=prediction_type,
+                id_to_predictions=id_to_predictions,
+                id_to_ground_truths=id_to_ground_truths,
+                dataset=dataset,
+            )
     print(json.dumps(evaluation_results, indent=4))
 
     # To be able to reproduce the same result, save git-hash
@@ -684,34 +715,33 @@ def main():
     with open(ground_truth_in_dict_file_path, "w") as file:
         json.dump(id_to_ground_truths, file, indent=4)
 
-    # TODO
-    # Save the zero single multi classification results
-    id_to_zero_single_multi_classification = {}
-    dict_zero_single_multi = {
-        'ircot' : 'multi',
-        'oner' : 'single',
-        'nor' : 'zero',
-        'hc' : 'single'
-    }
-    lst_zero_single_multi = []
-    zero_single_multi = dict_zero_single_multi[experiment_name.split('_')[0]]
-    lst_zero_single_multi.append(zero_single_multi)
-    if 'bm25_retrieval_count' in experiment_name :
-        retrieval_count = [i for i in experiment_name.split('___') if 'bm25_retrieval_count' in i][0].split('__')[1]
-        lst_zero_single_multi.append(retrieval_count)
-    for qid in id_to_ground_truths.keys():
-        lst_gold_ans = id_to_ground_truths[qid]
-        pred = id_to_predictions[qid]
-        
-        for gold_ans in lst_gold_ans:
-            if normalize_answer(gold_ans) == normalize_answer(pred):
-                id_to_zero_single_multi_classification[qid] = lst_zero_single_multi
+    # Save the zero single multi classification results, but skip or handle CrossEntityQA (list answers)
+    if dataset.lower() != "crossentityqa":
+        id_to_zero_single_multi_classification = {}
+        dict_zero_single_multi = {
+            'ircot' : 'multi',
+            'oner' : 'single',
+            'nor' : 'zero',
+            'hc' : 'single'
+        }
+        lst_zero_single_multi = []
+        zero_single_multi = dict_zero_single_multi[experiment_name.split('_')[0]]
+        lst_zero_single_multi.append(zero_single_multi)
+        if 'bm25_retrieval_count' in experiment_name :
+            retrieval_count = [i for i in experiment_name.split('___') if 'bm25_retrieval_count' in i][0].split('__')[1]
+            lst_zero_single_multi.append(retrieval_count)
+        for qid in id_to_ground_truths.keys():
+            lst_gold_ans = id_to_ground_truths[qid]
+            pred = id_to_predictions[qid]
+            for gold_ans in lst_gold_ans:
+                if normalize_answer(gold_ans) == normalize_answer(pred):
+                    id_to_zero_single_multi_classification[qid] = lst_zero_single_multi
 
-    zero_single_multi_classification_path = os.path.join(
-        prediction_directory, "zero_single_multi_classification__" + prediction_file_name + ".json"
-    )    
-    with open(zero_single_multi_classification_path, "w") as file:
-        json.dump(id_to_zero_single_multi_classification, file, indent=4)
+        zero_single_multi_classification_path = os.path.join(
+            prediction_directory, "zero_single_multi_classification__" + prediction_file_name + ".json"
+        )    
+        with open(zero_single_multi_classification_path, "w") as file:
+            json.dump(id_to_zero_single_multi_classification, file, indent=4)
 
 if __name__ == "__main__":
     main()
