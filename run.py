@@ -48,12 +48,12 @@ def timed(func):
     return wrapper
 
 dataset_to_prompt_set_to_qids = {
-"squad": {
 "crossentityqa": {
     "1": [],
     "2": [],
     "3": [],
 },
+"squad": {
         "1": [
             "5abb14bd5542992ccd8e7f07",
             "5ac2ada5554299657fa2900d",
@@ -965,6 +965,19 @@ def is_experiment_complete(
         num_complete_items = sum([bool(value) for key, value in predictions.items()])
     return num_complete_items / len(predictions) > 0.9
 
+def load_crossentityqa_qids():
+    """
+    Dynamically loads all query_ids from queries.jsonl for CrossEntityQA.
+    Returns a dict with keys "1", "2", "3" (all identical, for compatibility).
+    """
+    queries_path = os.path.join(os.path.dirname(__file__), "CrossEntityQA", "queries.jsonl")
+    qids = []
+    with open(queries_path, "r") as f:
+        for line in f:
+            obj = json.loads(line)
+            qids.append(obj["query_id"])
+    return {"1": qids, "2": qids, "3": qids}
+
 @timed
 def main():
 
@@ -1627,6 +1640,9 @@ def main():
             else:
                 print(f"Best HP prediction path {prediction_file_path} is not available.")
 
+# In main(), before using dataset_to_prompt_set_to_qids["crossentityqa"], ensure it's loaded:
+# if inferred_dataset == "crossentityqa" and dataset_to_prompt_set_to_qids["crossentityqa"] in (None, {"1": [], "2": [], "3": []}):
+#     dataset_to_prompt_set_to_qids["crossentityqa"] = load_crossentityqa_qids()
 
 if __name__ == "__main__":
     main()
