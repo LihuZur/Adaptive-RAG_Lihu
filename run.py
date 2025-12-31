@@ -1227,11 +1227,18 @@ def main():
         if hasattr(args, "instantiation_scheme") and "crossentityqa" in str(args.instantiation_scheme).lower():
             if (evaluation_path is None or "dev_500_subsampled" in str(evaluation_path) or not os.path.exists(evaluation_path)):
                 repo_root = os.path.dirname(os.path.abspath(__file__))
+                cwd = os.getcwd()
                 candidates = [
                     os.path.join(repo_root, "CrossEntityQA", "queries.jsonl"),
                     os.path.join(repo_root, "crossentityqa", "queries.jsonl"),
                     os.path.join(repo_root, "data", "CrossEntityQA", "queries.jsonl"),
                     os.path.join(repo_root, "data", "crossentityqa", "queries.jsonl"),
+                    os.path.join(cwd, "CrossEntityQA", "queries.jsonl"),
+                    os.path.join(cwd, "crossentityqa", "queries.jsonl"),
+                    os.path.join(cwd, "data", "CrossEntityQA", "queries.jsonl"),
+                    os.path.join(cwd, "data", "crossentityqa", "queries.jsonl"),
+                    os.path.abspath("CrossEntityQA/queries.jsonl"),
+                    os.path.abspath("crossentityqa/queries.jsonl"),
                 ]
                 for candidate in candidates:
                     if os.path.exists(candidate):
@@ -1239,7 +1246,7 @@ def main():
                         evaluation_path = candidate
                         break
                 else:
-                    raise ValueError("No CrossEntityQA/queries.jsonl or crossentityqa/queries.jsonl found in any expected location.")
+                    raise ValueError("No CrossEntityQA/queries.jsonl or crossentityqa/queries.jsonl found in any expected location. Checked: " + str(candidates))
 
         if hasattr(args, "use_backup") and args.use_backup:
             prediction_directory += "__backup"
