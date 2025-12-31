@@ -192,6 +192,12 @@ class LLMClientGenerator:
         import logging
         logger = logging.getLogger(__name__)
         prompt_trunc = prompt[:120].replace('\n', ' ')
+        # Force logger to INFO level and add StreamHandler if not present
+        if not logger.hasHandlers():
+            handler = logging.StreamHandler()
+            handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s'))
+            logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
         logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt_trunc} ...")
         """
         :param input_text:
