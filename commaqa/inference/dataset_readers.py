@@ -133,9 +133,10 @@ class MultiParaRCReader(DatasetReader):
                 if is_crossentityqa:
                     qid = input_instance["query_id"]
                     query = question = input_instance["query_text"]
-                    answer = input_instance.get("answers")
-                    if answer is None:
-                        print(f"[DEBUG] CrossEntityQA entry with query_id={qid} has no 'answers' field or is None.")
+                    # Use 'entity_coverage' as the answer for CrossEntityQA
+                    answer = input_instance.get("entity_coverage", [])
+                    if not answer:
+                        print(f"[DEBUG] CrossEntityQA entry with query_id={qid} has empty or missing 'entity_coverage' field.")
                     output_instance = {
                         "qid": qid,
                         "query": query,

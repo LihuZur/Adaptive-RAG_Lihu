@@ -56,6 +56,7 @@ local rc_qa_type = "cot";
       "engine": "gpt-4o-mini",
       "retry_after_n_seconds": 50,
       "add_context": true,
+      "answer_is_numbered_list": true,
     },
     "extract_answer": {
       "name": "answer_extractor",

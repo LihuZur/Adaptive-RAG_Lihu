@@ -59,6 +59,7 @@ local qa_question_prefix = (
             "multi_step_show_paras": multi_step_show_paras,
             "multi_step_show_cot": multi_step_show_cot,
             "end_state": "[EOQ]",
+            "answer_is_numbered_list": true,
         },
     },
     "prompt_reader_args": prompt_reader_args,

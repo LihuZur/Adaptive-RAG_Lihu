@@ -55,6 +55,7 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "retry_after_n_seconds": 50,
       "add_context": true,
       "next_model": "[EOQ]",
+      "answer_is_numbered_list": true,
     },
   },
   "reader": {

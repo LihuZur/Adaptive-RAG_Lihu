@@ -43,6 +43,7 @@ local qa_question_prefix = (
             "return_pids": false,
             "cumulate_titles": true,
             "end_state": "[EOQ]",
+            "answer_is_numbered_list": true,
         },
     },
     "prompt_reader_args": prompt_reader_args,

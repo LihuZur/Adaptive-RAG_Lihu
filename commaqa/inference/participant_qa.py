@@ -81,6 +81,16 @@ class LLMQAParticipantModel(ParticipantModel):
         return {"llm_qa": self.num_calls}
 
     def update_state(self, answer, state):
+        # For CrossEntityQA, always output a list of QIDs (split if needed)
+        import re
+        dataset = getattr(state, 'dataset', None)
+        if dataset is None and 'dataset' in state.data:
+            dataset = state.data['dataset']
+        if dataset and str(dataset).lower() == 'crossentityqa':
+            # If answer is a string, split on comma/space and filter QIDs
+            if isinstance(answer, str):
+                qids = re.findall(r'Q\d+', answer)
+                answer = qids
         if not self.allow_empty_answers and answer == "":
             print("WARNING: Generate empty answer.")
             return []
