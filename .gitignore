@@ -3,6 +3,8 @@
 raw_data/
 processed_data/
 predictions/
+!predictions/CrossEntityQA/
+!predictions/CrossEntityQA/**
 data/
 outputs/
 instantiated_configs/
