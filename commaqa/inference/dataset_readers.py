@@ -139,6 +139,7 @@ class MultiParaRCReader(DatasetReader):
                         "query": query,
                         "answer": answer,
                         "question": question,
+                        "metadata": {},  # Ensure metadata key exists for downstream compatibility
                     }
                     yield output_instance
                 else:
