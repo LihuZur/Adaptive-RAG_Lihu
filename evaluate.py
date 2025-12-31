@@ -602,13 +602,13 @@ def main():
     # For CrossEntityQA: if predictions file is missing, use entity_coverage from corpus.jsonl
     if dataset.lower() == "crossentityqa" and (not id_to_predictions or len(id_to_predictions) == 0):
         import glob
-        corpus_candidates = glob.glob("*corpus.jsonl") + glob.glob("CrossEntityQA/corpus.jsonl")
-        if not corpus_candidates:
-            raise FileNotFoundError("Could not find corpus.jsonl for CrossEntityQA.")
-        corpus_path = corpus_candidates[0]
+        queries_candidates = glob.glob("*queries.jsonl") + glob.glob("CrossEntityQA/queries.jsonl")
+        if not queries_candidates:
+            raise FileNotFoundError("Could not find queries.jsonl for CrossEntityQA.")
+        queries_path = queries_candidates[0]
         from lib import read_jsonl
-        corpus = read_jsonl(corpus_path)
-        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in corpus}
+        queries = read_jsonl(queries_path)
+        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in queries}
         id_to_predictions = id_to_entity_coverage.copy()
         id_to_ground_truths = id_to_entity_coverage.copy()
 
@@ -617,15 +617,15 @@ def main():
 
     # For CrossEntityQA: use entity_coverage as both predictions and gold answers
     if dataset.lower() == "crossentityqa":
-        # Load corpus.jsonl to get entity_coverage for all queries
+        # Load queries.jsonl to get entity_coverage for all queries
         import glob
-        corpus_candidates = glob.glob("*corpus.jsonl") + glob.glob("CrossEntityQA/corpus.jsonl")
-        if not corpus_candidates:
-            raise FileNotFoundError("Could not find corpus.jsonl for CrossEntityQA.")
-        corpus_path = corpus_candidates[0]
+        queries_candidates = glob.glob("*queries.jsonl") + glob.glob("CrossEntityQA/queries.jsonl")
+        if not queries_candidates:
+            raise FileNotFoundError("Could not find queries.jsonl for CrossEntityQA.")
+        queries_path = queries_candidates[0]
         from lib import read_jsonl
-        corpus = read_jsonl(corpus_path)
-        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in corpus}
+        queries = read_jsonl(queries_path)
+        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in queries}
         id_to_predictions = id_to_entity_coverage.copy()
         id_to_ground_truths = id_to_entity_coverage.copy()
         evaluation_results = evaluate_by_dicts(
