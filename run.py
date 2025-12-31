@@ -1154,7 +1154,11 @@ def main():
     if inferred_dataset == "crossentityqa":
         if not dataset_to_prompt_set_to_qids["crossentityqa"] or not dataset_to_prompt_set_to_qids["crossentityqa"].get("1"):
             dataset_to_prompt_set_to_qids["crossentityqa"] = load_crossentityqa_qids()
-    valid_qids = dataset_to_prompt_set_to_qids[inferred_dataset][_prompt_set]
+    valid_qids = None
+    if inferred_dataset in dataset_to_prompt_set_to_qids:
+        qid_entry = dataset_to_prompt_set_to_qids[inferred_dataset]
+        if qid_entry and _prompt_set in qid_entry and qid_entry[_prompt_set]:
+            valid_qids = qid_entry[_prompt_set]
     variable_replacements = {}
     if valid_qids is not None:
         variable_replacements = {"valid_qids": json.dumps(valid_qids)}
