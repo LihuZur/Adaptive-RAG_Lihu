@@ -82,7 +82,7 @@ def read_prompt(
         examples = valid_examples
 
     if order_by_key:
-        examples = sorted(examples, key=lambda example: filter_by_key_values[key].index(example[key]))
+        examples = sorted(examples, key=lambda example, key=key: filter_by_key_values[key].index(example[key]))
         assert not shuffle
 
     prompt_examples_texts = ["".join(example["lines"]).strip() for example in examples]
