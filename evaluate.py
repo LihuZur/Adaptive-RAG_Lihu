@@ -53,115 +53,14 @@ def answer_extractor(potentially_cot: str) -> str:
     if potentially_cot.startswith('"') and potentially_cot.endswith('"'):
         potentially_cot = potentially_cot[1:-1]
 
+
     cot_regex = re.compile(".* answer is:? (.*)\\.?")
     match = cot_regex.match(potentially_cot)
-    def main():
-        # ...existing code...
-        dataset = None
-        if args.dataset == "hotpotqa":
-            dataset = load_hotpotqa(args)
-        elif args.dataset == "2wikimultihopqa":
-            dataset = load_2wikimultihopqa(args)
-        elif args.dataset == "musique":
-            dataset = load_musique(args)
-        elif args.dataset == "nq":
-            dataset = load_nq(args)
-        elif args.dataset == "trivia":
-            dataset = load_trivia(args)
-        elif args.dataset == "squad":
-            dataset = load_squad(args)
-        elif args.dataset == "crossentityqa":
-            dataset = load_crossentityqa(args)
-        if dataset is None:
-            raise ValueError(f"Unknown or unsupported dataset: {args.dataset}")
-        # ...existing code...
-        # Evaluate predictions
-        results = evaluate_predictions(dataset, predictions, args)
-        # ...existing code...
-    elif prediction_type in ("titles", "pids", "real_pids"):
-        metrics = [SupportEmF1Metric()]
-    elif prediction_type in ("paras"):
-        metrics = [AnswerSupportRecallMetric()]
-
-    for id_ in set(id_to_ground_truths.keys()):
-        ground_truth = id_to_ground_truths[id_]
-        prediction = id_to_predictions[id_]
-
-        # Special handling for CrossEntityQA: compare sets of QIDs, skip normalization
-        if dataset.lower() == "crossentityqa":
-            # Ensure both are lists
-            if not isinstance(ground_truth, list):
-                ground_truth = [ground_truth]
-            if not isinstance(prediction, list):
-                prediction = [prediction]
-            # Convert to sets of strings (QIDs)
-            gt_set = set(str(e) for e in ground_truth)
-            pred_set = set(str(e) for e in prediction)
-            # Compute exact match and F1 as set overlap
-            intersection = len(gt_set & pred_set)
-            precision = intersection / len(pred_set) if pred_set else 0.0
-            recall = intersection / len(gt_set) if gt_set else 0.0
-            f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
-            em = 1.0 if gt_set == pred_set else 0.0
-            # Accumulate metrics manually
-            if not hasattr(metrics[0], "_total_em_ceqa"):
-                metrics[0]._total_em_ceqa = 0.0
-                metrics[0]._total_f1_ceqa = 0.0
-                metrics[0]._count_ceqa = 0
-            metrics[0]._total_em_ceqa += em
-            metrics[0]._total_f1_ceqa += f1
-            metrics[0]._count_ceqa += 1
-            continue
-
-        assert isinstance(prediction, (str, list))
-        if prediction_type == "answer" and isinstance(prediction, str):
-            if prediction.strip().startswith("[") or prediction.strip().endswith("]"):
-                prediction = [e for e in prediction.replace('"', "").replace("[", "").replace("]", "").split(",")]
-            else:
-                prediction = [prediction]
-
-        # Flatten ground truth and prediction if they are lists of lists (for other datasets)
-        def flatten(l):
-            return [item for sublist in l for item in (sublist if isinstance(sublist, list) else [sublist])]
-
-        if isinstance(ground_truth, list) and any(isinstance(e, list) for e in ground_truth):
-            ground_truth = flatten(ground_truth)
-        if isinstance(prediction, list) and any(isinstance(e, list) for e in prediction):
-            prediction = flatten(prediction)
-
-        prediction = [str(e) for e in prediction]
-        ground_truth = [str(e) for e in (ground_truth if isinstance(ground_truth, list) else [ground_truth])]
-
-        if prediction_type == "answer":
-            prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
-            metrics[0](prediction, ground_truth)
-            metrics[1](prediction, ground_truth)
-        elif prediction_type in ("titles", "pids", "real_pids"):
-            metrics[0](prediction, ground_truth)
-        elif prediction_type in ("paras"):
-            predicted_paras = [
-                " ".join([eval(prediction_)["title"], eval(prediction_)["paragraph_text"]])
-                for prediction_ in prediction
-            ]
-            metrics[0](predicted_paras, ground_truth)
-
-    # For CrossEntityQA, return the manually accumulated metrics
-    if dataset.lower() == "crossentityqa":
-        count = getattr(metrics[0], "_count_ceqa", 0)
-        em = getattr(metrics[0], "_total_em_ceqa", 0.0) / count if count else 0.0
-        f1 = getattr(metrics[0], "_total_f1_ceqa", 0.0) / count if count else 0.0
-        return {"em": round(em, 3), "f1": round(f1, 3), "count": count}
-
-    evaluation_results = metrics[0].get_metric()
-
-    if prediction_type == "answer":
-        evaluation_results_ = metrics[1].get_metric()
-        evaluation_results["sp_em"] = evaluation_results_["title_em"]
-        evaluation_results["sp_f1"] = evaluation_results_["title_f1"]
-        evaluation_results["sp_precision"] = evaluation_results_["title_precision"]
-        evaluation_results["sp_recall"] = evaluation_results_["title_recall"]
-
-    return evaluation_results
+    # ...existing code for answer extraction...
+    # This function should only extract the answer, not contain main logic.
+    if match:
+        return match.group(1)
+    return potentially_cot
 
 
 def official_evaluate_by_dicts(
