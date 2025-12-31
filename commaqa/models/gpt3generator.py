@@ -189,7 +189,8 @@ class GPT3Generator:
             self.model_tokens_limit = 3500  # GPT-3.5 and others
 
     def generate_text_sequence(self, prompt):
-        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt[:120].replace('\n',' ')} ...")
+        prompt_trunc = prompt[:120].replace('\n', ' ')
+        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt_trunc} ...")
         """
         :param input_text:
         :return: returns a sequence of tuples (string, score) where lower score is better
@@ -246,8 +247,7 @@ class GPT3Generator:
                         logger.error(f"[EMBEDDING] Could not reduce max_tokens further. Failing embedding.")
                         break
                     logger.warning(
-                        f"[EMBEDDING] (Round {index}) Decreasing max_tokens from "
-                        f"{last_used_max_tokens} to {updated_max_tokens} and retrying."
+                        f"[EMBEDDING] (Round {index}) Decreasing max_tokens from {last_used_max_tokens} to {updated_max_tokens} and retrying."
                     )
                     continue
 
@@ -288,7 +288,8 @@ class GPT3Generator:
             else:
                 output_seq_score.append((choice["text"], index))
 
-        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_seq_score[0][0][:120].replace('\n',' ')} ...")
+        output_trunc = output_seq_score[0][0][:120].replace('\n', ' ') if output_seq_score else ''
+        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_trunc} ...")
         logger.info(f"[EMBEDDING] Successfully finished embedding for prompt.")
         return sorted(output_seq_score, key=lambda x: x[1])
 
