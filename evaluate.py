@@ -32,7 +32,10 @@ def evaluate_by_dicts(
         assert isinstance(prediction, (list, tuple))
         prediction = [str(e) for e in prediction]
 
-        if prediction_type == "answer":
+        # For CrossEntityQA, pass ground_truth directly (list of QIDs)
+        if dataset.lower() == "crossentityqa":
+            metrics[0](prediction, ground_truth)
+        elif prediction_type == "answer":
             prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
             metrics[0](prediction, [ground_truth])
             metrics[1](prediction, ground_truth)
