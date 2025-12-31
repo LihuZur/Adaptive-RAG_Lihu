@@ -210,6 +210,8 @@ class QuestionSearchBase(object):
             except ValueError:
                 # Not a valid json ignore
                 pass
+            # Print the extracted/generated QIDs for runtime transparency
+            print(f"[QID: {example['qid']}] Extracted/generated QIDs: {final_answer}")
             if not silent:
                 print("\n")
             return (example["qid"], final_answer, chain)

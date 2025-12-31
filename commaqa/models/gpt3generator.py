@@ -233,6 +233,7 @@ class GPT3Generator:
             arguments["best_of"] = self.best_of
 
         success = False
+
         for index in range(500):
             try:
                 logger.info(f"[EMBEDDING] Attempt {index+1} for embedding.")
@@ -269,6 +270,9 @@ class GPT3Generator:
         if not success:
             logger.error("[EMBEDDING] Could not complete OpenAI call after 500 attempts.")
             raise Exception("Could not complete OpenAI call")
+
+        # Print the full LLM response (raw output) for runtime transparency
+        print("[LLM RAW RESPONSE]", response)
 
         output_seq_score = []
 
