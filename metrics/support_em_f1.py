@@ -182,3 +182,52 @@ class SupportEmF1Metric(Metric):
         self._min_predicted_paras = float("inf")
 
         self._count = 0
+
+
+class ListSetEMF1Metric(Metric):
+    """
+    Computes EM, F1, precision, recall for list-of-QIDs answers (set-based).
+    """
+
+    def __init__(self) -> None:
+        self._total_em = 0.0
+        self._total_f1 = 0.0
+        self._total_prec = 0.0
+        self._total_recall = 0.0
+        self._count = 0
+
+    def __call__(self, predicted: list, gold: list):
+        pred_set = set(str(e) for e in predicted)
+        gold_set = set(str(e) for e in gold)
+        tp = len(pred_set & gold_set)
+        fp = len(pred_set - gold_set)
+        fn = len(gold_set - pred_set)
+        prec = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+        f1 = 2 * prec * recall / (prec + recall) if (prec + recall) > 0 else 0.0
+        em = 1.0 if fp + fn == 0 else 0.0
+        self._total_em += em
+        self._total_f1 += f1
+        self._total_prec += prec
+        self._total_recall += recall
+        self._count += 1
+
+    def get_metric(self, reset: bool = False):
+        count = self._count if self._count > 0 else 1
+        result = {
+            "em": round(self._total_em / count, 3),
+            "f1": round(self._total_f1 / count, 3),
+            "precision": round(self._total_prec / count, 3),
+            "recall": round(self._total_recall / count, 3),
+            "count": self._count,
+        }
+        if reset:
+            self.reset()
+        return result
+
+    def reset(self):
+        self._total_em = 0.0
+        self._total_f1 = 0.0
+        self._total_prec = 0.0
+        self._total_recall = 0.0
+        self._count = 0

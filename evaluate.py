@@ -50,7 +50,8 @@ def evaluate_by_dicts(
 
     evaluation_results = metrics[0].get_metric()
 
-    if prediction_type == "answer":
+    # Only add secondary metrics if they exist (not for CrossEntityQA)
+    if prediction_type == "answer" and len(metrics) > 1:
         evaluation_results_ = metrics[1].get_metric()
         evaluation_results["sp_em"] = evaluation_results_["title_em"]
         evaluation_results["sp_f1"] = evaluation_results_["title_f1"]
@@ -82,6 +83,7 @@ from lib import (
 )
 from metrics.drop_answer_em_f1 import DropAnswerEmAndF1
 from metrics.support_em_f1 import SupportEmF1Metric
+from metrics.support_em_f1 import SupportEmF1Metric, ListSetEMF1Metric
 from metrics.answer_support_recall import AnswerSupportRecallMetric
 from metrics.squad_answer_em_f1 import SquadAnswerEmF1Metric
 
@@ -124,9 +126,11 @@ def answer_extractor(potentially_cot: str) -> str:
 
 
 def official_evaluate_by_dicts(
-    prediction_type: str, id_to_predictions: Dict[str, Any], id_to_ground_truths: Dict[str, Any], dataset: str
+    prediction_type: str,
+    id_to_predictions: Dict[str, Any],
+    id_to_ground_truths: Dict[str, Any],
+    dataset: str
 ) -> Dict:
-
     if prediction_type != "answer":
         # official evaluation is not available for non answer prediction.
         return evaluate_by_dicts(prediction_type, id_to_ground_truths, id_to_predictions, dataset)
