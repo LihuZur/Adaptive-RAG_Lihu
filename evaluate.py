@@ -1,3 +1,4 @@
+from typing import Dict, Any
 def evaluate_by_dicts(
     prediction_type: str,
     id_to_ground_truths: Dict[str, Any],
