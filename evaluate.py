@@ -55,25 +55,28 @@ def answer_extractor(potentially_cot: str) -> str:
 
     cot_regex = re.compile(".* answer is:? (.*)\\.?")
     match = cot_regex.match(potentially_cot)
-    if match:
-        output = match.group(1)
-        if output.endswith("."):
-            output = output[:-1]
-    else:
-        output = potentially_cot
-
-    return output
-
-
-def evaluate_by_dicts(
-    prediction_type: str,
-    id_to_ground_truths: Dict[str, Any],
-    id_to_predictions: Dict[str, Any],
-    dataset: str,
-) -> Dict:
-    if prediction_type == "answer":
-        if dataset in ['hotpotqa', '2wikimultihopqa', 'musique', 'iirc']:
-            metrics = [DropAnswerEmAndF1(), SupportEmF1Metric(do_normalize_answer=True)]
+    def main():
+        # ...existing code...
+        dataset = None
+        if args.dataset == "hotpotqa":
+            dataset = load_hotpotqa(args)
+        elif args.dataset == "2wikimultihopqa":
+            dataset = load_2wikimultihopqa(args)
+        elif args.dataset == "musique":
+            dataset = load_musique(args)
+        elif args.dataset == "nq":
+            dataset = load_nq(args)
+        elif args.dataset == "trivia":
+            dataset = load_trivia(args)
+        elif args.dataset == "squad":
+            dataset = load_squad(args)
+        elif args.dataset == "crossentityqa":
+            dataset = load_crossentityqa(args)
+        if dataset is None:
+            raise ValueError(f"Unknown or unsupported dataset: {args.dataset}")
+        # ...existing code...
+        # Evaluate predictions
+        results = evaluate_predictions(dataset, predictions, args)
         else:
             metrics = [SquadAnswerEmF1Metric(), SupportEmF1Metric(do_normalize_answer=True)]
     elif prediction_type in ("titles", "pids", "real_pids"):
