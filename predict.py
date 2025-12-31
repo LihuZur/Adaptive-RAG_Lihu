@@ -24,7 +24,7 @@ def main():
     )
     parser.add_argument("--dry-run", action="store_true", default=False, help="dry-run")
     parser.add_argument("--skip-evaluation", type=str, default="", help="skip-evaluation")
-    parser.add_argument("--force", action="store_true", default=False, help="force predict if it exists")
+    # --force argument removed: always overwrite predictions
     parser.add_argument(
         "--variable-replacements",
         type=str,
@@ -50,12 +50,7 @@ def main():
     prediction_filename = infer_source_target_prefix(config_filepath, args.evaluation_path) + prediction_filename
     prediction_filepath = os.path.join(prediction_directory, "prediction__" + prediction_filename + ".json")
 
-    if os.path.exists(prediction_filepath) and not args.force:
-        from run import is_experiment_complete
-
-        metrics_file_path = os.path.join(prediction_directory, "evaluation_metrics__" + prediction_filename + ".json")
-        if is_experiment_complete(config_filepath, prediction_filepath, metrics_file_path, args.variable_replacements):
-            exit(f"The prediction_file_path {prediction_filepath} already exists and is complete. Pass --force.")
+    # Always overwrite predictions: do not skip if file exists
 
     env_variables = {}
     retriever_address = get_retriever_address()
