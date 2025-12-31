@@ -593,8 +593,10 @@ def main():
     prediction_file_name = infer_source_target_prefix(config_filepath, args.evaluation_path) + prediction_file_name
     prediction_file_path = os.path.join(prediction_directory, "prediction__" + prediction_file_name + ".json")
 
+    # For CrossEntityQA, do not exit if predictions file is missing; allow fallback logic below
     if not os.path.exists(prediction_file_path):
-        exit(f"The prediction_file_path {prediction_file_path} is not available.")
+        if infer_dataset_from_file_path(args.evaluation_path).lower() != "crossentityqa":
+            exit(f"The prediction_file_path {prediction_file_path} is not available.")
 
     official_prefix = "official_" if args.official else ""
     save_metrics_path = os.path.join(
