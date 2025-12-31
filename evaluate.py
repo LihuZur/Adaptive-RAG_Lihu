@@ -77,8 +77,7 @@ def answer_extractor(potentially_cot: str) -> str:
         # ...existing code...
         # Evaluate predictions
         results = evaluate_predictions(dataset, predictions, args)
-        else:
-            metrics = [SquadAnswerEmF1Metric(), SupportEmF1Metric(do_normalize_answer=True)]
+        # ...existing code...
     elif prediction_type in ("titles", "pids", "real_pids"):
         metrics = [SupportEmF1Metric()]
     elif prediction_type in ("paras"):
