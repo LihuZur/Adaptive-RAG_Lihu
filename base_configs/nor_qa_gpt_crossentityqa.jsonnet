@@ -8,7 +8,7 @@ local prompt_reader_args = {
     "estimated_generation_length": 0,
     "shuffle": false,
     "model_length_limit": 1000000,
-    "tokenizer_model_name": "gpt-3.5-turbo",
+    "tokenizer_model_name": "google/flan-t5-xl",
 };
 
 local bm25_retrieval_count = 6;
