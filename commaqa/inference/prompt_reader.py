@@ -81,7 +81,7 @@ def read_prompt(
                     valid_examples.append(example)
         examples = valid_examples
 
-    if order_by_key:
+    if order_by_key and filter_by_key_values is not None:
         examples = sorted(examples, key=lambda example: filter_by_key_values[order_by_key].index(example[order_by_key]))
         assert not shuffle
 
