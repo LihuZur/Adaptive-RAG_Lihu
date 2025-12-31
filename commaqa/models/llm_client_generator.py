@@ -191,7 +191,8 @@ class LLMClientGenerator:
     def generate_text_sequence(self, prompt):
         import logging
         logger = logging.getLogger(__name__)
-        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt[:120].replace('\n',' ')} ...")
+        prompt_trunc = prompt[:120].replace('\n', ' ')
+        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt_trunc} ...")
         """
         :param input_text:
         :return: returns a sequence of tuples (string, score) where lower score is better
@@ -243,6 +244,7 @@ class LLMClientGenerator:
         generated_texts = modified_texts
 
         output_seq_score = [(text, 1 / (index + 1)) for index, text in enumerate(generated_texts)]
-        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_seq_score[0][0][:120].replace('\n',' ')} ...")
+        output_trunc = output_seq_score[0][0][:120].replace('\n', ' ') if output_seq_score else ''
+        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_trunc} ...")
         logger.info(f"[EMBEDDING] Successfully finished embedding for prompt.")
         return sorted(output_seq_score, key=lambda x: x[1])
