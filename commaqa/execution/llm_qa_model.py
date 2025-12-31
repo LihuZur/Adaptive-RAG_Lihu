@@ -17,7 +17,13 @@ class LLMQAModel:
         else:
             self.prompt = None
         if gen_model == "gpt3":
-            self.generator = GPT3Generator(**kwargs)
+            # Remove keys not accepted by GPT3Generator
+            gpt3_valid_keys = {
+                "engine", "temperature", "max_tokens", "top_p", "frequency_penalty", "presence_penalty",
+                "stop", "retry_after_n_seconds", "n", "best_of", "logprobs", "remove_method"
+            }
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in gpt3_valid_keys}
+            self.generator = GPT3Generator(**filtered_kwargs)
         elif gen_model == "llm_api":
             self.generator = LLMClientGenerator(**kwargs)
         else:
