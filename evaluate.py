@@ -1,3 +1,56 @@
+def evaluate_by_dicts(
+    prediction_type: str,
+    id_to_ground_truths: Dict[str, Any],
+    id_to_predictions: Dict[str, Any],
+    dataset: str,
+) -> Dict:
+    if prediction_type == "answer":
+        if dataset in ['hotpotqa', '2wikimultihopqa', 'musique', 'iirc']:
+            metrics = [DropAnswerEmAndF1(), SupportEmF1Metric(do_normalize_answer=True)]
+        else:
+            metrics = [SquadAnswerEmF1Metric(), SupportEmF1Metric(do_normalize_answer=True)]
+    elif prediction_type in ("titles", "pids", "real_pids"):
+        metrics = [SupportEmF1Metric()]
+    elif prediction_type in ("paras"):
+        metrics = [AnswerSupportRecallMetric()]
+
+    for id_ in set(id_to_ground_truths.keys()):
+        ground_truth = id_to_ground_truths[id_]
+        prediction = id_to_predictions[id_]
+
+        assert isinstance(prediction, (str, list))
+        if prediction_type == "answer" and isinstance(prediction, str):
+            if prediction.strip().startswith("[") or prediction.strip().endswith("]"):
+                prediction = [e for e in prediction.replace('"', "").replace("[", "").replace("]", "").split(",")]
+            else:
+                prediction = [prediction]
+
+        assert isinstance(prediction, (list, tuple))
+        prediction = [str(e) for e in prediction]
+
+        if prediction_type == "answer":
+            prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
+            metrics[0](prediction, [ground_truth])
+            metrics[1](prediction, ground_truth)
+        elif prediction_type in ("titles", "pids", "real_pids"):
+            metrics[0](prediction, ground_truth)
+        elif prediction_type in ("paras"):
+            predicted_paras = [
+                " ".join([eval(prediction_)["title"], eval(prediction_)["paragraph_text"]])
+                for prediction_ in prediction
+            ]
+            metrics[0](predicted_paras, ground_truth)
+
+    evaluation_results = metrics[0].get_metric()
+
+    if prediction_type == "answer":
+        evaluation_results_ = metrics[1].get_metric()
+        evaluation_results["sp_em"] = evaluation_results_["title_em"]
+        evaluation_results["sp_f1"] = evaluation_results_["title_f1"]
+        evaluation_results["sp_precision"] = evaluation_results_["title_precision"]
+        evaluation_results["sp_recall"] = evaluation_results_["title_recall"]
+
+    return evaluation_results
 import re
 import os
 import json
@@ -524,7 +577,8 @@ def main():
         question_type_value = question_type_value.strip()
 
     # Fallback logic for CrossEntityQA: always use CrossEntityQA/queries.jsonl as ground truth
-    dataset_name = infer_dataset_from_file_path(args.evaluation_path)
+    dataset = infer_dataset_from_file_path(args.evaluation_path)
+    dataset_name = dataset
     ground_truth_path = args.evaluation_path
     if dataset_name.lower() == "crossentityqa":
         ground_truth_path = os.path.join("CrossEntityQA", "queries.jsonl")
@@ -544,7 +598,6 @@ def main():
             id_: prediction for id_, prediction in id_to_predictions.items() if id_ in id_to_ground_truths.keys()
         }
 
-
     # For CrossEntityQA: if predictions file is missing, use entity_coverage from corpus.jsonl
     if dataset.lower() == "crossentityqa" and (not id_to_predictions or len(id_to_predictions) == 0):
         import glob
@@ -562,7 +615,6 @@ def main():
         exit("Ids in input examples and predictions don't match.")
 
     # For CrossEntityQA: use entity_coverage as both predictions and gold answers
-    dataset = infer_dataset_from_file_path(args.evaluation_path)
     if dataset.lower() == "crossentityqa":
         # Load corpus.jsonl to get entity_coverage for all queries
         import glob
