@@ -154,16 +154,26 @@ def inference_mode(args, reader, decomposer, model_map, override_answer_by=None)
 
     start_time = time.time()
 
-    if not args.input:
+    # Special handling for CrossEntityQA: use queries.jsonl if input is missing or points to missing dev_500_subsampled.jsonl
+    input_path = args.input
+    if input_path is None or ("crossentityqa" in str(input_path).lower() and ("dev_500_subsampled" in str(input_path) or not os.path.exists(input_path))):
+        # Try to use CrossEntityQA/queries.jsonl if available
+        candidate = os.path.join(os.path.dirname(os.path.dirname(__file__)), "CrossEntityQA", "queries.jsonl")
+        if os.path.exists(candidate):
+            print(f"[INFO] Using {candidate} as input for CrossEntityQA.")
+            input_path = candidate
+        else:
+            raise ValueError("Input file must be specified when run in non-demo mode, and no CrossEntityQA/queries.jsonl found.")
+    if not input_path:
         raise ValueError("Input file must be specified when run in non-demo mode")
     if args.threads > 1:
         import multiprocessing as mp
 
         mp.set_start_method("spawn")
         with mp.Pool(args.threads) as p:
-            qid_answer_chains = p.map(decomposer.return_qid_prediction, reader.read_examples(args.input))
+            qid_answer_chains = p.map(decomposer.return_qid_prediction, reader.read_examples(input_path))
     else:
-        iterator = reader.read_examples(args.input)
+        iterator = reader.read_examples(input_path)
         if args.silent:
             iterator = tqdm(iterator)
         for example in iterator:
