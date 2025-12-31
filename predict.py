@@ -83,6 +83,13 @@ def main():
     if args.variable_replacements:
         predict_command += f" --variable-replacements '{args.variable_replacements}'"
 
+    # Print the actual input file used (CrossEntityQA override)
+    from lib import infer_dataset_from_file_path
+    dataset_name = infer_dataset_from_file_path(args.evaluation_path)
+    real_input_path = args.evaluation_path
+    if dataset_name.lower() == "crossentityqa":
+        real_input_path = os.path.join("CrossEntityQA", "queries.jsonl")
+    print(f"[INFO] Using {real_input_path} as input for {dataset_name}.")
     print(f"Run predict_command: \n{predict_command}\n")
 
     if not args.dry_run:

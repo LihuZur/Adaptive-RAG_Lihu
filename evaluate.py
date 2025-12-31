@@ -583,6 +583,7 @@ def main():
     ground_truth_path = args.evaluation_path
     if dataset_name.lower() == "crossentityqa":
         ground_truth_path = os.path.join("CrossEntityQA", "queries.jsonl")
+    print(f"[INFO] Using {ground_truth_path} as ground truth for {dataset_name}.")
     id_to_ground_truths = load_ground_truths(
         experiment_config,
         ground_truth_path,

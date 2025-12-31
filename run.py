@@ -1636,6 +1636,13 @@ def main():
 
         if args.command == "predict":
 
+            # Print the actual input file used (CrossEntityQA override)
+            from lib import infer_dataset_from_file_path
+            dataset_name = infer_dataset_from_file_path(evaluation_path)
+            real_input_path = evaluation_path
+            if dataset_name.lower() == "crossentityqa":
+                real_input_path = os.path.join("CrossEntityQA", "queries.jsonl")
+            print(f"[INFO] Using {real_input_path} as input for {dataset_name}.")
             run_command = f"python predict.py {target_write_best_config_file_path} {evaluation_path} --llm_port_num {args.llm_port_num}"
 
             if args.silent:
@@ -1657,7 +1664,12 @@ def main():
 
         if args.command == "evaluate":
             if os.path.exists(prediction_file_path):
-                #import pdb; pdb.set_trace()
+                from lib import infer_dataset_from_file_path
+                dataset_name = infer_dataset_from_file_path(evaluation_path)
+                real_input_path = evaluation_path
+                if dataset_name.lower() == "crossentityqa":
+                    real_input_path = os.path.join("CrossEntityQA", "queries.jsonl")
+                print(f"[INFO] Using {real_input_path} as ground truth for {dataset_name}.")
                 run_command = f"python evaluate.py {target_write_best_config_file_path} {evaluation_path} --set_name {args.set_name} --llm_port_num {args.llm_port_num}"
                 if os.path.exists(metrics_file_path) and args.skip_if_exists:
                     print(f"Skipping as the metrics file already exists here: {metrics_file_path}.")
