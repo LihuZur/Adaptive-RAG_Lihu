@@ -85,6 +85,32 @@ def evaluate_by_dicts(
         ground_truth = id_to_ground_truths[id_]
         prediction = id_to_predictions[id_]
 
+        # Special handling for CrossEntityQA: compare sets of QIDs, skip normalization
+        if dataset.lower() == "crossentityqa":
+            # Ensure both are lists
+            if not isinstance(ground_truth, list):
+                ground_truth = [ground_truth]
+            if not isinstance(prediction, list):
+                prediction = [prediction]
+            # Convert to sets of strings (QIDs)
+            gt_set = set(str(e) for e in ground_truth)
+            pred_set = set(str(e) for e in prediction)
+            # Compute exact match and F1 as set overlap
+            intersection = len(gt_set & pred_set)
+            precision = intersection / len(pred_set) if pred_set else 0.0
+            recall = intersection / len(gt_set) if gt_set else 0.0
+            f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+            em = 1.0 if gt_set == pred_set else 0.0
+            # Accumulate metrics manually
+            if not hasattr(metrics[0], "_total_em_ceqa"):
+                metrics[0]._total_em_ceqa = 0.0
+                metrics[0]._total_f1_ceqa = 0.0
+                metrics[0]._count_ceqa = 0
+            metrics[0]._total_em_ceqa += em
+            metrics[0]._total_f1_ceqa += f1
+            metrics[0]._count_ceqa += 1
+            continue
+
         assert isinstance(prediction, (str, list))
         if prediction_type == "answer" and isinstance(prediction, str):
             if prediction.strip().startswith("[") or prediction.strip().endswith("]"):
@@ -92,7 +118,7 @@ def evaluate_by_dicts(
             else:
                 prediction = [prediction]
 
-        # Flatten ground truth and prediction if they are lists of lists (for CrossEntityQA)
+        # Flatten ground truth and prediction if they are lists of lists (for other datasets)
         def flatten(l):
             return [item for sublist in l for item in (sublist if isinstance(sublist, list) else [sublist])]
 
@@ -116,6 +142,13 @@ def evaluate_by_dicts(
                 for prediction_ in prediction
             ]
             metrics[0](predicted_paras, ground_truth)
+
+    # For CrossEntityQA, return the manually accumulated metrics
+    if dataset.lower() == "crossentityqa":
+        count = getattr(metrics[0], "_count_ceqa", 0)
+        em = getattr(metrics[0], "_total_em_ceqa", 0.0) / count if count else 0.0
+        f1 = getattr(metrics[0], "_total_f1_ceqa", 0.0) / count if count else 0.0
+        return {"em": round(em, 3), "f1": round(f1, 3), "count": count}
 
     evaluation_results = metrics[0].get_metric()
 
