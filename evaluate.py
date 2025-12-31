@@ -578,9 +578,14 @@ def main():
         question_type_key = question_type_key.strip()
         question_type_value = question_type_value.strip()
 
+    # Fallback logic for CrossEntityQA: always use CrossEntityQA/queries.jsonl as ground truth
+    dataset_name = infer_dataset_from_file_path(args.evaluation_path)
+    ground_truth_path = args.evaluation_path
+    if dataset_name.lower() == "crossentityqa":
+        ground_truth_path = os.path.join("CrossEntityQA", "queries.jsonl")
     id_to_ground_truths = load_ground_truths(
         experiment_config,
-        args.evaluation_path,
+        ground_truth_path,
         question_type_key=question_type_key,
         question_type_value=question_type_value,
     )
