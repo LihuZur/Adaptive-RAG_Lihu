@@ -5,7 +5,10 @@ def evaluate_by_dicts(
     id_to_predictions: Dict[str, Any],
     dataset: str,
 ) -> Dict:
-    if prediction_type == "answer":
+    # For CrossEntityQA, always use SupportEmF1Metric (list of QIDs)
+    if dataset.lower() == "crossentityqa":
+        metrics = [SupportEmF1Metric()]
+    elif prediction_type == "answer":
         if dataset in ['hotpotqa', '2wikimultihopqa', 'musique', 'iirc']:
             metrics = [DropAnswerEmAndF1(), SupportEmF1Metric(do_normalize_answer=True)]
         else:
