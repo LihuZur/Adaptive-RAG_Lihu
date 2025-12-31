@@ -92,12 +92,21 @@ def evaluate_by_dicts(
             else:
                 prediction = [prediction]
 
-        assert isinstance(prediction, (list, tuple))
+        # Flatten ground truth and prediction if they are lists of lists (for CrossEntityQA)
+        def flatten(l):
+            return [item for sublist in l for item in (sublist if isinstance(sublist, list) else [sublist])]
+
+        if isinstance(ground_truth, list) and any(isinstance(e, list) for e in ground_truth):
+            ground_truth = flatten(ground_truth)
+        if isinstance(prediction, list) and any(isinstance(e, list) for e in prediction):
+            prediction = flatten(prediction)
+
         prediction = [str(e) for e in prediction]
+        ground_truth = [str(e) for e in (ground_truth if isinstance(ground_truth, list) else [ground_truth])]
 
         if prediction_type == "answer":
             prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
-            metrics[0](prediction, [ground_truth])
+            metrics[0](prediction, ground_truth)
             metrics[1](prediction, ground_truth)
         elif prediction_type in ("titles", "pids", "real_pids"):
             metrics[0](prediction, ground_truth)

@@ -189,6 +189,7 @@ class GPT3Generator:
             self.model_tokens_limit = 3500  # GPT-3.5 and others
 
     def generate_text_sequence(self, prompt):
+        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt[:120].replace('\n',' ')} ...")
         """
         :param input_text:
         :return: returns a sequence of tuples (string, score) where lower score is better
@@ -227,13 +228,14 @@ class GPT3Generator:
         success = False
         for index in range(500):
             try:
+                logger.info(f"[EMBEDDING] Attempt {index+1} for embedding.")
                 response = openai_call(**arguments)
                 success = True
+                logger.info(f"[EMBEDDING] Embedding call succeeded on attempt {index+1}.")
                 break
             except Exception as exception:
-
                 success = False
-
+                logger.error(f"[EMBEDDING] Exception during embedding attempt {index+1}: {exception}")
                 tokenizer = get_gpt_tokenizer()
                 prompt_num_tokens = len(tokenizer.tokenize(prompt))
                 if prompt_num_tokens + arguments["max_tokens"] > self.model_tokens_limit > prompt_num_tokens:
@@ -241,27 +243,25 @@ class GPT3Generator:
                     updated_max_tokens = self.model_tokens_limit - prompt_num_tokens
                     arguments["max_tokens"] = updated_max_tokens
                     if last_used_max_tokens == updated_max_tokens:
+                        logger.error(f"[EMBEDDING] Could not reduce max_tokens further. Failing embedding.")
                         break
-                    print(
-                        f"WARNING: (Round {index}) Decreasing max_tokens from "
+                    logger.warning(
+                        f"[EMBEDDING] (Round {index}) Decreasing max_tokens from "
                         f"{last_used_max_tokens} to {updated_max_tokens} and retrying."
                     )
                     continue
 
                 if self.retry_after_n_seconds is None:
                     import traceback
+                    logger.error(traceback.format_exc())
+                    raise
 
-                    print(traceback.format_exc())
-                    exit()
-
-                print(f"Encountered exception of class: {exception.__class__}")
-                if hasattr(exception, "user_message"):
-                    print(exception.user_message)
-                print(f"Potentially reached OpenAI rate limit. Will try again in {self.retry_after_n_seconds}s.")
+                logger.warning(f"[EMBEDDING] Potentially reached OpenAI rate limit. Will try again in {self.retry_after_n_seconds}s.")
                 time.sleep(self.retry_after_n_seconds)
                 pass
 
         if not success:
+            logger.error("[EMBEDDING] Could not complete OpenAI call after 500 attempts.")
             raise Exception("Could not complete OpenAI call")
 
         output_seq_score = []
@@ -288,5 +288,7 @@ class GPT3Generator:
             else:
                 output_seq_score.append((choice["text"], index))
 
+        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_seq_score[0][0][:120].replace('\n',' ')} ...")
+        logger.info(f"[EMBEDDING] Successfully finished embedding for prompt.")
         return sorted(output_seq_score, key=lambda x: x[1])
 

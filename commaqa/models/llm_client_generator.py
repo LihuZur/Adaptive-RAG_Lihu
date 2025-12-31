@@ -189,6 +189,9 @@ class LLMClientGenerator:
         self.remove_method = remove_method
 
     def generate_text_sequence(self, prompt):
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt[:120].replace('\n',' ')} ...")
         """
         :param input_text:
         :return: returns a sequence of tuples (string, score) where lower score is better
@@ -222,7 +225,11 @@ class LLMClientGenerator:
             "length_penalty": self.length_penalty,
             "keep_prompt": False,
         }
-        result = llm_call(**params)
+        try:
+            result = llm_call(**params)
+        except Exception as e:
+            logger.error(f"[EMBEDDING] Exception during embedding: {e}")
+            raise
 
         generated_texts = result["generated_texts"]
         modified_texts = []
@@ -236,10 +243,6 @@ class LLMClientGenerator:
         generated_texts = modified_texts
 
         output_seq_score = [(text, 1 / (index + 1)) for index, text in enumerate(generated_texts)]
-        # print(prompt)
-        # print("------------")
-        # print(output_seq_score[0][0])
-
-        # TODO: Deal with output-probabilities if needed.
-
+        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_seq_score[0][0][:120].replace('\n',' ')} ...")
+        logger.info(f"[EMBEDDING] Successfully finished embedding for prompt.")
         return sorted(output_seq_score, key=lambda x: x[1])
