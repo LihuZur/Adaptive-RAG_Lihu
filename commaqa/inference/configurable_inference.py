@@ -157,13 +157,21 @@ def inference_mode(args, reader, decomposer, model_map, override_answer_by=None)
     # Special handling for CrossEntityQA: use queries.jsonl if input is missing or points to missing dev_500_subsampled.jsonl
     input_path = args.input
     if input_path is None or ("crossentityqa" in str(input_path).lower() and ("dev_500_subsampled" in str(input_path) or not os.path.exists(input_path))):
-        # Try to use CrossEntityQA/queries.jsonl if available
-        candidate = os.path.join(os.path.dirname(os.path.dirname(__file__)), "CrossEntityQA", "queries.jsonl")
-        if os.path.exists(candidate):
-            print(f"[INFO] Using {candidate} as input for CrossEntityQA.")
-            input_path = candidate
+        # Try to use CrossEntityQA/queries.jsonl or crossentityqa/queries.jsonl if available
+        repo_root = os.path.dirname(os.path.dirname(__file__))
+        candidates = [
+            os.path.join(repo_root, "CrossEntityQA", "queries.jsonl"),
+            os.path.join(repo_root, "crossentityqa", "queries.jsonl"),
+            os.path.join(repo_root, "data", "CrossEntityQA", "queries.jsonl"),
+            os.path.join(repo_root, "data", "crossentityqa", "queries.jsonl"),
+        ]
+        for candidate in candidates:
+            if os.path.exists(candidate):
+                print(f"[INFO] Using {candidate} as input for CrossEntityQA.")
+                input_path = candidate
+                break
         else:
-            raise ValueError("Input file must be specified when run in non-demo mode, and no CrossEntityQA/queries.jsonl found.")
+            raise ValueError("Input file must be specified when run in non-demo mode, and no CrossEntityQA/queries.jsonl or crossentityqa/queries.jsonl found in any expected location.")
     if not input_path:
         raise ValueError("Input file must be specified when run in non-demo mode")
     if args.threads > 1:
