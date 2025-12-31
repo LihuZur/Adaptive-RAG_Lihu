@@ -202,7 +202,8 @@ def inference_mode(args, reader, decomposer, model_map, override_answer_by=None)
     seconds_taken = round(end_time - start_time)
 
     predictions = {x[0]: x[1] for x in qid_answer_chains}
-    print(f"Writing predictions in {args.output}")
+    abs_output_path = os.path.abspath(args.output)
+    print(f"[INFO] Writing LLM+retriever predictions to: {abs_output_path}")
     with open(args.output, "w") as output_fp:
         json.dump(predictions, output_fp, indent=4)
 

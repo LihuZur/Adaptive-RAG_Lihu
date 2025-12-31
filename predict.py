@@ -50,7 +50,10 @@ def main():
     prediction_filename = infer_source_target_prefix(config_filepath, args.evaluation_path) + prediction_filename
     prediction_filepath = os.path.join(prediction_directory, "prediction__" + prediction_filename + ".json")
 
-    # Always overwrite predictions: do not skip if file exists
+    # Always overwrite predictions: delete file if it exists, for safety
+    if os.path.exists(prediction_filepath):
+        print(f"[INFO] Deleting existing prediction file: {prediction_filepath}")
+        os.remove(prediction_filepath)
 
     env_variables = {}
     retriever_address = get_retriever_address()
