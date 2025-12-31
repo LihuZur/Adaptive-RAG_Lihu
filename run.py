@@ -1150,6 +1150,10 @@ def main():
     _prompt_set = "1" if args.prompt_set == "aggregate" else args.prompt_set
 
     inferred_dataset = infer_dataset(file_content)
+    # Dynamically load CrossEntityQA qids if needed
+    if inferred_dataset == "crossentityqa":
+        if not dataset_to_prompt_set_to_qids["crossentityqa"] or not dataset_to_prompt_set_to_qids["crossentityqa"].get("1"):
+            dataset_to_prompt_set_to_qids["crossentityqa"] = load_crossentityqa_qids()
     valid_qids = dataset_to_prompt_set_to_qids[inferred_dataset][_prompt_set]
     variable_replacements = {}
     if valid_qids is not None:
@@ -1402,6 +1406,7 @@ def main():
             subprocess.call(run_command, shell=True)
 
         elif args.command == "summarize" and not args_best_is_passed:
+
             pass
 
         elif args.command == "delete_predictions":
