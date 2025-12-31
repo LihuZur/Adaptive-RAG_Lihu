@@ -1,7 +1,7 @@
 local dataset = "crossentityqa";
 local retrieval_corpus_name = dataset;
 local add_pinned_paras = false;
-local valid_qids = null;
+local valid_qids = std.extVar("valid_qids");
 local prompt_reader_args = {
   "order_by_key": "qid",
   "estimated_generation_length": 0,
@@ -50,6 +50,7 @@ local rc_qa_type = "cot";
       "next_model": if std.endsWith(rc_qa_type, "cot") then "extract_answer" else null,
       "prompt_file": "prompts/"+dataset+"/"+rc_context_type+"_context_"+rc_qa_type+"_qa_codex.txt",
       "prompt_reader_args": prompt_reader_args,
+      "valid_qids": valid_qids,
       "end_state": "[EOQ]",
       "gen_model": "gpt3",
       "engine": "gpt-4o-mini",
