@@ -32,10 +32,15 @@ logger = logging.getLogger(__name__)
 
 def load_dataset(corpus_name: str, split: str = "dev_500") -> List[Dict[str, Any]]:
     """Load dataset from file."""
-    dataset_path = Path(f"processed_data/{corpus_name}/{split}_subsampled.jsonl")
-    
-    if not dataset_path.exists():
-        raise FileNotFoundError(f"Dataset not found: {dataset_path}")
+    # Special handling for CrossEntityQA
+    if corpus_name == "crossentityqa":
+        dataset_path = Path(f"CrossEntityQA/queries_with_ground_truth.jsonl")
+        if not dataset_path.exists():
+            raise FileNotFoundError(f"Dataset not found: {dataset_path}")
+    else:
+        dataset_path = Path(f"processed_data/{corpus_name}/{split}_subsampled.jsonl")
+        if not dataset_path.exists():
+            raise FileNotFoundError(f"Dataset not found: {dataset_path}")
     
     data = []
     with open(dataset_path) as f:
@@ -64,6 +69,7 @@ def retrieve_bm25_scores(
         "hotpotqa": "hotpotqa",
         "2wikimultihopqa": "2wikimultihopqa",
         "musique": "musique",
+        "crossentityqa": "crossentityqa",
     }
     actual_corpus = corpus_mapping.get(corpus_name, corpus_name)
     
@@ -112,8 +118,34 @@ def build_null_distribution(
     """
     logger.info(f"Building null distribution for {corpus_name}")
     
+    # Broken query IDs for CrossEntityQA (skip these)
+    BROKEN_QUERY_IDS = {
+        'cast_Q44578_easy_2', 'series_Q642878_easy_5', 'series_Q2484680_easy_6',
+        'founded_by_Q317521_easy_11', 'cast_Q25188_easy_12', 'series_Q8337_easy_13',
+        'series_Q2484680_easy_38', 'series_Q8337_easy_44', 'series_Q642878_easy_48',
+        'series_Q8337_easy_80', 'series_Q8337_easy_127', 'award_Q103360_2000_2023_medium_57',
+        'series_Q642878_easy_77', 'series_Q2484680_medium_76', 'capitals_Q46_medium_89',
+        'series_Q642878_easy_123', 'series_Q2484680_easy_129', 'cast_Q25188_medium_117',
+        'award_Q38104_2010_2023_medium_116', 'cast_Q47703_medium_122',
+        'cast_Q44578_easy_36', 'cast_Q44578_easy_84', 'cast_Q44578_easy_128',
+        'award_Q103360_2000_2023_easy_9', 'award_Q103360_2000_2023_easy_22',
+        'award_Q103360_2000_2023_easy_25', 'award_Q103360_2000_2023_easy_26',
+        'award_Q103360_2000_2023_easy_46', 'award_Q103360_2000_2023_easy_52',
+        'award_Q103360_2000_2023_easy_72', 'award_Q103360_2000_2023_easy_78',
+        'award_Q103360_2000_2023_easy_95', 'award_Q103360_2000_2023_easy_108',
+        'award_Q103360_2000_2023_easy_113', 'award_Q103360_2000_2023_easy_119',
+        'award_Q103360_2000_2023_easy_134', 'award_Q103360_2000_2023_easy_138',
+        'award_Q103360_2000_2023_easy_139', 'award_Q103360_2000_2023_easy_143'
+    }
+    
     # Load dataset
     data = load_dataset(corpus_name, split)
+    
+    # Filter out broken queries for CrossEntityQA
+    if corpus_name == "crossentityqa":
+        original_count = len(data)
+        data = [item for item in data if item.get("query_id") not in BROKEN_QUERY_IDS]
+        logger.info(f"Filtered {original_count - len(data)} broken queries, {len(data)} remaining")
     
     # Sample queries
     if len(data) > num_queries:
@@ -127,14 +159,6 @@ def build_null_distribution(
     # Collect BM25 scores
     all_scores = []
     
-    for i, item in enumerate(sampled_data):
-        query = item.get("question_text", "") or item.get("question", "")
-        
-        print(f"[LOOP] Item {i+1}: question='{query[:50] if query else 'EMPTY'}'")
-        
-        if not query.strip():
-            print(f"[SKIP] Empty query, skipping")
-            continue
     for i, item in enumerate(sampled_data):
         query = item.get("question_text", "") or item.get("question", "")
         
@@ -189,7 +213,7 @@ def main():
     parser.add_argument(
         "corpus_name",
         type=str,
-        choices=["hotpotqa", "2wikimultihopqa", "musique", "nq", "trivia", "squad"],
+        choices=["hotpotqa", "2wikimultihopqa", "musique", "nq", "trivia", "squad", "crossentityqa"],
         help="Corpus name",
     )
     parser.add_argument(
