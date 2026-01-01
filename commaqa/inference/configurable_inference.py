@@ -229,6 +229,17 @@ def inference_mode(args, reader, decomposer, model_map, override_answer_by=None)
     variable_replacements_path = args.output[:ext_index] + "_variable_replacements.json"
     with open(variable_replacements_path, "w") as output_fp:
         output_fp.write(args.variable_replacements)
+    
+    # Save passage count statistics for evaluation
+    passage_counts_path = args.output[:ext_index] + "_passage_counts.json"
+    passage_counts = {}
+    for example in config_map.get("data_instances", []):
+        qid = example.get("qid")
+        if qid:
+            passage_counts[qid] = len(example.get("paragraphs", []))
+    with open(passage_counts_path, "w") as output_fp:
+        json.dump(passage_counts, output_fp, indent=4)
+    print(f"[INFO] Saved passage counts to: {passage_counts_path}")
 
 
 if __name__ == "__main__":

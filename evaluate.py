@@ -100,13 +100,19 @@ def evaluate_by_dicts(
         except Exception as e:
             print(f"Warning: Could not load qrels: {e}")
     
-    # Get fetched passage counts from config data_instances
+    # Get fetched passage counts from the saved passage_counts file
     fetched_passage_counts = {}
-    if dataset.lower() == "crossentityqa" and config is not None and "data_instances" in config:
-        for instance in config["data_instances"]:
-            qid = instance.get("qid")
-            if qid:
-                fetched_passage_counts[qid] = len(instance.get("paragraphs", []))
+    if dataset.lower() == "crossentityqa":
+        passage_counts_path = prediction_file_path.replace(".json", "_passage_counts.json")
+        if os.path.exists(passage_counts_path):
+            try:
+                with open(passage_counts_path) as f:
+                    fetched_passage_counts = json.load(f)
+                print(f"[DEBUG] Loaded fetched passage counts for {len(fetched_passage_counts)} queries from {passage_counts_path}")
+            except Exception as e:
+                print(f"[DEBUG] Could not load passage counts file: {e}")
+        else:
+            print(f"[DEBUG] Passage counts file not found: {passage_counts_path}")
     
     # Queries with broken/incompatible ground truth (GT shows movies instead of actors, etc.)
     BROKEN_QUERY_IDS = {
@@ -748,6 +754,17 @@ def main():
     # get prediction_type
     experiment_config = load_experiment_config(config_filepath, args)
     prediction_type = experiment_config["prediction_type"]
+    
+    # For CrossEntityQA, try to load the backed up config from predictions directory
+    # which has the actual data_instances with fetched passages
+    backed_up_config = None
+    backed_up_config_path = os.path.join(prediction_directory, "config__" + prediction_file_name + ".jsonnet")
+    if os.path.exists(backed_up_config_path):
+        try:
+            backed_up_config = load_experiment_config(backed_up_config_path, args)
+            print(f"[DEBUG] Loaded backed up config from {backed_up_config_path}")
+        except Exception as e:
+            print(f"[DEBUG] Could not load backed up config: {e}")
 
     # prep ground_truths
     question_type_key = question_type_value = None
@@ -784,13 +801,16 @@ def main():
         exit("Ids in input examples and predictions don't match.")
 
     # Evaluate predictions against ground truth (works for all datasets including CrossEntityQA)
+    # Use backed_up_config if available (has actual fetched passages), otherwise use experiment_config
+    config_to_use = backed_up_config if backed_up_config is not None else experiment_config
+    
     if args.official:
         evaluation_results = official_evaluate_by_dicts(
             prediction_type=prediction_type,
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
-            config=experiment_config,
+            config=config_to_use,
         )
     else:
         evaluation_results = evaluate_by_dicts(
@@ -798,7 +818,7 @@ def main():
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
-            config=experiment_config,
+            config=config_to_use,
         )
     print(json.dumps(evaluation_results, indent=4))
 
