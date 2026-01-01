@@ -6,7 +6,7 @@ local llm_server_host = std.extVar("LLM_SERVER_HOST");
 local llm_server_port = std.extVar("LLM_SERVER_PORT");
 local corpus_name = dataset;
 local dataset_name = dataset;
-local valid_qids = null;
+local valid_qids = std.extVar("valid_qids");
 local prompt_reader_args = {
     "order_by_key": "qid",
     "estimated_generation_length": 300,
