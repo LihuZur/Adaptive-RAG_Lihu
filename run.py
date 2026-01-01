@@ -813,9 +813,9 @@ instantiation_schemes = {
         "distractor_count": ['"1"'],
     },
     "hc_qa": {
-        "bm25_retrieval_count": ["50", "100"],  # Need more candidates since avg K=9.2, max K=20
-        "gamma": ["0.3", "0.5"],  # Search more candidates (30-50% instead of 10-20%)
-        "min_hc": ["0.0"],  # No threshold - let HC decide based on statistics alone
+        "bm25_retrieval_count": ["100"],  # Large candidate pool for HC to select from
+        "gamma": ["0.1", "0.15", "0.2"],  # More aggressive thresholds to select ~9 passages (was 0.3-0.5 selecting only 7.1)
+        "min_hc": ["0.0", "-0.5"],  # Allow negative HC scores to force more passages through
     }
 }
 
