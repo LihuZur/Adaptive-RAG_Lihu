@@ -70,6 +70,7 @@ def evaluate_by_dicts(
     id_to_ground_truths: Dict[str, Any],
     id_to_predictions: Dict[str, Any],
     dataset: str,
+    config: Dict[str, Any] = None,
 ) -> Dict:
     # For CrossEntityQA, use entity list metric that handles " and " separated entities
     if dataset.lower() == "crossentityqa":
@@ -84,6 +85,29 @@ def evaluate_by_dicts(
     elif prediction_type in ("paras"):
         metrics = [AnswerSupportRecallMetric()]
 
+    # Load qrels for CrossEntityQA to get expected passage counts
+    qrels_passage_counts = {}
+    if dataset.lower() == "crossentityqa" and config is not None:
+        try:
+            qrels_path = "CrossEntityQA/qrels.tsv"
+            if os.path.exists(qrels_path):
+                with open(qrels_path) as f:
+                    for line in f:
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 3:
+                            qid = parts[0]
+                            qrels_passage_counts[qid] = qrels_passage_counts.get(qid, 0) + 1
+        except Exception as e:
+            print(f"Warning: Could not load qrels: {e}")
+    
+    # Get fetched passage counts from config data_instances
+    fetched_passage_counts = {}
+    if dataset.lower() == "crossentityqa" and config is not None and "data_instances" in config:
+        for instance in config["data_instances"]:
+            qid = instance.get("qid")
+            if qid:
+                fetched_passage_counts[qid] = len(instance.get("paragraphs", []))
+    
     # Queries with broken/incompatible ground truth (GT shows movies instead of actors, etc.)
     BROKEN_QUERY_IDS = {
         # Original 20 broken queries (series/cast showing wrong data)
@@ -181,6 +205,12 @@ def evaluate_by_dicts(
             print("=" * 80)
             print(f"EVALUATING QUERY {query_counter}: {id_}")
             print(f"QUESTION: {query_text}")
+            
+            # Print passage counts
+            expected_passages = qrels_passage_counts.get(id_, "?")
+            fetched_passages = fetched_passage_counts.get(id_, "?")
+            print(f"PASSAGES: Fetched={fetched_passages} | Expected={expected_passages}")
+            
             print("-" * 80)
             print(f"PREDICTION: {prediction[0] if prediction else ''}")
             print(f"GROUND TRUTH: {ground_truth}")
@@ -225,8 +255,30 @@ def evaluate_by_dicts(
     if dataset.lower() == "crossentityqa" and 'skipped_count' in locals():
         evaluation_results["skipped_queries"] = skipped_count
         evaluation_results["evaluated_queries"] = query_counter - skipped_count
+        
+        # Add passage count statistics
+        if fetched_passage_counts:
+            import statistics
+            fetched_counts = list(fetched_passage_counts.values())
+            evaluation_results["avg_fetched_passages"] = statistics.mean(fetched_counts)
+            evaluation_results["min_fetched_passages"] = min(fetched_counts)
+            evaluation_results["max_fetched_passages"] = max(fetched_counts)
+            evaluation_results["std_fetched_passages"] = statistics.stdev(fetched_counts) if len(fetched_counts) > 1 else 0
+        
+        if qrels_passage_counts:
+            import statistics
+            expected_counts = list(qrels_passage_counts.values())
+            evaluation_results["avg_expected_passages"] = statistics.mean(expected_counts)
+            evaluation_results["min_expected_passages"] = min(expected_counts)
+            evaluation_results["max_expected_passages"] = max(expected_counts)
+            evaluation_results["std_expected_passages"] = statistics.stdev(expected_counts) if len(expected_counts) > 1 else 0
+        
         print(f"\n{'='*80}")
         print(f"EVALUATION SUMMARY: {evaluation_results['evaluated_queries']} queries evaluated, {skipped_count} queries skipped")
+        if fetched_passage_counts:
+            print(f"FETCHED PASSAGES: Mean={evaluation_results['avg_fetched_passages']:.2f}, Std={evaluation_results['std_fetched_passages']:.2f}, Min={evaluation_results['min_fetched_passages']}, Max={evaluation_results['max_fetched_passages']}")
+        if qrels_passage_counts:
+            print(f"EXPECTED PASSAGES: Mean={evaluation_results['avg_expected_passages']:.2f}, Std={evaluation_results['std_expected_passages']:.2f}, Min={evaluation_results['min_expected_passages']}, Max={evaluation_results['max_expected_passages']}")
         print(f"{'='*80}\n")
 
     return evaluation_results
@@ -236,11 +288,12 @@ def official_evaluate_by_dicts(
     prediction_type: str,
     id_to_predictions: Dict[str, Any],
     id_to_ground_truths: Dict[str, Any],
-    dataset: str
+    dataset: str,
+    config: Dict[str, Any] = None,
 ) -> Dict:
     if prediction_type != "answer":
         # official evaluation is not available for non answer prediction.
-        return evaluate_by_dicts(prediction_type, id_to_ground_truths, id_to_predictions, dataset)
+        return evaluate_by_dicts(prediction_type, id_to_ground_truths, id_to_predictions, dataset, config)
 
     question_ids = list(id_to_predictions.keys())
 
@@ -440,7 +493,7 @@ def official_evaluate_by_dicts(
         return metrics
 
     if dataset == "iirc":
-        return evaluate_by_dicts("answer", id_to_ground_truths, id_to_predictions, dataset)
+        return evaluate_by_dicts("answer", id_to_ground_truths, id_to_predictions, dataset, config)
 
 
 def load_experiment_config(config_file_path: str, args):
@@ -737,6 +790,7 @@ def main():
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
+            config=experiment_config,
         )
     else:
         evaluation_results = evaluate_by_dicts(
@@ -744,6 +798,7 @@ def main():
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
+            config=experiment_config,
         )
     print(json.dumps(evaluation_results, indent=4))
 
