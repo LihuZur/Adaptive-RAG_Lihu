@@ -138,8 +138,11 @@ def evaluate_by_dicts(
             if isinstance(ground_truth, list):
                 ground_truth = ground_truth[0] if ground_truth else ""
             
+            # Debug: Check if query is in broken list
+            is_broken = id_ in BROKEN_QUERY_IDS
+            
             # Check if this query should be skipped
-            if id_ in BROKEN_QUERY_IDS:
+            if is_broken:
                 print("=" * 80)
                 print(f"EVALUATING QUERY {query_counter}: {id_}")
                 print(f"QUESTION: {query_text}")
