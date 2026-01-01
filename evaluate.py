@@ -86,6 +86,7 @@ def evaluate_by_dicts(
 
     # Queries with broken/incompatible ground truth (GT shows movies instead of actors, etc.)
     BROKEN_QUERY_IDS = {
+        # Original 20 broken queries (series/cast showing wrong data)
         "cast_Q44578_easy_2",
         "series_Q642878_easy_5",
         "series_Q2484680_easy_6",
@@ -106,6 +107,26 @@ def evaluate_by_dicts(
         "cast_Q25188_medium_117",
         "award_Q38104_2010_2023_medium_116",
         "cast_Q47703_medium_122",
+        # Additional 19 broken queries (actor questions with wrong cast, award questions mixing directors/films)
+        "cast_Q44578_easy_36",
+        "cast_Q44578_easy_84",
+        "cast_Q44578_easy_128",
+        "award_Q103360_2000_2023_easy_9",
+        "award_Q103360_2000_2023_easy_22",
+        "award_Q103360_2000_2023_easy_25",
+        "award_Q103360_2000_2023_easy_26",
+        "award_Q103360_2000_2023_easy_46",
+        "award_Q103360_2000_2023_easy_52",
+        "award_Q103360_2000_2023_easy_72",
+        "award_Q103360_2000_2023_easy_78",
+        "award_Q103360_2000_2023_easy_95",
+        "award_Q103360_2000_2023_easy_108",
+        "award_Q103360_2000_2023_easy_113",
+        "award_Q103360_2000_2023_easy_119",
+        "award_Q103360_2000_2023_easy_134",
+        "award_Q103360_2000_2023_easy_138",
+        "award_Q103360_2000_2023_easy_139",
+        "award_Q103360_2000_2023_easy_143",
     }
 
     query_counter = 0
