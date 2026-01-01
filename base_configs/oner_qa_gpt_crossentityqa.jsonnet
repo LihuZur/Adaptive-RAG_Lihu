@@ -15,12 +15,12 @@ local llm_retrieval_count = null;
 local llm_map_count = null;
 local bm25_retrieval_count = 5;
 local rc_context_type_ = "gold_with_n_distractors";
-local distractor_count = "2";
+local distractor_count = "1";
 local rc_context_type = (
   if rc_context_type_ == "gold_with_n_distractors"
   then "gold_with_" + distractor_count + "_distractors"  else rc_context_type_
 );
-local rc_qa_type = "cot";
+local rc_qa_type = "qa";  // Changed from "cot" to "qa" to skip answer extraction
 
 {
   "start_state": "generate_titles",
