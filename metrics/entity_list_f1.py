@@ -1,6 +1,6 @@
 """
 Entity List F1 Metric for CrossEntityQA
-Compares entity lists separated by " and " regardless of order.
+Compares entity lists separated by commas regardless of order.
 Computes precision, recall, and F1 based on set overlap.
 """
 import re
@@ -30,12 +30,15 @@ def extract_entity_tokens(entity: str) -> Set[str]:
                   'corp', 'inc', 'ltd', 'llc', 'company', 'corporation', 'incorporated',
                   'co', 'limited', 'plc', 'gmbh', 'ag'}
     
+    # Remove parentheses and their contents first (e.g., "(film)" or "(1960 film)")
+    entity = re.sub(r'\([^)]*\)', '', entity)
+    
     tokens = entity.split()
     # Keep tokens that are meaningful (3+ chars and not stop words)
     meaningful_tokens = set()
     for token in tokens:
-        # Remove commas, parentheses, dots and other punctuation
-        token = token.strip(',.()[]').replace('.', '')
+        # Remove commas, dots and other punctuation
+        token = token.strip(',.[]').replace('.', '')
         # Skip years (4-digit numbers)
         if token.isdigit() and len(token) == 4:
             continue
@@ -47,7 +50,7 @@ def extract_entity_tokens(entity: str) -> Set[str]:
 
 def extract_entities(text: str) -> List[Set[str]]:
     """
-    Extract entities from text by splitting on " and " or commas.
+    Extract entities from text by splitting on commas or " and ".
     Returns a list of token sets, one per entity.
     """
     if not text:
@@ -56,12 +59,12 @@ def extract_entities(text: str) -> List[Set[str]]:
     # Fix encoding issues
     text = ftfy.fix_text(text)
     
-    # Try splitting by " and " first (preferred format)
-    if " and " in text:
-        entities = text.split(" and ")
-    # Fallback to comma splitting if no " and " found
-    elif "," in text:
+    # Try splitting by comma first (preferred format)
+    if "," in text:
         entities = text.split(",")
+    # Fallback to " and " splitting if no commas found
+    elif " and " in text:
+        entities = text.split(" and ")
     else:
         # Single entity
         entities = [text]
@@ -113,8 +116,8 @@ def compute_entity_f1(predicted: str, ground_truth: str, threshold: float = 0.5)
     Compute precision, recall, and F1 for entity lists using fuzzy token matching.
     
     Args:
-        predicted: Predicted answer string with entities separated by " and " or commas
-        ground_truth: Ground truth string with entities separated by " and "
+        predicted: Predicted answer string with entities separated by commas or " and "
+        ground_truth: Ground truth string with entities separated by commas
         threshold: Minimum token overlap similarity for matching
     
     Returns:
@@ -199,7 +202,7 @@ def compute_exact_match(predicted: str, ground_truth: str, threshold: float = 0.
 class EntityListF1Metric(Metric):
     """
     Metric for evaluating entity list predictions.
-    Splits by " and " (or commas as fallback), compares as sets.
+    Splits by commas (or " and " as fallback), compares as sets.
     """
     
     def __init__(self) -> None:

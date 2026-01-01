@@ -4,7 +4,7 @@ Preprocessing script to add ground truth to CrossEntityQA queries.
 For each query_id:
 1. Find all relevant passage_ids from qrels.tsv
 2. For each passage_id, get the entity_label from corpus.jsonl
-3. Aggregate entity_labels with " and " between them
+3. Aggregate entity_labels with commas between them
 4. Add as "ground_truth" field to queries.jsonl
 """
 
@@ -62,7 +62,7 @@ def generate_ground_truth(passage_ids, passage_to_entity):
         passage_to_entity: Dict mapping passage_id to entity_label
     
     Returns:
-        String with entity_labels joined by " and "
+        String with entity_labels joined by ", "
     """
     entity_labels = []
     for passage_id in passage_ids:
@@ -72,7 +72,7 @@ def generate_ground_truth(passage_ids, passage_to_entity):
         else:
             print(f"Warning: passage_id {passage_id} not found in corpus")
     
-    return " and ".join(entity_labels)
+    return ", ".join(entity_labels)
 
 
 def process_queries(queries_path, output_path, query_to_passages, passage_to_entity):

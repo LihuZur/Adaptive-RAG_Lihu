@@ -1,5 +1,5 @@
-IMPORTANT: When listing multiple entities in your answer, separate them with " and " (not commas). 
-Example: "Entity1 and Entity2 and Entity3"
+IMPORTANT: When listing multiple entities in your answer, separate them with commas. 
+Example: "Entity1, Entity2, Entity3"
 
 # METADATA: {"query_id": "filmography_Q2001_easy_103"}
 Context:
@@ -14,7 +14,7 @@ Full Metal Jacket is a 1987 war film directed and produced by Stanley Kubrick fr
 The Shining is a 1980 psychological horror film produced and directed by Stanley Kubrick and co-written with novelist Diane Johnson. It is based on Stephen King's 1977 novel and stars Jack Nicholson, Shelley Duvall, Danny Lloyd and Scatman Crothers.
 
 Q: What films did Stanley Kubrick direct from 1953 to 1977?
-A: Paths of Glory and A Clockwork Orange and 2001: A Space Odyssey and Full Metal Jacket and The Shining
+A: Paths of Glory, A Clockwork Orange, 2001: A Space Odyssey, Full Metal Jacket, The Shining
 
 # METADATA: {"query_id": "founded_by_Q317521_easy_124"}
 Context:
@@ -27,7 +27,7 @@ X.com was an American online bank founded by Ed Ho, Harris Fricker, Elon Musk, a
 Astra Nova School, successor to Ad Astra, is a nonprofit online school founded by Elon Musk and Joshua Dahn on the campus of SpaceX.
 
 Q: What companies did Elon Musk found?
-A: OpenAI and Neuralink and X.com and Astra Nova School
+A: OpenAI, Neuralink, X.com, Astra Nova School
 
 # METADATA: {"query_id": "award_Q38104_2010_2023_easy_107"}
 Context:
@@ -40,7 +40,7 @@ Arthur Bruce McDonald  P.Eng (born August 29, 1943) is a Canadian astrophysicist
 Brian Paul Schmidt (born 24 February 1967) is an American Australian astrophysicist at the Australian National University's Mount Stromlo Observatory and Research School of Astronomy and Astrophysics. He was the Vice-Chancellor of the Australian National University (ANU) from January 2016 to January 2024. He is known for his research in using supernovae as cosmological probes. He previously held a Federation Fellowship and a Laureate Fellowship from the Australian Research Council, and was elected a Fellow of the Royal Society (FRS) in 2012. Schmidt shared both the 2006 Shaw Prize in Astronomy and the 2011 Nobel Prize in Physics with Saul Perlmutter and Adam Riess for providing evidence that the expansion of the universe is accelerating.
 
 Q: Who received the Nobel Prize in Physics from 2010 to 2016?
-A: Shuji Nakamura and David Thouless and Arthur McDonald and Brian Schmidt
+A: Shuji Nakamura, David Thouless, Arthur McDonald, Brian Schmidt
 
 # METADATA: {"query_id": "capitals_Q46_easy_121"}
 Context:
@@ -51,75 +51,75 @@ Skopje is the capital and largest city of North Macedonia. It lies in the northe
 Bucharest (UK:   BOO-kə-REST, US:  -⁠rest; Romanian: București [bukuˈreʃtʲ] ) is the capital and largest city of Romania. The metropolis stands on the River Dâmbovița in south-eastern Romania. Its population is officially estimated at 1.71 million residents within a greater metropolitan area of 2.31 million residents, which makes Bucharest the 8th most-populous city by population within city limits in the European Union.
 
 Q: What capitals are located in Europe?
-A: Oslo and Skopje and Bucharest
+A: Oslo, Skopje, Bucharest
 
 # METADATA: {"query_id": "filmography_Q8877_easy_0"}
 Context:
 Steven Spielberg is a renowned American film director. Between 1964 and 1972, he directed several films that contributed to his early reputation in the industry, including Firelight and Amblin'.
 
 Q: What films did Steven Spielberg direct from 1964 to 1972?
-A: Firelight and Amblin'
+A: Firelight, Amblin'
 
 # METADATA: {"query_id": "position_Q14211_all_all_easy_1"}
 Context:
 The Prime Minister of Great Britain is the head of government in the United Kingdom. From 1721 to 1742, the office was held by Robert Walpole and Spencer Compton, who shaped early British parliamentary history.
 
 Q: Who are the Prime Ministers of Great Britain from 1721 to 1742?
-A: Robert Walpole and Spencer Compton
+A: Robert Walpole, Spencer Compton
 
 # METADATA: {"query_id": "cast_Q44578_easy_2"}
 Context:
 A creative ensemble refers to a group of actors who collaborate on a theatrical or cinematic production. The following actors are recognized for their roles in such ensembles: John Smith, Jane Doe, Alice Johnson, Bob Lee, and Carol White.
 
 Q: Who are the actors in the creative ensemble?
-A: John Smith and Jane Doe and Alice Johnson and Bob Lee and Carol White
+A: John Smith, Jane Doe, Alice Johnson, Bob Lee, Carol White
 
 # METADATA: {"query_id": "filmography_Q2001_easy_3"}
 Context:
 Stanley Kubrick was an influential film director. Between 1953 and 1957, he released several films that are now considered classics, including Fear and Desire, Killer's Kiss, and The Killing.
 
 Q: What films did Stanley Kubrick release from 1953 to 1957?
-A: Fear and Desire and Killer's Kiss and The Killing
+A: Fear and Desire, Killer's Kiss, The Killing
 
 # METADATA: {"query_id": "capitals_Q15_easy_4"}
 Context:
 Gabon, the Democratic Republic of the Congo, Eritrea, and Tanzania are African countries, each with its own capital city: Libreville, Kinshasa, Asmara, and Dodoma, respectively.
 
 Q: What capital cities are located in Gabon, the Democratic Republic of the Congo, Eritrea, and Tanzania?
-A: Libreville and Kinshasa and Asmara and Dodoma
+A: Libreville, Kinshasa, Asmara, Dodoma
 
 # METADATA: {"query_id": "series_Q642878_easy_5"}
 Context:
 "Spider-Man: Far From Home" is a superhero film featuring a cast of talented actors, including Tom Holland and Jake Gyllenhaal.
 
 Q: Who are the actors in Spider-Man: Far From Home?
-A: Tom Holland and Jake Gyllenhaal
+A: Tom Holland, Jake Gyllenhaal
 
 # METADATA: {"query_id": "series_Q2484680_easy_6"}
 Context:
 "GoldenEye" is a James Bond film known for its ensemble cast, including Pierce Brosnan, Sean Bean, Izabella Scorupco, and Famke Janssen.
 
 Q: Who are the actors in GoldenEye?
-A: Pierce Brosnan and Sean Bean and Izabella Scorupco and Famke Janssen
+A: Pierce Brosnan, Sean Bean, Izabella Scorupco, Famke Janssen
 
 # METADATA: {"query_id": "award_Q80061_all_all_easy_8"}
 Context:
 The Nobel Prize in Physiology or Medicine is awarded annually to individuals who have made significant contributions to the field. Recipients from 1901 to 1905 include Emil von Behring, Ronald Ross, Niels Ryberg Finsen, Ivan Pavlov, and Robert Koch.
 
 Q: Who received the Nobel Prize in Physiology or Medicine from 1901 to 1905?
-A: Emil von Behring and Ronald Ross and Niels Ryberg Finsen and Ivan Pavlov and Robert Koch
+A: Emil von Behring, Ronald Ross, Niels Ryberg Finsen, Ivan Pavlov, Robert Koch
 
 # METADATA: {"query_id": "award_Q103360_2000_2023_easy_9"}
 Context:
 The Academy Award for Best Picture is one of the most prestigious awards in the film industry. The winning films from 2000 to 2001 were Gladiator and A Beautiful Mind.
 
 Q: Who received the Academy Award for Best Picture from 2000 to 2001?
-A: Gladiator and A Beautiful Mind
+A: Gladiator, A Beautiful Mind
 
 # METADATA: {"query_id": "capitals_Q46_easy_10"}
 Context:
 Northern Europe is home to several capital cities, including Stockholm, Oslo, Copenhagen, and Helsinki.
 
 Q: What capitals are located in Northern Europe?
-A: Stockholm and Oslo and Copenhagen and Helsinki
+A: Stockholm, Oslo, Copenhagen, Helsinki
 
