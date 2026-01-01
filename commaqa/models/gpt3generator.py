@@ -271,8 +271,15 @@ class GPT3Generator:
             logger.error("[EMBEDDING] Could not complete OpenAI call after 500 attempts.")
             raise Exception("Could not complete OpenAI call")
 
-        # Print the full LLM response (raw output) for runtime transparency
-        print("[LLM RAW RESPONSE]", response)
+        # Print only the interesting part of the LLM response (the main content)
+        interesting_content = None
+        if response and "choices" in response and response["choices"]:
+            choice = response["choices"][0]
+            if "message" in choice and "content" in choice["message"]:
+                interesting_content = choice["message"]["content"]
+            elif "text" in choice:
+                interesting_content = choice["text"]
+        print("[LLM RESPONSE CONTENT]", interesting_content)
 
         output_seq_score = []
 
