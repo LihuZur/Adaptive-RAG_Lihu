@@ -160,7 +160,8 @@ def build_null_distribution(
     all_scores = []
     
     for i, item in enumerate(sampled_data):
-        query = item.get("question_text", "") or item.get("question", "")
+        # CrossEntityQA uses "query_text", other datasets use "question"
+        query = item.get("query_text", "") or item.get("question", "")
         
         if not query.strip():
             continue
