@@ -20,7 +20,7 @@ local rc_context_type = (
   if rc_context_type_ == "gold_with_n_distractors"
   then "gold_with_" + distractor_count + "_distractors"  else rc_context_type_
 );
-local rc_qa_type = "qa";  // Changed from "cot" to "qa" to skip answer extraction
+local rc_qa_type = "cot";
 
 {
   "start_state": "generate_titles",
@@ -47,7 +47,7 @@ local rc_qa_type = "qa";  // Changed from "cot" to "qa" to skip answer extractio
     },
     "answer_main_question": {
       "name": "llmqa",
-      "next_model": if std.endsWith(rc_qa_type, "cot") then "extract_answer" else null,
+      "next_model": null,  // Skip extract_answer for CrossEntityQA - use raw LLM response
       "prompt_file": "prompts/"+dataset+"/"+rc_context_type+"_context_"+rc_qa_type+"_qa_codex.txt",
       "prompt_reader_args": prompt_reader_args,
       "valid_qids": valid_qids,
