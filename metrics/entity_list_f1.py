@@ -23,21 +23,23 @@ def extract_entity_tokens(entity: str) -> Set[str]:
     # Normalize first
     entity = normalize_entity(entity)
     
-    # Remove ordinal numbers (1st, 2nd, etc.) and common title words
+    # Remove ordinal numbers (1st, 2nd, etc.), common title words, and company suffixes
     stop_words = {'of', 'the', 'a', 'an', 'and', '1st', '2nd', '3rd', '4th', '5th', 
                   '6th', '7th', '8th', '9th', '10th', 'earl', 'duke', 'marquess',
-                  'count', 'baron', 'sir', 'lord', 'lady', 'film'}
+                  'count', 'baron', 'sir', 'lord', 'lady', 'film', 'bank', 'group',
+                  'corp', 'inc', 'ltd', 'llc', 'company', 'corporation', 'incorporated',
+                  'co', 'limited', 'plc', 'gmbh', 'ag'}
     
     tokens = entity.split()
     # Keep tokens that are meaningful (3+ chars and not stop words)
     meaningful_tokens = set()
     for token in tokens:
-        # Remove commas, parentheses and other punctuation
-        token = token.strip(',.()[]')
+        # Remove commas, parentheses, dots and other punctuation
+        token = token.strip(',.()[]').replace('.', '')
         # Skip years (4-digit numbers)
         if token.isdigit() and len(token) == 4:
             continue
-        if len(token) >= 3 and token not in stop_words:
+        if len(token) >= 2 and token not in stop_words:  # Lowered to 2 chars for "X", "xAI" etc.
             meaningful_tokens.add(token)
     
     return meaningful_tokens

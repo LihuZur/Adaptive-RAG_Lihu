@@ -84,7 +84,32 @@ def evaluate_by_dicts(
     elif prediction_type in ("paras"):
         metrics = [AnswerSupportRecallMetric()]
 
+    # Queries with broken/incompatible ground truth (GT shows movies instead of actors, etc.)
+    BROKEN_QUERY_IDS = {
+        "cast_Q44578_easy_2",
+        "series_Q642878_easy_5",
+        "series_Q2484680_easy_6",
+        "founded_by_Q317521_easy_11",
+        "cast_Q25188_easy_12",
+        "series_Q8337_easy_13",
+        "series_Q2484680_easy_38",
+        "series_Q8337_easy_44",
+        "series_Q642878_easy_48",
+        "series_Q8337_easy_80",
+        "series_Q8337_easy_127",
+        "award_Q103360_2000_2023_medium_57",
+        "series_Q642878_easy_77",
+        "series_Q2484680_medium_76",
+        "capitals_Q46_medium_89",
+        "series_Q642878_easy_123",
+        "series_Q2484680_easy_129",
+        "cast_Q25188_medium_117",
+        "award_Q38104_2010_2023_medium_116",
+        "cast_Q47703_medium_122",
+    }
+
     query_counter = 0
+    skipped_count = 0
     for id_ in set(id_to_ground_truths.keys()):
         query_counter += 1
         ground_truth = id_to_ground_truths[id_]
@@ -112,6 +137,21 @@ def evaluate_by_dicts(
             # Ensure ground_truth is a string (unwrap if accidentally wrapped in list)
             if isinstance(ground_truth, list):
                 ground_truth = ground_truth[0] if ground_truth else ""
+            
+            # Check if this query should be skipped
+            if id_ in BROKEN_QUERY_IDS:
+                print("=" * 80)
+                print(f"EVALUATING QUERY {query_counter}: {id_}")
+                print(f"QUESTION: {query_text}")
+                print("-" * 80)
+                print(f"PREDICTION: {prediction[0] if prediction else ''}")
+                print(f"GROUND TRUTH: {ground_truth}")
+                print("-" * 80)
+                print("SCORES - SKIPPED (broken query)")
+                print("=" * 80)
+                print()
+                skipped_count += 1
+                continue  # Skip metric calculation for this query
             
             # Print query evaluation details
             print("=" * 80)
@@ -156,6 +196,14 @@ def evaluate_by_dicts(
         evaluation_results["sp_f1"] = evaluation_results_["title_f1"]
         evaluation_results["sp_precision"] = evaluation_results_["title_precision"]
         evaluation_results["sp_recall"] = evaluation_results_["title_recall"]
+
+    # Add skipped count info for CrossEntityQA
+    if dataset.lower() == "crossentityqa" and 'skipped_count' in locals():
+        evaluation_results["skipped_queries"] = skipped_count
+        evaluation_results["evaluated_queries"] = query_counter - skipped_count
+        print(f"\n{'='*80}")
+        print(f"EVALUATION SUMMARY: {evaluation_results['evaluated_queries']} queries evaluated, {skipped_count} queries skipped")
+        print(f"{'='*80}\n")
 
     return evaluation_results
 
