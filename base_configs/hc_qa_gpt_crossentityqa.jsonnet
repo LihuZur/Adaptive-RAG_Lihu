@@ -47,7 +47,7 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
     },
     "llmqa": {
       "name": "llmqa",
-      "prompt_file": "prompts/crossentityqa/no_context_cot_qa_codex.txt",
+      "prompt_file": "prompts/crossentityqa/gold_with_1_distractors_context_cot_qa_codex.txt",
       "prompt_reader_args": prompt_reader_args,
       "gen_model": "gpt3",
       "engine": "gpt-4o-mini",
