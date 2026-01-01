@@ -25,6 +25,7 @@ from metrics.support_em_f1 import SupportEmF1Metric
 from metrics.support_em_f1 import SupportEmF1Metric, ListSetEMF1Metric
 from metrics.answer_support_recall import AnswerSupportRecallMetric
 from metrics.squad_answer_em_f1 import SquadAnswerEmF1Metric
+from metrics.entity_list_f1 import EntityListF1Metric
 
 def normalize_answer(s):
     """Lower text and remove punctuation, articles and extra whitespace."""
@@ -70,9 +71,9 @@ def evaluate_by_dicts(
     id_to_predictions: Dict[str, Any],
     dataset: str,
 ) -> Dict:
-    # For CrossEntityQA, use regular answer metrics (ground_truth is now a string, not a list)
+    # For CrossEntityQA, use entity list metric that handles " and " separated entities
     if dataset.lower() == "crossentityqa":
-        metrics = [SquadAnswerEmF1Metric()]
+        metrics = [EntityListF1Metric()]
     elif prediction_type == "answer":
         if dataset in ['hotpotqa', '2wikimultihopqa', 'musique', 'iirc']:
             metrics = [DropAnswerEmAndF1(), SupportEmF1Metric(do_normalize_answer=True)]

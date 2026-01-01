@@ -54,6 +54,7 @@ local rc_qa_type = "cot";
       "end_state": "[EOQ]",
       "gen_model": "gpt3",
       "engine": "gpt-4o-mini",
+      "max_tokens": 512,  // Allow longer responses for complete answers
       "retry_after_n_seconds": 50,
       "add_context": true,
       "answer_is_numbered_list": false,
