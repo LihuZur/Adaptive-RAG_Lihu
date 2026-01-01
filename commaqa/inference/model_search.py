@@ -212,28 +212,28 @@ class QuestionSearchBase(object):
                 pass
             
             # Print organized summary for the query (always show, ignore silent flag)
-            print("\n" + "="*80)
-            print(f"QUERY ID: {example['qid']}")
-            print(f"QUERY: {example.get('question', example.get('query_text', 'N/A'))}")
-            print("-"*80)
+            # print("\n" + "="*80)
+            # print(f"QUERY ID: {example['qid']}")
+            # print(f"QUERY: {example.get('question', example.get('query_text', 'N/A'))}")
+            # print("-"*80)
             
             # Extract retrieved passage IDs if available
-            retrieved_pids = []
-            if hasattr(data, 'paragraphs') and data.paragraphs:
-                retrieved_pids = [p.get('pid', p.get('title', 'unknown')) for p in data.paragraphs[:5]]
-            if retrieved_pids:
-                print(f"RETRIEVED PASSAGES: {', '.join(retrieved_pids)}")
-                print("-"*80)
+            # retrieved_pids = []
+            # if hasattr(data, 'paragraphs') and data.paragraphs:
+            #     retrieved_pids = [p.get('pid', p.get('title', 'unknown')) for p in data.paragraphs[:5]]
+            # if retrieved_pids:
+            #     print(f"RETRIEVED PASSAGES: {', '.join(retrieved_pids)}")
+            #     print("-"*80)
             
-            print(f"LLM RESPONSE: {final_answer}")
+            # print(f"LLM RESPONSE: {final_answer}")
             
             # Show ground truth if available (check multiple possible field names)
-            gt = example.get('ground_truth') or example.get('answer') or example.get('answers')
-            if gt:
-                print("-"*80)
-                print(f"GROUND TRUTH: {gt}")
+            # gt = example.get('ground_truth') or example.get('answer') or example.get('answers')
+            # if gt:
+            #     print("-"*80)
+            #     print(f"GROUND TRUTH: {gt}")
             
-            print("="*80 + "\n")
+            # print("="*80 + "\n")
             
             return (example["qid"], final_answer, chain)
 
