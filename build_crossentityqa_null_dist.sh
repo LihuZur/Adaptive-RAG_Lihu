@@ -24,8 +24,8 @@ echo ""
 # Configuration
 RETRIEVER_HOST="${RETRIEVER_HOST:-http://127.0.0.1}"
 RETRIEVER_PORT="${RETRIEVER_PORT:-8000}"
-NUM_QUERIES="${NUM_QUERIES:-100}"
-RETRIEVAL_PER_QUERY="${RETRIEVAL_PER_QUERY:-100}"
+NUM_QUERIES="${NUM_QUERIES:-105}"  # Use all 105 valid queries for better distribution
+RETRIEVAL_PER_QUERY="${RETRIEVAL_PER_QUERY:-150}"  # Get more scores per query for richer distribution
 
 echo "Configuration:"
 echo "  Retriever Host: $RETRIEVER_HOST"

@@ -813,9 +813,9 @@ instantiation_schemes = {
         "distractor_count": ['"1"'],
     },
     "hc_qa": {
-        "bm25_retrieval_count": ["30", "50"],  # More candidates = better HC selection
-        "gamma": ["0.1", "0.2"],  # Standard HC thresholds
-        "min_hc": ["0.0", "1.0"],  # No threshold vs. conservative threshold
+        "bm25_retrieval_count": ["50", "100"],  # Need more candidates since avg K=9.2, max K=20
+        "gamma": ["0.3", "0.5"],  # Search more candidates (30-50% instead of 10-20%)
+        "min_hc": ["0.0"],  # No threshold - let HC decide based on statistics alone
     },
 }
 
