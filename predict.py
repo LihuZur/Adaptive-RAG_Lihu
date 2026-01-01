@@ -86,7 +86,7 @@ def main():
     dataset_name = infer_dataset_from_file_path(args.evaluation_path)
     real_input_path = args.evaluation_path
     if dataset_name.lower() == "crossentityqa":
-        real_input_path = os.path.join("CrossEntityQA", "queries.jsonl")
+        real_input_path = os.path.join("CrossEntityQA", "queries_with_ground_truth.jsonl")
     print(f"[INFO] Using {real_input_path} as input for {dataset_name}.")
     print(f"Run predict_command: \n{predict_command}\n")
 

@@ -1,64 +1,3 @@
-from typing import Dict, Any
-def evaluate_by_dicts(
-    prediction_type: str,
-    id_to_ground_truths: Dict[str, Any],
-    id_to_predictions: Dict[str, Any],
-    dataset: str,
-) -> Dict:
-    # For CrossEntityQA, always use SupportEmF1Metric (list of QIDs)
-    if dataset.lower() == "crossentityqa":
-        metrics = [SupportEmF1Metric()]
-    elif prediction_type == "answer":
-        if dataset in ['hotpotqa', '2wikimultihopqa', 'musique', 'iirc']:
-            metrics = [DropAnswerEmAndF1(), SupportEmF1Metric(do_normalize_answer=True)]
-        else:
-            metrics = [SquadAnswerEmF1Metric(), SupportEmF1Metric(do_normalize_answer=True)]
-    elif prediction_type in ("titles", "pids", "real_pids"):
-        metrics = [SupportEmF1Metric()]
-    elif prediction_type in ("paras"):
-        metrics = [AnswerSupportRecallMetric()]
-
-    for id_ in set(id_to_ground_truths.keys()):
-        ground_truth = id_to_ground_truths[id_]
-        prediction = id_to_predictions[id_]
-
-        assert isinstance(prediction, (str, list))
-        if prediction_type == "answer" and isinstance(prediction, str):
-            if prediction.strip().startswith("[") or prediction.strip().endswith("]"):
-                prediction = [e for e in prediction.replace('"', "").replace("[", "").replace("]", "").split(",")]
-            else:
-                prediction = [prediction]
-
-        assert isinstance(prediction, (list, tuple))
-        prediction = [str(e) for e in prediction]
-
-        # For CrossEntityQA, pass ground_truth directly (list of QIDs)
-        if dataset.lower() == "crossentityqa":
-            metrics[0](prediction, ground_truth)
-        elif prediction_type == "answer":
-            prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
-            metrics[0](prediction, [ground_truth])
-            metrics[1](prediction, ground_truth)
-        elif prediction_type in ("titles", "pids", "real_pids"):
-            metrics[0](prediction, ground_truth)
-        elif prediction_type in ("paras"):
-            predicted_paras = [
-                " ".join([eval(prediction_)["title"], eval(prediction_)["paragraph_text"]])
-                for prediction_ in prediction
-            ]
-            metrics[0](predicted_paras, ground_truth)
-
-    evaluation_results = metrics[0].get_metric()
-
-    # Only add secondary metrics if they exist (not for CrossEntityQA)
-    if prediction_type == "answer" and len(metrics) > 1:
-        evaluation_results_ = metrics[1].get_metric()
-        evaluation_results["sp_em"] = evaluation_results_["title_em"]
-        evaluation_results["sp_f1"] = evaluation_results_["title_f1"]
-        evaluation_results["sp_precision"] = evaluation_results_["title_precision"]
-        evaluation_results["sp_recall"] = evaluation_results_["title_recall"]
-
-    return evaluation_results
 import re
 import os
 import json
@@ -123,6 +62,69 @@ def answer_extractor(potentially_cot: str) -> str:
     if match:
         return match.group(1)
     return potentially_cot
+
+
+def evaluate_by_dicts(
+    prediction_type: str,
+    id_to_ground_truths: Dict[str, Any],
+    id_to_predictions: Dict[str, Any],
+    dataset: str,
+) -> Dict:
+    # For CrossEntityQA, use regular answer metrics (ground_truth is now a string, not a list)
+    if dataset.lower() == "crossentityqa":
+        metrics = [SquadAnswerEmF1Metric()]
+    elif prediction_type == "answer":
+        if dataset in ['hotpotqa', '2wikimultihopqa', 'musique', 'iirc']:
+            metrics = [DropAnswerEmAndF1(), SupportEmF1Metric(do_normalize_answer=True)]
+        else:
+            metrics = [SquadAnswerEmF1Metric(), SupportEmF1Metric(do_normalize_answer=True)]
+    elif prediction_type in ("titles", "pids", "real_pids"):
+        metrics = [SupportEmF1Metric()]
+    elif prediction_type in ("paras"):
+        metrics = [AnswerSupportRecallMetric()]
+
+    for id_ in set(id_to_ground_truths.keys()):
+        ground_truth = id_to_ground_truths[id_]
+        prediction = id_to_predictions[id_]
+
+        assert isinstance(prediction, (str, list))
+        if prediction_type == "answer" and isinstance(prediction, str):
+            if prediction.strip().startswith("[") or prediction.strip().endswith("]"):
+                prediction = [e for e in prediction.replace('"', "").replace("[", "").replace("]", "").split(",")]
+            else:
+                prediction = [prediction]
+
+        assert isinstance(prediction, (list, tuple))
+        prediction = [str(e) for e in prediction]
+
+        # For CrossEntityQA, treat as regular answer comparison (ground_truth is a string)
+        if dataset.lower() == "crossentityqa":
+            prediction = [answer_extractor(_prediction) for _prediction in prediction]
+            metrics[0](prediction, [ground_truth])
+        elif prediction_type == "answer":
+            prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
+            metrics[0](prediction, [ground_truth])
+            metrics[1](prediction, ground_truth)
+        elif prediction_type in ("titles", "pids", "real_pids"):
+            metrics[0](prediction, ground_truth)
+        elif prediction_type in ("paras"):
+            predicted_paras = [
+                " ".join([eval(prediction_)["title"], eval(prediction_)["paragraph_text"]])
+                for prediction_ in prediction
+            ]
+            metrics[0](predicted_paras, ground_truth)
+
+    evaluation_results = metrics[0].get_metric()
+
+    # Only add secondary metrics if they exist (not for CrossEntityQA)
+    if prediction_type == "answer" and len(metrics) > 1:
+        evaluation_results_ = metrics[1].get_metric()
+        evaluation_results["sp_em"] = evaluation_results_["title_em"]
+        evaluation_results["sp_f1"] = evaluation_results_["title_f1"]
+        evaluation_results["sp_precision"] = evaluation_results_["title_precision"]
+        evaluation_results["sp_recall"] = evaluation_results_["title_recall"]
+
+    return evaluation_results
 
 
 def official_evaluate_by_dicts(
@@ -387,7 +389,11 @@ def load_ground_truths(
 
         id_ = example["qid"]
         if prediction_type in ("answer", "paras"):
-            id_to_ground_truths[id_] = example["answer"]
+            # For CrossEntityQA, use ground_truth field if it exists, otherwise use answer
+            if "ground_truth" in example:
+                id_to_ground_truths[id_] = example["ground_truth"]
+            else:
+                id_to_ground_truths[id_] = example["answer"]
         elif prediction_type == "titles":
             id_to_ground_truths[id_] = example["titles"]
         elif prediction_type == "pids":
@@ -587,12 +593,12 @@ def main():
         question_type_key = question_type_key.strip()
         question_type_value = question_type_value.strip()
 
-    # Fallback logic for CrossEntityQA: always use CrossEntityQA/queries.jsonl as ground truth
+    # Fallback logic for CrossEntityQA: always use CrossEntityQA/queries_with_ground_truth.jsonl as ground truth
     dataset = infer_dataset_from_file_path(args.evaluation_path)
     dataset_name = dataset
     ground_truth_path = args.evaluation_path
     if dataset_name.lower() == "crossentityqa":
-        ground_truth_path = os.path.join("CrossEntityQA", "queries.jsonl")
+        ground_truth_path = os.path.join("CrossEntityQA", "queries_with_ground_truth.jsonl")
     print(f"[INFO] Using {ground_truth_path} as ground truth for {dataset_name}.")
     id_to_ground_truths = load_ground_truths(
         experiment_config,
@@ -609,56 +615,24 @@ def main():
             id_: prediction for id_, prediction in id_to_predictions.items() if id_ in id_to_ground_truths.keys()
         }
 
-    # For CrossEntityQA: if predictions file is missing, use entity_coverage from corpus.jsonl
-    if dataset.lower() == "crossentityqa" and (not id_to_predictions or len(id_to_predictions) == 0):
-        import glob
-        queries_candidates = glob.glob("*queries.jsonl") + glob.glob("CrossEntityQA/queries.jsonl")
-        if not queries_candidates:
-            raise FileNotFoundError("Could not find queries.jsonl for CrossEntityQA.")
-        queries_path = queries_candidates[0]
-        from lib import read_jsonl
-        queries = read_jsonl(queries_path)
-        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in queries}
-        id_to_predictions = id_to_entity_coverage.copy()
-        id_to_ground_truths = id_to_entity_coverage.copy()
-
     if set(id_to_ground_truths.keys()) != set(id_to_predictions.keys()):
         exit("Ids in input examples and predictions don't match.")
 
-    # For CrossEntityQA: use entity_coverage as both predictions and gold answers
-    if dataset.lower() == "crossentityqa":
-        # Load queries.jsonl to get entity_coverage for all queries
-        import glob
-        queries_candidates = glob.glob("*queries.jsonl") + glob.glob("CrossEntityQA/queries.jsonl")
-        if not queries_candidates:
-            raise FileNotFoundError("Could not find queries.jsonl for CrossEntityQA.")
-        queries_path = queries_candidates[0]
-        from lib import read_jsonl
-        queries = read_jsonl(queries_path)
-        id_to_entity_coverage = {ex["query_id"]: ex["entity_coverage"] for ex in queries}
-        id_to_predictions = id_to_entity_coverage.copy()
-        id_to_ground_truths = id_to_entity_coverage.copy()
-        evaluation_results = evaluate_by_dicts(
+    # Evaluate predictions against ground truth (works for all datasets including CrossEntityQA)
+    if args.official:
+        evaluation_results = official_evaluate_by_dicts(
             prediction_type=prediction_type,
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
         )
     else:
-        if args.official:
-            evaluation_results = official_evaluate_by_dicts(
-                prediction_type=prediction_type,
-                id_to_predictions=id_to_predictions,
-                id_to_ground_truths=id_to_ground_truths,
-                dataset=dataset,
-            )
-        else:
-            evaluation_results = evaluate_by_dicts(
-                prediction_type=prediction_type,
-                id_to_predictions=id_to_predictions,
-                id_to_ground_truths=id_to_ground_truths,
-                dataset=dataset,
-            )
+        evaluation_results = evaluate_by_dicts(
+            prediction_type=prediction_type,
+            id_to_predictions=id_to_predictions,
+            id_to_ground_truths=id_to_ground_truths,
+            dataset=dataset,
+        )
     print(json.dumps(evaluation_results, indent=4))
 
     # To be able to reproduce the same result, save git-hash

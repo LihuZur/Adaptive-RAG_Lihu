@@ -214,42 +214,42 @@ def make_musique_documents(elasticsearch_index: str, metadata: Dict = None):
                     metadata["idx"] += 1
 
 def make_crossentityqa_documents(elasticsearch_index: str, metadata: Dict = None):
-    # Assumes CrossEntityQA is in ../Downloads/CrossEntityQA or ./CrossEntityQA
-    # Try both locations for robustness
-    import pathlib
-    base_dirs = [
-        os.path.join(os.getcwd(), "CrossEntityQA"),
-        os.path.expanduser(os.path.join("~", "Downloads", "CrossEntityQA")),
-    ]
-    corpus_path = None
-    for base in base_dirs:
-        candidate = os.path.join(base, "corpus.jsonl")
-        if os.path.exists(candidate):
-            corpus_path = candidate
-            break
-    if corpus_path is None:
-        raise FileNotFoundError("Could not find CrossEntityQA/corpus.jsonl in expected locations.")
+    # Assumes CrossEntityQA is in ./CrossEntityQA
+    corpus_path = os.path.join(os.getcwd(), "CrossEntityQA", "corpus.jsonl")
+    
+    if not os.path.exists(corpus_path):
+        raise FileNotFoundError(f"Could not find CrossEntityQA corpus at: {corpus_path}")
 
     metadata = metadata or {"idx": 1}
     assert "idx" in metadata
 
-    used_full_ids = set()
+    used_passage_ids = set()
     with open(corpus_path, "r") as f:
         for line in tqdm(f, desc="Indexing CrossEntityQA passages"):
             if not line.strip():
                 continue
             instance = json.loads(line)
-            # Expect fields: id, title, text (or paragraph_text), url (optional)
-            title = instance.get("title", "")
-            paragraph_text = instance.get("text") or instance.get("paragraph_text") or ""
-            url = instance.get("url", "")
-            full_id = hash_object(" ".join([title, paragraph_text]))
-            if full_id in used_full_ids:
+            
+            # CrossEntityQA corpus.jsonl structure:
+            # - passage_id: unique identifier (e.g., "Q2300160_p0")
+            # - text: the passage text to be indexed and retrieved
+            # - entity_label: the entity name (e.g., "Vito Scotti")
+            # - entity_qid: the entity ID (e.g., "Q2300160")
+            passage_id = instance["passage_id"]
+            paragraph_text = instance["text"]
+            title = instance.get("entity_label", "")
+            
+            # Avoid duplicates
+            if passage_id in used_passage_ids:
                 continue
-            used_full_ids.add(full_id)
-            id_ = full_id[:32]
+            used_passage_ids.add(passage_id)
+            
+            # Use passage_id directly as the hash (it's already unique)
+            id_ = hash_object(passage_id)[:32]
             paragraph_index = 0
             is_abstract = True
+            url = ""
+            
             es_paragraph = {
                 "id": id_,
                 "title": title,

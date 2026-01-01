@@ -967,10 +967,10 @@ def is_experiment_complete(
 
 def load_crossentityqa_qids():
     """
-    Dynamically loads all query_ids from queries.jsonl for CrossEntityQA.
+    Dynamically loads all query_ids from queries_with_ground_truth.jsonl for CrossEntityQA.
     Returns a dict with keys "1", "2", "3" (all identical, for compatibility).
     """
-    queries_path = os.path.join(os.path.dirname(__file__), "CrossEntityQA", "queries.jsonl")
+    queries_path = os.path.join(os.path.dirname(__file__), "CrossEntityQA", "queries_with_ground_truth.jsonl")
     qids = []
     with open(queries_path, "r") as f:
         for line in f:
@@ -1223,22 +1223,22 @@ def main():
 
 
         evaluation_path = args.evaluation_path if hasattr(args, "evaluation_path") else None
-        # Special handling for crossentityqa: always use CrossEntityQA/queries.jsonl if evaluation_path is missing or points to dev_500_subsampled.jsonl
+        # Special handling for crossentityqa: always use CrossEntityQA/queries_with_ground_truth.jsonl if evaluation_path is missing or points to dev_500_subsampled.jsonl
         if hasattr(args, "instantiation_scheme") and "crossentityqa" in str(args.instantiation_scheme).lower():
             if (evaluation_path is None or "dev_500_subsampled" in str(evaluation_path) or not os.path.exists(evaluation_path)):
                 repo_root = os.path.dirname(os.path.abspath(__file__))
                 cwd = os.getcwd()
                 candidates = [
-                    os.path.join(repo_root, "CrossEntityQA", "queries.jsonl"),
-                    os.path.join(repo_root, "crossentityqa", "queries.jsonl"),
-                    os.path.join(repo_root, "data", "CrossEntityQA", "queries.jsonl"),
-                    os.path.join(repo_root, "data", "crossentityqa", "queries.jsonl"),
-                    os.path.join(cwd, "CrossEntityQA", "queries.jsonl"),
-                    os.path.join(cwd, "crossentityqa", "queries.jsonl"),
-                    os.path.join(cwd, "data", "CrossEntityQA", "queries.jsonl"),
-                    os.path.join(cwd, "data", "crossentityqa", "queries.jsonl"),
-                    os.path.abspath("CrossEntityQA/queries.jsonl"),
-                    os.path.abspath("crossentityqa/queries.jsonl"),
+                    os.path.join(repo_root, "CrossEntityQA", "queries_with_ground_truth.jsonl"),
+                    os.path.join(repo_root, "crossentityqa", "queries_with_ground_truth.jsonl"),
+                    os.path.join(repo_root, "data", "CrossEntityQA", "queries_with_ground_truth.jsonl"),
+                    os.path.join(repo_root, "data", "crossentityqa", "queries_with_ground_truth.jsonl"),
+                    os.path.join(cwd, "CrossEntityQA", "queries_with_ground_truth.jsonl"),
+                    os.path.join(cwd, "crossentityqa", "queries_with_ground_truth.jsonl"),
+                    os.path.join(cwd, "data", "CrossEntityQA", "queries_with_ground_truth.jsonl"),
+                    os.path.join(cwd, "data", "crossentityqa", "queries_with_ground_truth.jsonl"),
+                    os.path.abspath("CrossEntityQA/queries_with_ground_truth.jsonl"),
+                    os.path.abspath("crossentityqa/queries_with_ground_truth.jsonl"),
                 ]
                 for candidate in candidates:
                     if os.path.exists(candidate):
@@ -1246,7 +1246,7 @@ def main():
                         evaluation_path = candidate
                         break
                 else:
-                    raise ValueError("No CrossEntityQA/queries.jsonl or crossentityqa/queries.jsonl found in any expected location. Checked: " + str(candidates))
+                    raise ValueError("No CrossEntityQA/queries_with_ground_truth.jsonl or crossentityqa/queries_with_ground_truth.jsonl found in any expected location. Checked: " + str(candidates))
 
         if hasattr(args, "use_backup") and args.use_backup:
             prediction_directory += "__backup"
@@ -1641,7 +1641,7 @@ def main():
             dataset_name = infer_dataset_from_file_path(evaluation_path)
             real_input_path = evaluation_path
             if dataset_name.lower() == "crossentityqa":
-                real_input_path = os.path.join("CrossEntityQA", "queries.jsonl")
+                real_input_path = os.path.join("CrossEntityQA", "queries_with_ground_truth.jsonl")
             print(f"[INFO] Using {real_input_path} as input for {dataset_name}.")
             run_command = f"python predict.py {target_write_best_config_file_path} {evaluation_path} --llm_port_num {args.llm_port_num}"
 
@@ -1668,7 +1668,7 @@ def main():
                 dataset_name = infer_dataset_from_file_path(evaluation_path)
                 real_input_path = evaluation_path
                 if dataset_name.lower() == "crossentityqa":
-                    real_input_path = os.path.join("CrossEntityQA", "queries.jsonl")
+                    real_input_path = os.path.join("CrossEntityQA", "queries_with_ground_truth.jsonl")
                 print(f"[INFO] Using {real_input_path} as ground truth for {dataset_name}.")
                 run_command = f"python evaluate.py {target_write_best_config_file_path} {evaluation_path} --set_name {args.set_name} --llm_port_num {args.llm_port_num}"
                 if os.path.exists(metrics_file_path) and args.skip_if_exists:
