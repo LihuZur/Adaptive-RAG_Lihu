@@ -71,6 +71,7 @@ def evaluate_by_dicts(
     id_to_predictions: Dict[str, Any],
     dataset: str,
     config: Dict[str, Any] = None,
+    prediction_file_path: str = None,
 ) -> Dict:
     # For CrossEntityQA, use entity list metric that handles " and " separated entities
     if dataset.lower() == "crossentityqa":
@@ -102,7 +103,7 @@ def evaluate_by_dicts(
     
     # Get fetched passage counts from the saved passage_counts file
     fetched_passage_counts = {}
-    if dataset.lower() == "crossentityqa":
+    if dataset.lower() == "crossentityqa" and prediction_file_path:
         passage_counts_path = prediction_file_path.replace(".json", "_passage_counts.json")
         if os.path.exists(passage_counts_path):
             try:
@@ -296,10 +297,11 @@ def official_evaluate_by_dicts(
     id_to_ground_truths: Dict[str, Any],
     dataset: str,
     config: Dict[str, Any] = None,
+    prediction_file_path: str = None,
 ) -> Dict:
     if prediction_type != "answer":
         # official evaluation is not available for non answer prediction.
-        return evaluate_by_dicts(prediction_type, id_to_ground_truths, id_to_predictions, dataset, config)
+        return evaluate_by_dicts(prediction_type, id_to_ground_truths, id_to_predictions, dataset, config, prediction_file_path)
 
     question_ids = list(id_to_predictions.keys())
 
@@ -499,7 +501,7 @@ def official_evaluate_by_dicts(
         return metrics
 
     if dataset == "iirc":
-        return evaluate_by_dicts("answer", id_to_ground_truths, id_to_predictions, dataset, config)
+        return evaluate_by_dicts("answer", id_to_ground_truths, id_to_predictions, dataset, config, prediction_file_path)
 
 
 def load_experiment_config(config_file_path: str, args):
@@ -811,6 +813,7 @@ def main():
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
             config=config_to_use,
+            prediction_file_path=prediction_file_path,
         )
     else:
         evaluation_results = evaluate_by_dicts(
@@ -819,6 +822,7 @@ def main():
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
             config=config_to_use,
+            prediction_file_path=prediction_file_path,
         )
     print(json.dumps(evaluation_results, indent=4))
 
