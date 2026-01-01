@@ -84,7 +84,9 @@ def evaluate_by_dicts(
     elif prediction_type in ("paras"):
         metrics = [AnswerSupportRecallMetric()]
 
+    query_counter = 0
     for id_ in set(id_to_ground_truths.keys()):
+        query_counter += 1
         ground_truth = id_to_ground_truths[id_]
         prediction = id_to_predictions[id_]
 
@@ -104,7 +106,27 @@ def evaluate_by_dicts(
             # Ensure ground_truth is a string (unwrap if accidentally wrapped in list)
             if isinstance(ground_truth, list):
                 ground_truth = ground_truth[0] if ground_truth else ""
-            metrics[0](prediction[0] if prediction else "", [ground_truth])
+            
+            # Print query evaluation details
+            print("=" * 80)
+            print(f"EVALUATING QUERY {query_counter}: {id_}")
+            print("-" * 80)
+            print(f"PREDICTION: {prediction[0] if prediction else ''}")
+            print(f"GROUND TRUTH: {ground_truth}")
+            
+            # Call metric and capture score before aggregation
+            # We need to compute the score for this specific query
+            from metrics.entity_list_f1 import compute_entity_f1, compute_exact_match
+            pred_str = prediction[0] if prediction else ""
+            precision, recall, f1 = compute_entity_f1(pred_str, ground_truth)
+            em = compute_exact_match(pred_str, ground_truth)
+            
+            print("-" * 80)
+            print(f"SCORES - EM: {em:.3f} | Precision: {precision:.3f} | Recall: {recall:.3f} | F1: {f1:.3f}")
+            print("=" * 80)
+            print()
+            
+            metrics[0](pred_str, [ground_truth])
         elif prediction_type == "answer":
             prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
             metrics[0](prediction, [ground_truth])

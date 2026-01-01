@@ -15,14 +15,38 @@ def normalize_entity(entity: str) -> str:
     return entity.strip().lower()
 
 
-def extract_entities(text: str) -> Set[str]:
+def extract_entity_tokens(entity: str) -> Set[str]:
+    """
+    Extract meaningful tokens from an entity name.
+    Splits by spaces and removes very common words.
+    """
+    # Normalize first
+    entity = normalize_entity(entity)
+    
+    # Remove ordinal numbers (1st, 2nd, etc.) and common title words
+    stop_words = {'of', 'the', 'a', 'an', 'and', '1st', '2nd', '3rd', '4th', '5th', 
+                  '6th', '7th', '8th', '9th', '10th', 'earl', 'duke', 'marquess',
+                  'count', 'baron', 'sir', 'lord', 'lady'}
+    
+    tokens = entity.split()
+    # Keep tokens that are meaningful (3+ chars and not stop words)
+    meaningful_tokens = set()
+    for token in tokens:
+        # Remove commas and other punctuation
+        token = token.strip(',.')
+        if len(token) >= 3 and token not in stop_words:
+            meaningful_tokens.add(token)
+    
+    return meaningful_tokens
+
+
+def extract_entities(text: str) -> List[Set[str]]:
     """
     Extract entities from text by splitting on " and " or commas.
-    Handles both formats for robustness.
-    Returns a set of normalized entities.
+    Returns a list of token sets, one per entity.
     """
     if not text:
-        return set()
+        return []
     
     # Fix encoding issues
     text = ftfy.fix_text(text)
@@ -37,23 +61,50 @@ def extract_entities(text: str) -> Set[str]:
         # Single entity
         entities = [text]
     
-    # Normalize each entity
-    normalized = set()
+    # Extract token sets for each entity
+    entity_token_sets = []
     for entity in entities:
-        norm = normalize_entity(entity)
-        if norm:  # Skip empty strings
-            normalized.add(norm)
+        tokens = extract_entity_tokens(entity)
+        if tokens:  # Skip empty token sets
+            entity_token_sets.append(tokens)
     
-    return normalized
+    return entity_token_sets
 
 
-def compute_entity_f1(predicted: str, ground_truth: str) -> Tuple[float, float, float]:
+def entity_match(pred_tokens: Set[str], gt_tokens: Set[str], threshold: float = 0.5) -> bool:
     """
-    Compute precision, recall, and F1 for entity lists.
+    Check if two entities match based on token overlap.
+    
+    Args:
+        pred_tokens: Token set from predicted entity
+        gt_tokens: Token set from ground truth entity
+        threshold: Minimum Jaccard similarity to consider a match
+    
+    Returns:
+        True if entities match, False otherwise
+    """
+    if not pred_tokens or not gt_tokens:
+        return False
+    
+    # Compute Jaccard similarity: intersection / union
+    intersection = pred_tokens & gt_tokens
+    union = pred_tokens | gt_tokens
+    
+    if not union:
+        return False
+    
+    similarity = len(intersection) / len(union)
+    return similarity >= threshold
+
+
+def compute_entity_f1(predicted: str, ground_truth: str, threshold: float = 0.5) -> Tuple[float, float, float]:
+    """
+    Compute precision, recall, and F1 for entity lists using fuzzy token matching.
     
     Args:
         predicted: Predicted answer string with entities separated by " and " or commas
         ground_truth: Ground truth string with entities separated by " and "
+        threshold: Minimum token overlap similarity for matching
     
     Returns:
         Tuple of (precision, recall, f1)
@@ -67,28 +118,71 @@ def compute_entity_f1(predicted: str, ground_truth: str) -> Tuple[float, float, 
     if len(pred_entities) == 0 or len(gt_entities) == 0:
         return 0.0, 0.0, 0.0
     
-    # Compute overlap
-    overlap = pred_entities & gt_entities
-    num_overlap = len(overlap)
+    # Match predicted entities to ground truth using greedy matching
+    matched_gt = set()
+    matched_pred = 0
     
-    if num_overlap == 0:
+    for pred_tokens in pred_entities:
+        # Find best matching GT entity
+        best_match = None
+        best_similarity = 0.0
+        
+        for i, gt_tokens in enumerate(gt_entities):
+            if i in matched_gt:
+                continue
+            
+            if entity_match(pred_tokens, gt_tokens, threshold):
+                intersection = pred_tokens & gt_tokens
+                union = pred_tokens | gt_tokens
+                similarity = len(intersection) / len(union) if union else 0
+                
+                if similarity > best_similarity:
+                    best_similarity = similarity
+                    best_match = i
+        
+        if best_match is not None:
+            matched_gt.add(best_match)
+            matched_pred += 1
+    
+    if matched_pred == 0:
         return 0.0, 0.0, 0.0
     
-    precision = num_overlap / len(pred_entities)
-    recall = num_overlap / len(gt_entities)
-    f1 = (2 * precision * recall) / (precision + recall)
+    precision = matched_pred / len(pred_entities)
+    recall = len(matched_gt) / len(gt_entities)
+    f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
     
     return precision, recall, f1
 
 
-def compute_exact_match(predicted: str, ground_truth: str) -> int:
+def compute_exact_match(predicted: str, ground_truth: str, threshold: float = 0.5) -> int:
     """
-    Compute exact match: 1 if entity sets are identical, 0 otherwise.
-    Order doesn't matter.
+    Compute exact match: 1 if all entities match (using fuzzy matching), 0 otherwise.
     """
     pred_entities = extract_entities(predicted)
     gt_entities = extract_entities(ground_truth)
-    return int(pred_entities == gt_entities)
+    
+    if len(pred_entities) != len(gt_entities):
+        return 0
+    
+    # Try to match all entities
+    matched_gt = set()
+    
+    for pred_tokens in pred_entities:
+        found_match = False
+        for i, gt_tokens in enumerate(gt_entities):
+            if i in matched_gt:
+                continue
+            
+            if entity_match(pred_tokens, gt_tokens, threshold):
+                matched_gt.add(i)
+                found_match = True
+                break
+        
+        if not found_match:
+            return 0
+    
+    # All entities matched
+    return 1
 
 
 class EntityListF1Metric(Metric):
