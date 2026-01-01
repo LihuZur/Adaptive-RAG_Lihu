@@ -108,6 +108,7 @@ def build_null_distribution(
     retrieval_per_query: int = 100,
     retriever_host: str = "http://127.0.0.1",
     retriever_port: int = 8000,
+    exclude_top_k: int = 0,
 ) -> NullDistribution:
     """
     Build null distribution by retrieving documents for random queries.
@@ -115,6 +116,11 @@ def build_null_distribution(
     Strategy: Use questions from the dataset but retrieve from the corpus.
     Since most retrieved documents will be non-relevant (datasets have 87-93% noise),
     this provides a good approximation of the null distribution.
+    
+    Args:
+        exclude_top_k: Exclude top-K ranked documents from null distribution.
+                      Useful for dense-relevance datasets where relevant docs
+                      concentrate in top ranks (e.g., set to 20 for CrossEntityQA).
     """
     logger.info(f"Building null distribution for {corpus_name}")
     
@@ -176,7 +182,14 @@ def build_null_distribution(
             retriever_port=retriever_port,
         )
         
-        all_scores.extend(scores)
+        # Exclude top-K ranked scores if specified (to remove likely relevant docs)
+        if exclude_top_k > 0 and len(scores) > exclude_top_k:
+            filtered_scores = scores[exclude_top_k:]
+            all_scores.extend(filtered_scores)
+            if i == 0:
+                logger.info(f"Excluding top-{exclude_top_k} ranks, keeping {len(filtered_scores)} per query")
+        else:
+            all_scores.extend(scores)
         
         if (i + 1) % 10 == 0:
             logger.info(f"Collected {len(all_scores)} scores so far")
@@ -253,6 +266,12 @@ def main():
         default="processed_data/hc_null_distributions",
         help="Output directory (default: processed_data/hc_null_distributions)",
     )
+    parser.add_argument(
+        "--exclude_top_k",
+        type=int,
+        default=0,
+        help="Exclude top-K ranked docs from null dist (default: 0). Set to 20 for dense-relevance datasets like CrossEntityQA.",
+    )
     
     args = parser.parse_args()
     
@@ -264,6 +283,7 @@ def main():
         retrieval_per_query=args.retrieval_per_query,
         retriever_host=args.retriever_host,
         retriever_port=args.retriever_port,
+        exclude_top_k=args.exclude_top_k,
     )
     
     # Save to file
