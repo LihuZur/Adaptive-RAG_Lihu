@@ -26,14 +26,17 @@ def extract_entity_tokens(entity: str) -> Set[str]:
     # Remove ordinal numbers (1st, 2nd, etc.) and common title words
     stop_words = {'of', 'the', 'a', 'an', 'and', '1st', '2nd', '3rd', '4th', '5th', 
                   '6th', '7th', '8th', '9th', '10th', 'earl', 'duke', 'marquess',
-                  'count', 'baron', 'sir', 'lord', 'lady'}
+                  'count', 'baron', 'sir', 'lord', 'lady', 'film'}
     
     tokens = entity.split()
     # Keep tokens that are meaningful (3+ chars and not stop words)
     meaningful_tokens = set()
     for token in tokens:
-        # Remove commas and other punctuation
-        token = token.strip(',.')
+        # Remove commas, parentheses and other punctuation
+        token = token.strip(',.()[]')
+        # Skip years (4-digit numbers)
+        if token.isdigit() and len(token) == 4:
+            continue
         if len(token) >= 3 and token not in stop_words:
             meaningful_tokens.add(token)
     
@@ -74,6 +77,7 @@ def extract_entities(text: str) -> List[Set[str]]:
 def entity_match(pred_tokens: Set[str], gt_tokens: Set[str], threshold: float = 0.5) -> bool:
     """
     Check if two entities match based on token overlap.
+    Uses subset matching if prediction is fully contained in GT, otherwise uses Jaccard similarity.
     
     Args:
         pred_tokens: Token set from predicted entity
@@ -86,7 +90,12 @@ def entity_match(pred_tokens: Set[str], gt_tokens: Set[str], threshold: float = 
     if not pred_tokens or not gt_tokens:
         return False
     
-    # Compute Jaccard similarity: intersection / union
+    # If all prediction tokens appear in ground truth, it's a match (subset matching)
+    # This handles cases like "Duel" matching "Duel (1971 film)"
+    if pred_tokens.issubset(gt_tokens):
+        return True
+    
+    # Otherwise, compute Jaccard similarity: intersection / union
     intersection = pred_tokens & gt_tokens
     union = pred_tokens | gt_tokens
     

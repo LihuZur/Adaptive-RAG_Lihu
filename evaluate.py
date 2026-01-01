@@ -90,6 +90,12 @@ def evaluate_by_dicts(
         ground_truth = id_to_ground_truths[id_]
         prediction = id_to_predictions[id_]
 
+        # Extract question text and actual ground truth for CrossEntityQA
+        query_text = ""
+        if dataset.lower() == "crossentityqa" and isinstance(ground_truth, dict):
+            query_text = ground_truth.get("question", "")
+            ground_truth = ground_truth.get("answer", ground_truth)
+
         assert isinstance(prediction, (str, list))
         if prediction_type == "answer" and isinstance(prediction, str):
             if prediction.strip().startswith("[") or prediction.strip().endswith("]"):
@@ -110,6 +116,7 @@ def evaluate_by_dicts(
             # Print query evaluation details
             print("=" * 80)
             print(f"EVALUATING QUERY {query_counter}: {id_}")
+            print(f"QUESTION: {query_text}")
             print("-" * 80)
             print(f"PREDICTION: {prediction[0] if prediction else ''}")
             print(f"GROUND TRUTH: {ground_truth}")
@@ -400,7 +407,7 @@ def load_ground_truths(
         reader.remove_pinned_para_titles = True
         reader.add_paras_from_files = None
 
-    # prep ground_truths
+    # prep ground_truths - now includes query text
     id_to_ground_truths = {}
     for example in reader.read_examples(ground_truth_file_path):
 
@@ -417,9 +424,16 @@ def load_ground_truths(
         if prediction_type in ("answer", "paras"):
             # For CrossEntityQA, use ground_truth field if it exists, otherwise use answer
             if "ground_truth" in example:
-                id_to_ground_truths[id_] = example["ground_truth"]
+                # Store both ground truth and query text
+                id_to_ground_truths[id_] = {
+                    "answer": example["ground_truth"],
+                    "question": example.get("question", "")
+                }
             else:
-                id_to_ground_truths[id_] = example["answer"]
+                id_to_ground_truths[id_] = {
+                    "answer": example["answer"],
+                    "question": example.get("question", "")
+                }
         elif prediction_type == "titles":
             id_to_ground_truths[id_] = example["titles"]
         elif prediction_type == "pids":
