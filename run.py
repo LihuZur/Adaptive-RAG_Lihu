@@ -816,7 +816,7 @@ instantiation_schemes = {
         "bm25_retrieval_count": ["50", "100"],  # Need more candidates since avg K=9.2, max K=20
         "gamma": ["0.3", "0.5"],  # Search more candidates (30-50% instead of 10-20%)
         "min_hc": ["0.0"],  # No threshold - let HC decide based on statistics alone
-    },
+    }
 }
 
 
