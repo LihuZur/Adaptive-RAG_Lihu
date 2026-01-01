@@ -98,9 +98,6 @@ def main():
         variable_replacements_str = json.dumps(variable_replacements).replace(" ", "")
         run_command_array += ["--variable_replacements", f"'{variable_replacements_str}'"]
 
-    if args.command in ("predict"):
-        run_command_array.append("--skip_if_exists --silent")
-
     if args.command in ("predict", "evaluate", "track", "summarize", "ground_truth_check") and args.use_backup:
         run_command_array += ["--use_backup"]
 

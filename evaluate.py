@@ -760,17 +760,6 @@ def main():
     # get prediction_type
     experiment_config = load_experiment_config(config_filepath, args)
     prediction_type = experiment_config["prediction_type"]
-    
-    # For CrossEntityQA, try to load the backed up config from predictions directory
-    # which has the actual data_instances with fetched passages
-    backed_up_config = None
-    backed_up_config_path = os.path.join(prediction_directory, "config__" + prediction_file_name + ".jsonnet")
-    if os.path.exists(backed_up_config_path):
-        try:
-            backed_up_config = load_experiment_config(backed_up_config_path, args)
-            print(f"[DEBUG] Loaded backed up config from {backed_up_config_path}")
-        except Exception as e:
-            print(f"[DEBUG] Could not load backed up config: {e}")
 
     # prep ground_truths
     question_type_key = question_type_value = None
@@ -807,16 +796,13 @@ def main():
         exit("Ids in input examples and predictions don't match.")
 
     # Evaluate predictions against ground truth (works for all datasets including CrossEntityQA)
-    # Use backed_up_config if available (has actual fetched passages), otherwise use experiment_config
-    config_to_use = backed_up_config if backed_up_config is not None else experiment_config
-    
     if args.official:
         evaluation_results = official_evaluate_by_dicts(
             prediction_type=prediction_type,
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
-            config=config_to_use,
+            config=experiment_config,
             prediction_file_path=prediction_file_path,
         )
     else:
@@ -825,7 +811,7 @@ def main():
             id_to_predictions=id_to_predictions,
             id_to_ground_truths=id_to_ground_truths,
             dataset=dataset,
-            config=config_to_use,
+            config=experiment_config,
             prediction_file_path=prediction_file_path,
         )
     print(json.dumps(evaluation_results, indent=4))
