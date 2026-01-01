@@ -1219,7 +1219,7 @@ def main():
 
         experiment_name = os.path.splitext(os.path.split(local_file_path)[1])[0]
 
-        prediction_directory = os.path.join("predictions", experiment_name)
+        prediction_directory = os.path.join("predictions", args.set_name, experiment_name)
 
 
         evaluation_path = args.evaluation_path if hasattr(args, "evaluation_path") else None
