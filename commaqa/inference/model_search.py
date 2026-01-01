@@ -186,7 +186,7 @@ class QuestionSearchBase(object):
             chain = "\n" + example["qid"] + "\n" + example["question"]
             if not silent:
                 print("\n")
-            return (example["qid"], "", chain)
+            return (example["qid"], "", chain, 0)
         else:
             data = final_state._data
             chain = "\n" + example["qid"] + "\n" + example["question"]
@@ -217,12 +217,12 @@ class QuestionSearchBase(object):
             # print(f"QUERY: {example.get('question', example.get('query_text', 'N/A'))}")
             # print("-"*80)
             
-            # Extract retrieved passage IDs if available
-            # retrieved_pids = []
-            # if hasattr(data, 'paragraphs') and data.paragraphs:
-            #     retrieved_pids = [p.get('pid', p.get('title', 'unknown')) for p in data.paragraphs[:5]]
-            # if retrieved_pids:
-            #     print(f"RETRIEVED PASSAGES: {', '.join(retrieved_pids)}")
+            # Extract retrieved passage count for statistics
+            passage_count = 0
+            if "paras" in data:
+                passage_count = len(data["paras"])
+            elif "paragraphs" in data:
+                passage_count = len(data["paragraphs"])
             #     print("-"*80)
             
             # print(f"LLM RESPONSE: {final_answer}")
@@ -235,7 +235,7 @@ class QuestionSearchBase(object):
             
             # print("="*80 + "\n")
             
-            return (example["qid"], final_answer, chain)
+            return (example["qid"], final_answer, chain, passage_count)
 
 
 class BestFirstDecomposer(QuestionSearchBase):

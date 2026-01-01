@@ -151,6 +151,7 @@ def demo_mode(args, reader, decomposer):
 def inference_mode(args, reader, decomposer, model_map, override_answer_by=None):
     print("Running inference on examples")
     qid_answer_chains = []
+    passage_counts = {}
 
     start_time = time.time()
 
@@ -192,11 +193,13 @@ def inference_mode(args, reader, decomposer, model_map, override_answer_by=None)
         if args.silent:
             iterator = tqdm(iterator)
         for example in iterator:
-            qid_answer_chains.append(
-                decomposer.return_qid_prediction(
-                    example, override_answer_by=override_answer_by, debug=args.debug, silent=args.silent
-                )
+            result = decomposer.return_qid_prediction(
+                example, override_answer_by=override_answer_by, debug=args.debug, silent=args.silent
             )
+            qid_answer_chains.append(result)
+            # Capture passage count (result is now a 4-tuple: qid, answer, chain, passage_count)
+            if len(result) >= 4:
+                passage_counts[result[0]] = result[3]
 
     end_time = time.time()
     seconds_taken = round(end_time - start_time)
@@ -232,14 +235,9 @@ def inference_mode(args, reader, decomposer, model_map, override_answer_by=None)
     
     # Save passage count statistics for evaluation
     passage_counts_path = args.output[:ext_index] + "_passage_counts.json"
-    passage_counts = {}
-    for example in config_map.get("data_instances", []):
-        qid = example.get("qid")
-        if qid:
-            passage_counts[qid] = len(example.get("paragraphs", []))
     with open(passage_counts_path, "w") as output_fp:
         json.dump(passage_counts, output_fp, indent=4)
-    print(f"[INFO] Saved passage counts to: {passage_counts_path}")
+    print(f"[INFO] Saved passage counts for {len(passage_counts)} queries to: {passage_counts_path}")
 
 
 if __name__ == "__main__":
