@@ -911,8 +911,13 @@ def infer_dataset(content: str) -> str:
 def summarize_and_results(hyperparameter_metrics_data: List[Dict]) -> None:
     for datum in hyperparameter_metrics_data:
         complete = datum.pop("complete")
-        if not complete and datum["metric_value"] != "n/a":
-            datum["metric_value"] = "** " + str(datum["metric_value"]) + " **"
+        # Mark incomplete experiments with asterisks
+        if not complete:
+            if "metric_value" in datum and datum["metric_value"] != "n/a":
+                datum["metric_value"] = "** " + str(datum["metric_value"]) + " **"
+            elif "F1" in datum and datum["F1"] is not None:
+                # Mark F1 column for incomplete experiments
+                datum["F1"] = f"**{datum['F1']}**"
     dataframe = pd.DataFrame(hyperparameter_metrics_data)
     print(dataframe)
 
@@ -1364,22 +1369,19 @@ def main():
                 hyperparameter_metrics_datum = {key: value for key, value in variable_replacements.items()}
                 if "para_recall" in metrics and "avg_predicted_paras" in metrics:
                     metric_value = "@".join(
-                        [str(round(metrics["title_recall"] * 100, 1)), str(round(metrics["avg_predicted_titles"], 1))]
+                        [str(round(metrics["title_recall"], 3)), str(round(metrics["avg_predicted_titles"], 1))]
                     )
                     metric_value += " | "
                     metric_value += "@".join(
-                        [str(round(metrics["para_recall"] * 100, 1)), str(round(metrics["avg_predicted_paras"], 1))]
+                        [str(round(metrics["para_recall"], 3)), str(round(metrics["avg_predicted_paras"], 1))]
                     )
+                    hyperparameter_metrics_datum["metric_value"] = metric_value
                 else:
-                    metric_value = " | ".join(
-                        [  # Note that "|" is used to identify the first metric if required.
-                            str(round(metrics["f1"] * 100, 1)),  # First item will be used for knowing best HP.
-                            str(round(metrics["precision"] * 100, 1)) if "precision" in metrics else "----",
-                            str(round(metrics["recall"] * 100, 1)) if "recall" in metrics else "----",
-                            str(metrics["count"]).rjust(5, " "),
-                        ]
-                    )
-                hyperparameter_metrics_datum["metric_value"] = metric_value
+                    # Store metrics as separate columns instead of concatenated string
+                    hyperparameter_metrics_datum["F1"] = round(metrics["f1"], 3)
+                    hyperparameter_metrics_datum["Precision"] = round(metrics["precision"], 3) if "precision" in metrics else None
+                    hyperparameter_metrics_datum["Recall"] = round(metrics["recall"], 3) if "recall" in metrics else None
+                    hyperparameter_metrics_datum["Count"] = metrics["count"]
                 hyperparameter_metrics_datum["complete"] = is_experiment_complete(
                     local_file_path, prediction_file_path, metrics_file_path, args.variable_replacements
                 )
@@ -1390,7 +1392,11 @@ def main():
                     exit("The best HP config can't be identified as all exps are not complete yet.")
 
                 hyperparameter_metrics_datum = {key: value for key, value in variable_replacements.items()}
-                hyperparameter_metrics_datum["metric_value"] = "n/a"
+                # Use separate columns for consistency
+                hyperparameter_metrics_datum["F1"] = "n/a"
+                hyperparameter_metrics_datum["Precision"] = "n/a"
+                hyperparameter_metrics_datum["Recall"] = "n/a"
+                hyperparameter_metrics_datum["Count"] = "n/a"
                 hyperparameter_metrics_datum["complete"] = False
                 hyperparameter_metrics_data.append(hyperparameter_metrics_datum)
 
