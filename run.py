@@ -814,8 +814,8 @@ instantiation_schemes = {
     },
     "hc_qa": {
         "bm25_retrieval_count": ["100"],  # Large candidate pool for HC to select from
-        "gamma": ["0.1", "0.15", "0.2"],  # More aggressive thresholds to select ~9 passages (was 0.3-0.5 selecting only 7.1)
-        "min_hc": ["0.0", "-0.5"],  # Allow negative HC scores to force more passages through
+        "gamma": ["0.3", "0.4", "0.5"],  # With new null dist (mean=12.94 vs 13.99), these should select 8-10 passages
+        "min_hc": ["0.0"],  # Standard gating threshold
     }
 }
 

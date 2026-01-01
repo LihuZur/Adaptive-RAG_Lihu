@@ -1,7 +1,7 @@
 IMPORTANT INSTRUCTIONS:
 1. Read ALL the context passages carefully and use information from ALL relevant passages in your answer.
 2. Your answer must ONLY be a comma-separated list of entities with NO additional text, explanations, or formatting.
-3. Format: "Entity1, Entity2, Entity3"
+3. Format: "Entity1, Entity2, Entity3" and so on (depending on the correct amount of entities you receive)
 4. Do NOT add phrases like "The answer is" or "Based on the context" - output ONLY the comma-separated list.
 
 # METADATA: {"query_id": "filmography_Q8877_easy_0"}
