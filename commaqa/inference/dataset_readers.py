@@ -133,15 +133,19 @@ class MultiParaRCReader(DatasetReader):
                 if is_crossentityqa:
                     qid = input_instance["query_id"]
                     query = question = input_instance["query_text"]
-                    # Use 'entity_coverage' as the answer for CrossEntityQA
-                    answer = input_instance.get("entity_coverage", [])
+                    # Use 'ground_truth' field if available, otherwise fall back to 'entity_coverage'
+                    if "ground_truth" in input_instance:
+                        answer = input_instance["ground_truth"]
+                    else:
+                        answer = input_instance.get("entity_coverage", [])
                     if not answer:
-                        print(f"[DEBUG] CrossEntityQA entry with query_id={qid} has empty or missing 'entity_coverage' field.")
+                        print(f"[DEBUG] CrossEntityQA entry with query_id={qid} has empty or missing answer field.")
                     output_instance = {
                         "qid": qid,
                         "query": query,
                         "answer": answer,
                         "question": question,
+                        "ground_truth": input_instance.get("ground_truth", answer),  # Preserve ground_truth field
                         "metadata": {},  # Ensure metadata key exists for downstream compatibility
                     }
                     yield output_instance
