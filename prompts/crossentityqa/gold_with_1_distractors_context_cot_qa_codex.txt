@@ -1,125 +1,250 @@
-IMPORTANT: When listing multiple entities in your answer, separate them with commas. 
-Example: "Entity1, Entity2, Entity3"
+IMPORTANT INSTRUCTIONS:
+1. Read ALL the context passages carefully and use information from ALL relevant passages in your answer.
+2. Your answer must ONLY be a comma-separated list of entities with NO additional text, explanations, or formatting.
+3. Format: "Entity1, Entity2, Entity3"
+4. Do NOT add phrases like "The answer is" or "Based on the context" - output ONLY the comma-separated list.
+
+# METADATA: {"query_id": "filmography_Q8877_easy_0"}
+Context:
+Duel is a 1971 American road action thriller film directed by Steven Spielberg in his feature film debut. It centers on a traveling salesman David Mann (Dennis Weaver) driving his car through rural California to meet a client. However, he finds himself chased and terrorized by the mostly unseen driver of a semi-truck. The screenplay by Richard Matheson adapts his own short story of the same name, published in the April 1971 issue of Playboy, and based on an encounter on November 22, 1963, when a trucker dangerously cut him off on a California freeway.
+Produced by Universal Television as a television film, Duel originally aired as a part of the ABC Movie of the Week series on November 13, 1971. It later received an international theatrical release by Universal Pictures in an extended version featuring scenes shot after the film's original TV broadcast. The film received positive reviews from critics, with Spielberg's direction being singled out for praise. It has since been recognized as an influential cult classic and one of the greatest television films ever made.
+
+Firelight is a 1964 science fiction film written and directed by American filmmaker Steven Spielberg at the age of 17. This is Spielberg's feature film directorial debut.
+The film follows a mysterious alien encounter and invasion; Spielberg would return to the subject with Firelight as inspiration for his third major film, Close Encounters of the Third Kind in 1977. Only three minutes and forty seconds of footage from Firelight has been made public, and very little of it survives. Spielberg has called it "one of the five worst films ever made".
+
+Q: What films did Steven Spielberg direct from 1964 to 1972?
+A: Duel (1971 film), Firelight (1964 film)
+
+# METADATA: {"query_id": "position_Q14211_all_all_easy_1"}
+Context:
+Spencer Compton, 1st Earl of Wilmington (1673 – 2 July 1743) was a British Whig statesman who served continuously in government from 1715 until his death in 1743. He sat in the English and British House of Commons between 1698 and 1728, and was then raised to the peerage and sat in the House of Lords. He served as prime minister of Great Britain from 1742 until his death in 1743. He is considered to have been Britain's second prime minister, after Robert Walpole, but worked closely with the Secretary of State, Lord Carteret, in order to secure the support of the various factions making up the government.
+
+Robert Walpole, 1st Earl of Orford (; 26 August 1676 – 18 March 1745), known between 1725 and 1742 as Sir Robert Walpole, was a British Whig statesman who is generally regarded as the de facto first Prime Minister of Great Britain, serving from 1721 to 1742. His formal titles included First Lord of the Treasury, Chancellor of the Exchequer, and Leader of the House of Commons.
+Although the exact dates of Walpole's dominance, dubbed the "Robinocracy", are a matter of scholarly debate, the period 1721–1742 is often used. He dominated the Walpole–Townshend ministry, as well as the subsequent Walpole ministry, and holds the record as the longest-serving British prime minister. W. A. Speck wrote that Walpole's uninterrupted run of 20 years as prime minister "is rightly regarded as one of the
+
+Q: Who are the Prime Ministers of Great Britain from 1721 to 1742?
+A: Spencer Compton, 1st Earl of Wilmington, Robert Walpole
+
+# METADATA: {"query_id": "filmography_Q2001_easy_3"}
+Context:
+The Killing is a 1956 American film noir directed by Stanley Kubrick and produced by James B. Harris. It was written by Kubrick and Jim Thompson and based on Lionel White's novel Clean Break. It stars Sterling Hayden, Coleen Gray, and Vince Edwards, and features Marie Windsor, Elisha Cook Jr., Jay C. Flippen and Timothy Carey.
+The film was Kubrick's third directorial effort and was generally well received by the critics.
+
+Fear and Desire is a 1952 American independent anti-war film directed, produced, and edited by Stanley Kubrick in his directorial debut, and written by Howard Sackler. With a production team of fifteen people, the film originally premiered at the Venice Film Festival, in a side program, under the title Shape of Fear. Though the film is not about any specific war, it was produced and released at the height of the Korean War.
+
+Paths of Glory is a 1957 American anti-war film directed by Stanley Kubrick, from a screenplay he co-wrote with Calder Willingham and Jim Thompson. It is adapted from the 1935 novel of the same name by Humphrey Cobb, which in turn was based on the Souain corporals affair during World War I. The film stars Kirk Douglas as Colonel Dax, the commanding officer of French soldiers who refuse to continue a suicidal attack, after which Dax defends them against charges of cowardice in a court-martial. It also features Ralph Meeker, Adolphe Menjou, George Macready, Timothy Carey, Joe Turkel, Wayne Morris and Richard Anderson.
+The film was co-produced through Douglas' film production company, Bryna Productions, and a joint venture between Stanley Kubrick and James B. Harris, Harris-Kubrick Pictures.
+
+Q: What films did Stanley Kubrick release from 1953 to 1957?
+A: The Killing (film), Fear and Desire, Paths of Glory
+
+# METADATA: {"query_id": "capitals_Q15_easy_4"}
+Context:
+Asmara ( əs-MAHR-ə), or Asmera, is the capital and most populous city of Eritrea, in the country's Central Region. It sits at an elevation of 2,325 metres (7,628 ft), making it the sixth highest capital in the world by altitude and the second highest capital in Africa. The city is located at the tip of an escarpment that is both the northwestern edge of the Eritrean Highlands and the Great Rift Valley in neighbouring Ethiopia. In 2017, the city was declared as a UNESCO World Heritage Site for its well-preserved modernist architecture. According to local traditions, the city was founded after four separate villages unified to live together peacefully after long periods of conflict. Asmara existed as a major settlement for over half a millennium and enjoyed some importance as it stood on the trade route to Massawa. Asmara first rose to prominence during the 20th century, when it became capital of Italian Eritrea. Under Italian rule the city of Asmara experienced rapid urbanization and modernization, to the point that was called Piccola Roma (Little Rome).
+
+Dodoma (lit. 'It has sunk' in Gogo), officially Dodoma City (Jiji Kuu la Dodoma, in Swahili), is the capital city of Tanzania. With a population of 765,179, it is also the administrative capital of both Dodoma Municipal Council and the entire Dodoma Region. In July 2024, Dodoma officially surpassed Arusha to become the third largest city in Tanzania on both infrastructure and population measures.
+In 1974, the Tanzanian government announced that Tanzania's national capital would be moved from Dar es Salaam to Dodoma for social and economic reasons and to centralise the capital within the country. It became the official capital in 1996.
+Much of Dodoma's initial design did not come to fruition until the 21st century. In May 2023, the national government under President Samia Suluhu unveiled the new State House in Dodoma in a historic event stamping the relocation of government duties to the city. As a result, Dar es Salaam has remained the commercial and maritime capital of Tanzania, while also retaining the state house Ikulu and a number of government functions.
+
+Kinshasa (; French: [kinʃasa]; Lingala: Kinsásá), formerly named Léopoldville from 1881–1966 (Dutch: Leopoldstad), is the capital and largest city of the Democratic Republic of the Congo. Kinshasa is one of the world's fastest-growing megacities, with an estimated population of 17.8 million in 2024. It is the most densely populated city in the DRC, the third-most populous city and third-largest metropolitan area in Africa, and the world's twenty-second most populous city and fourth-most populous capital city. It is the leading economic, political, and cultural center of the DRC, housing several industries including manufacturing, telecommunications, banking, and entertainment. The city also hosts some of the DRC's significant institutional buildings, such as the People's Palace, Palace of
+
+Libreville (; French: [libʁəvil]) is the capital and largest city of Gabon, located on the Gabon Estuary. Libreville occupies 65 square kilometres (25 sq mi) of the northwestern province of Estuaire. Libreville is also a port on the Gabon Estuary, near the Gulf of Guinea. As of the 2013 census, its population was 703,904.
+The area has been inhabited by the Mpongwe people since before the French acquired the land in 1839. It was later an American Christian mission, and a slave resettlement site, before becoming the chief port of the colony of French Equatorial Africa. By the time of Gabonese independence in 1960, the city was a trading post and minor administrative centre with a population of 32,000. Since 1960, Libreville has grown rapidly and now is home to one-third of the national population.
+
+Q: What capital cities are located in Gabon, the Democratic Republic of the Congo, Eritrea, and Tanzania?
+A: Asmara, Dodoma, Kinshasa, Libreville
+
+# METADATA: {"query_id": "capitals_Q46_easy_10"}
+Context:
+The City of Brussels is the largest municipality and historical centre of the Brussels-Capital Region, as well as the capital of the French Community of Belgium, the Flemish Region (from which it is separate) and Belgium. The City of Brussels is also the administrative centre of the European Union, as it hosts a number of principal EU institutions in its European Quarter.
+Besides the central historic town located within the Pentagon, the City of Brussels covers some of the city's immediate outskirts within the greater Brussels-Capital Region, namely the former municipalities of Haren, Laeken, and Neder-Over-Heembeek to the north, as well as the Avenue Louise/Louizalaan and the Bois de la Cambre/Ter Kamerenbos park to the south-east, where it borders municipalities in Flanders.
+As of 1 January 2024, the City of Brussels had a population of 196,828 inhabitants. The total area is 33.09 km2 (12.78 sq mi), which gives a population density of 5,949/km2 (15,410/sq mi). As of 2023, there were 75,998 registered non-Belgians in the City. In common with all of Brussels' municipalities, it is legally bilingual (French–Dutch).
+
+Stockholm (; Swedish: [ˈstɔ̂kː(h)ɔlm] ) is the capital and most populous city of Sweden, as well as the largest urban area in the Nordic countries. Approximately 1 million people live in the municipality, with 1.6 million in the urban area, and 2.5 million in the metropolitan area. The city stretches across fourteen islands where Lake Mälaren flows into the Baltic Sea. Outside the city to the east, and along the coast, is the island chain of the Stockholm archipelago. The area has been settled since the Stone Age, in the 6th millennium BC, and was founded as a city in 1252 by Swedish statesman Birger Jarl. The city serves as the county seat of Stockholm County.
+Stockholm is the cultural, media, political, and economic centre of Sweden. The Stockholm region alone accounts for over a third
+
+Helsinki (Swedish: Helsingfors) is the capital and most populous city in Finland. It is on the shore of the Gulf of Finland and is the seat of southern Finland's Uusimaa region. About 690,000 people live in the municipality, with 1.3 million in the capital region and 1.6 million in the metropolitan area. As the most populous urban area in Finland, it is the country's most significant centre for politics, education, finance, culture, and research. Helsinki is 80 kilometres (50 mi) north of Tallinn, Estonia, 400 kilometres (250 mi) east of Stockholm, Sweden, and 300 kilometres (190 mi) west of Saint Petersburg, Russia.
+Together with the cities of Espoo, Vantaa and Kauniainen—and surrounding commuter towns, including the neighbouring municipality of Sipoo to the east—Helsinki forms a
+
+Warsaw, officially the Capital City of Warsaw, is the capital and largest city of Poland. The metropolis stands on the River Vistula in east-central Poland. Its population is officially estimated at 1.86 million residents within a greater metropolitan area of 3.27 million residents, which makes Warsaw the 6th most-populous city in the European Union. The city area measures 517 km2 (200 sq mi) and comprises 18 districts, while the metropolitan area covers 6,100 km2 (2,355 sq mi). Warsaw is classified as an alpha global city, a major political, economic and cultural hub, and the country's seat of government. It is also the capital of the Masovian Voivodeship.
+Warsaw traces its origins to a small fishing town in Masovia. The city rose to prominence in the late 16th century, when Sigismund III
+
+Q: What capitals are located in Northern Europe?
+A: City of Brussels, Stockholm, Helsinki, Warsaw
+
+# METADATA: {"query_id": "award_Q80061_all_all_easy_8"}
+Context:
+Ivan Petrovich Pavlov (Russian: Иван Петрович Павлов, IPA: [ɪˈvan pʲɪˈtrovʲɪtɕ ˈpavləf] ; 26 September [O.S. 14 September] 1849 – 27 February 1936) was a Russian and Soviet experimental neurologist and physiologist known for his discovery of classical conditioning through his experiments with dogs. Pavlov also conducted significant research on the physiology of digestion, for which he was awarded the Nobel Prize in Physiology or Medicine in 1904.
+
+Emil von Behring (German: [ˈeːmiːl fɔn ˈbeːʁɪŋ] ; Emil Adolf von Behring: born Emil Adolf Behring; 15 March 1854 – 31 March 1917), was a German physiologist who received the 1901 Nobel Prize in Physiology or Medicine, the first one awarded in that field, for his discovery of a diphtheria antitoxin. He was widely known as a "saviour of children", as diphtheria used to be a major cause of child death. His work with the disease, as well as tetanus, has come to bring him most of his fame and acknowledgment. He was honoured with Prussian nobility in 1901, henceforth being known by the surname "von Behring".
+
+Heinrich Hermann Robert Koch ( KOKH; German: [ˈʁoːbɛʁt kɔx] ; 11 December 1843 – 27 May 1910) was a German physician and microbiologist. As the discoverer of the specific causative agents of deadly infectious diseases including tuberculosis, cholera and anthrax, he is regarded as one of the main founders of modern bacteriology. As such he is popularly nicknamed the father of microbiology (with Louis Pasteur), and as the father of medical bacteriology. His discovery of the anthrax bacterium (Bacillus anthracis) in 1876 is considered as the birth of modern bacteriology. Koch used his discoveries to establish that germs "could cause a specific disease" and directly provided proofs for the germ theory of diseases, therefore creating the scientific basis of public health, saving millions of
+
+Sir Ronald Ross  (13 May 1857 – 16 September 1932) was a British medical doctor who received the Nobel Prize for Physiology or Medicine in 1902 for his work on the transmission of malaria, becoming the first British Nobel laureate, and the first born outside Europe. His discovery of the malarial parasite in the gastrointestinal tract of a mosquito in 1897 proved that malaria was transmitted by mosquitoes, and laid the foundation for the method of combating the disease.
+Ross was a polymath, writing a number of poems, publishing several novels, and composing songs. He was also an amateur artist and mathematician. He worked in the Indian Medical Service for 25 years. It was during his service that he made the groundbreaking medical discovery. After resigning from his service in India, he joined the faculty of Liverpool School of Tropical Medicine, and continued as Professor and Chairman of Tropical Medicine of the institute for 10 years. In 1926, he became Director-in-Chief of the Ross Institute and Hospital for Tropical Diseases, which was established in honour of his works. He remained there until his death.
+
+Niels Ryberg Finsen (15 December 1860 – 24 September 1904) was a physician and scientist. In 1903, he was awarded the Nobel Prize in Medicine and Physiology "in recognition of his contribution to the treatment of diseases, especially lupus vulgaris, with concentrated light radiation, whereby he has opened a new avenue for medical science."
+
+Q: Who received the Nobel Prize in Physiology or Medicine from 1901 to 1905?
+A: Ivan Pavlov, Emil von Behring, Robert Koch, Ronald Ross, Niels Ryberg Finsen
 
 # METADATA: {"query_id": "filmography_Q2001_easy_103"}
 Context:
-Paths of Glory is a 1957 American anti-war film directed by Stanley Kubrick, from a screenplay he co-wrote with Calder Willingham and Jim Thompson. It is adapted from the 1935 novel of the same name by Humphrey Cobb, which in turn was based on the Souain corporals affair during World War I. The film stars Kirk Douglas as Colonel Dax, the commanding officer of French soldiers who refuse to continue a suicidal attack, after which Dax defends them against charges of cowardice in a court-martial. It also features Ralph Meeker, Adolphe Menjou, George Macready, Timothy Carey, Joe Turkel, Wayne Morris and Richard Anderson.
-
-A Clockwork Orange is a 1971 dystopian crime film written, produced, and directed by Stanley Kubrick. It is based on Anthony Burgess's 1962 novel. The film employs disturbing and violent themes to comment on psychiatry, juvenile delinquency, youth gangs, and broader social, political, and economic issues in a dystopian near-future Great Britain.
+Barry Lyndon is a 1975 historical drama film written, directed, and produced by Stanley Kubrick, based on the 1844 novel The Luck of Barry Lyndon by William Makepeace Thackeray. Narrated by Michael Hordern, and starring Ryan O'Neal, Marisa Berenson, Patrick Magee, Leonard Rossiter and Hardy Krüger, the film recounts the early exploits and later unravelling of an 18th-century Irish rogue and gold digger who marries a rich widow in order to attempt to climb the social ladder and assume her late husband's aristocratic position.
+Kubrick began production on Barry Lyndon after his 1971 film A Clockwork Orange. He had originally intended to direct a biopic on Napoleon, but lost his financing because of the commercial failure of the similar 1970 Dino De Laurentiis–produced Waterloo. Kubrick
 
 2001: A Space Odyssey is a 1968 epic science fiction film produced and directed by Stanley Kubrick, who co-wrote the screenplay with Arthur C. Clarke. Its plot was inspired by several short stories optioned from Clarke, primarily "The Sentinel" (1951) and "Encounter in the Dawn" (1953). The film stars Keir Dullea, Gary Lockwood, William Sylvester, and Douglas Rain, and follows a voyage by astronauts, scientists, and the sentient supercomputer HAL 9000 to Jupiter to investigate an alien monolith.
+The film is noted for its scientifically accurate depiction of spaceflight, pioneering special effects, and ambiguous themes. Kubrick avoided conventional cinematic and narrative techniques; dialogue is used sparingly, and long sequences are accompanied only by music. Shunning the convention that
 
-Full Metal Jacket is a 1987 war film directed and produced by Stanley Kubrick from a screenplay he co-wrote with Michael Herr and Gustav Hasford. The film is based on Hasford's 1979 autobiographical novel The Short-Timers. It stars Matthew Modine, R. Lee Ermey, Vincent D'Onofrio, Adam Baldwin, Dorian Harewood, and Arliss Howard.
+Spartacus is a 1960 American epic historical drama film directed by Stanley Kubrick and starring Kirk Douglas in the title role, a slave and gladiator who leads a rebellion against Rome during the events of the Third Servile War. Adapted by Dalton Trumbo from Howard Fast's  1951 novel of the same title, the film also stars Laurence Olivier as Roman general and politician Marcus Licinius Crassus, Charles Laughton as rival senator Sempronius Gracchus, Peter Ustinov as gladiatorial school owner Lentulus Batiatus, and John Gavin as Julius Caesar. Jean Simmons played Spartacus' wife Varinia, a fictional character, and Tony Curtis played the fictional slave Antoninus.
+Douglas, whose company Bryna Productions was producing the film, removed original director Anthony Mann after three weeks of
 
-The Shining is a 1980 psychological horror film produced and directed by Stanley Kubrick and co-written with novelist Diane Johnson. It is based on Stephen King's 1977 novel and stars Jack Nicholson, Shelley Duvall, Danny Lloyd and Scatman Crothers.
+The Killing is a 1956 American film noir directed by Stanley Kubrick and produced by James B. Harris. It was written by Kubrick and Jim Thompson and based on Lionel White's novel Clean Break. It stars Sterling Hayden, Coleen Gray, and Vince Edwards, and features Marie Windsor, Elisha Cook Jr., Jay C. Flippen and Timothy Carey.
+The film was Kubrick's third directorial effort and was generally well received by the critics.
+
+A Clockwork Orange is a 1971 dystopian crime film written, produced, and directed by Stanley Kubrick. It is based on Anthony Burgess's 1962 novel. The film employs disturbing and violent themes to comment on psychiatry, juvenile delinquency, youth gangs, and broader social, political, and economic issues in a dystopian near-future Great Britain.
+Alex (Malcolm McDowell), the central character, is a charismatic, anti-social delinquent whose interests include classical music (especially that of Beethoven), committing rape, theft, and "ultra-violence". He leads a small gang of thugs, Pete (Michael Tarn), Georgie (James Marcus), and Dim (Warren Clarke), whom he calls his droogs (from the Russian word друг, which is "friend", "buddy"). The film chronicles the horrific crime spree of his gang,
+
+Fear and Desire is a 1952 American independent anti-war film directed, produced, and edited by Stanley Kubrick in his directorial debut, and written by Howard Sackler. With a production team of fifteen people, the film originally premiered at the Venice Film Festival, in a side program, under the title Shape of Fear. Though the film is not about any specific war, it was produced and released at the height of the Korean War.
+
+Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (known simply and more commonly as Dr. Strangelove) is a 1964 political satire black comedy film co-written, produced, and directed by Stanley Kubrick. It is loosely based on the thriller novel Red Alert (1958) by Peter George, who wrote the screenplay with Kubrick and Terry Southern. The film, financed and released by Columbia Pictures, was a co-production between the United States and the United Kingdom.
+Dr. Strangelove parodies Cold War fears of a nuclear war between the United States and the Soviet Union and stars Peter Sellers (portraying three different characters), George C. Scott, Sterling Hayden, Keenan Wynn, Slim Pickens, and Tracy Reed. The story concerns an insane brigadier general of the United States Air
+
+Lolita is a 1962 black comedy-psychological drama film directed by Stanley Kubrick, based on the 1955 novel of the same name by Vladimir Nabokov. The black-and-white film follows a middle-aged literature professor who develops an infatuation with an adolescent. It stars James Mason as Humbert Humbert, Shelley Winters as Mrs. Haze, Peter Sellers as Quilty, and Sue Lyon (in her film debut) as Dolores "Lolita" Haze.
+The novel was considered "unfilmable" when Kubrick acquired the rights around the time of its U.S. publication. Owing to restrictions imposed by the Hays Code (1934–68), Kubrick and producer James B. Harris were compelled to tone down the paedophilic elements that were central to the novel's narrative. Sue Lyon was 14 years old at the time filming began and played a 13-year-old girl at the time of Humbert's seduction.
+
+Paths of Glory is a 1957 American anti-war film directed by Stanley Kubrick, from a screenplay he co-wrote with Calder Willingham and Jim Thompson. It is adapted from the 1935 novel of the same name by Humphrey Cobb, which in turn was based on the Souain corporals affair during World War I. The film stars Kirk Douglas as Colonel Dax, the commanding officer of French soldiers who refuse to continue a suicidal attack, after which Dax defends them against charges of cowardice in a court-martial. It also features Ralph Meeker, Adolphe Menjou, George Macready, Timothy Carey, Joe Turkel, Wayne Morris and Richard Anderson.
+The film was co-produced through Douglas' film production company, Bryna Productions, and a joint venture between Stanley Kubrick and James B. Harris, Harris-Kubrick Pictures.
 
 Q: What films did Stanley Kubrick direct from 1953 to 1977?
-A: Paths of Glory, A Clockwork Orange, 2001: A Space Odyssey, Full Metal Jacket, The Shining
+A: Barry Lyndon, 2001: A Space Odyssey, Spartacus (film), The Killing (film), A Clockwork Orange (film), Fear and Desire, Dr. Strangelove, Lolita (1962 film), Paths of Glory
 
 # METADATA: {"query_id": "founded_by_Q317521_easy_124"}
 Context:
-OpenAI is an American artificial intelligence (AI) organization headquartered in San Francisco, California. It aims to develop "safe and beneficial" artificial general intelligence (AGI), which it defines as "highly autonomous systems that outperform humans at most economically valuable work". As a leading organization in the ongoing AI boom, OpenAI is known for the GPT family of large language models, the DALL-E series of text-to-image models, and a text-to-video model named Sora.
+Neuralink Corp. is an American neurotechnology company that has developed as of 2024 implantable brain–computer interfaces (BCIs). It was founded by Elon Musk and a team of eight scientists and engineers. Neuralink was launched in 2016 and first publicly reported in March 2017. The company is based in Fremont, California, with plans to build a three-story building with office and manufacturing space in Del Valle, about 10 miles east of Gigafactory Texas, Tesla's headquarters and manufacturing plant.
+Since its founding, the company has hired several high-profile neuroscientists from various universities. By 2019, it had received $158 million in funding ($100 million was from Musk) and had 90 employees. At that time, Neuralink announced that it was working on a "sewing machine-like" device
 
-Neuralink Corp. is an American neurotechnology company that has developed as of 2024 implantable brain–computer interfaces (BCIs). It was founded by Elon Musk and a team of eight scientists and engineers. Neuralink was launched in 2016 and first publicly reported in March 2017.
+OpenAI is an American artificial intelligence (AI) organization headquartered in San Francisco, California. It aims to develop "safe and beneficial" artificial general intelligence (AGI), which it defines as "highly autonomous systems that outperform humans at most economically valuable work". As a leading organization in the ongoing AI boom, OpenAI is known for the GPT family of large language models, the DALL-E series of text-to-image models, and a text-to-video model named Sora. Its release of ChatGPT in November 2022 has been credited with catalyzing widespread interest in generative AI.
+The organization was founded in 2015 in Delaware but evolved a complex corporate structure. As of October 2025, following restructuring approved by California and Delaware regulators, the non-profit
 
-X.com was an American online bank founded by Ed Ho, Harris Fricker, Elon Musk, and Christopher Payne in 1999 in Palo Alto, California. It merged with competitor Confinity in 2000, retaining the X.com name, and the company changed its name to PayPal in 2001.
+The Boring Company (TBC) is an American infrastructure, tunnel construction service, and equipment company founded by Elon Musk. TBC was founded as a subsidiary of SpaceX in 2017, and was spun off as a separate corporation in 2018. TBC has completed multiple test tunnels and one tunneling project that is open to the public.
+In 2018, TBC completed one test tunnel in Los Angeles County, California. In 2021, TBC completed the Las Vegas Convention Center (LVCC) Loop, a three-station transportation system with 1.7 miles (2.7 km) of tunnels. As of April 2024, a segment to Resorts World Las Vegas is also open, and tunnels to Encore and Westgate resorts are being finalized. The system is planned to expand to a total of 68 miles (109 km) of tunnels.
+Many other TBC projects in cities across the United States were announced, but subsequently became inactive or were canceled.
+In November 2025 they began to trial self-driving vehicles (which still has a driver ready to take over if need be).
 
-Astra Nova School, successor to Ad Astra, is a nonprofit online school founded by Elon Musk and Joshua Dahn on the campus of SpaceX.
+Thud was a satirical media company founded by Ben Berkley, Cole Bolton, and Elon Musk in 2017. The company launched satirical websites and products. After Musk pulled his funding, the company went defunct in May 2019.
+
+Astra Nova School, successor to Ad Astra, is a nonprofit online school founded by Elon Musk and Joshua Dahn on the campus of SpaceX. The Washington Post said it was possibly "the most exclusive school in the world".
+
+Zip2 Corp. was a company that provided and licensed online city guide software to newspapers. The company was founded in Palo Alto, California, as Global Link Information Network, Inc. on November 9, 1995, by Greg Kouri and brothers Elon and Kimbal Musk. Initially, Global Link provided local businesses with an Internet presence, but later began to assist newspapers in designing online city guides before being purchased by Compaq Computer in 1999.
+
+X Corp. is an American technology company headquartered in Bastrop, Texas. Established by Elon Musk in 2023 as the successor to Twitter, Inc., it is a wholly owned subsidiary of xAI since March 28, 2025, which is itself partly owned by Musk. The company owns the social networking service X (formerly Twitter), and has announced plans to use it as a base for other offerings, including the incorporation of xAI's Grok and Aurora models. They also own the trademarks of services Vine, Periscope, and X.com.
+
+PayPal Holdings, Inc. is an American multinational financial technology company operating an online payments system in the majority of countries that support online money transfers; it serves as an electronic alternative to traditional paper methods such as checks and money orders. The company operates as a payment processor for online vendors, auction sites and many other commercial and company users.
+Established in 1998 as Confinity, PayPal went public through an IPO in 2002. It became a wholly owned subsidiary of eBay later that year, valued at $1.5 billion. In 2015, eBay spun off PayPal to its shareholders, and PayPal became an independent company again. The company was ranked 143rd on the 2022 Fortune 500 of the largest United States corporations by revenue. Since 2023, PayPal is a member of the MACH Alliance.
+
+The America PAC (AMERICA) is a super PAC (political action committee) created by Elon Musk with the backing of a number of prominent tech businessmen to support Donald Trump's 2024 presidential campaign, and later used to support other conservative candidates and causes. The group's primary purpose is to finance canvassing operations. Musk is the primary donor, with his contributions making up 91% of the declared contributions as of December 2024.
+
+X.AI Corp., doing business as xAI, is an American company working in the area of artificial intelligence (AI), social media and technology. Founded by Elon Musk in 2023, the company's flagship products are the generative AI chatbot named Grok and the social media platform X (formerly known as Twitter), the latter of which they acquired in March 2025.
+
+X.com was an American online bank founded by Ed Ho, Harris Fricker, Elon Musk, and Christopher Payne in 1999 in Palo Alto, California. It merged with competitor Confinity in 2000, retaining the X.com name, and the company changed its name to PayPal in 2001. Starting in 2023, the x.com domain began to be used for Twitter, which was acquired by Elon Musk in 2022 and subsequently rebranded to X.
+
+Space Exploration Technologies Corp., more commonly known as SpaceX, is a private American aerospace company and space transportation company headquartered at the Starbase development site in Starbase, Texas. Since its founding in 2002, the company has made numerous advances in rocket propulsion, reusable launch vehicles, human spaceflight and satellite constellation technology. As of 2025, SpaceX is the world's dominant space launch provider, its launch cadence eclipsing all others, including private competitors and national programs like the Chinese space program. SpaceX, NASA, and the United States Armed Forces work closely together by means of governmental contracts.
+SpaceX was founded by Elon Musk in 2002 with a vision of decreasing the costs of space launches, paving the way to a
 
 Q: What companies did Elon Musk found?
-A: OpenAI, Neuralink, X.com, Astra Nova School
+A: Neuralink, OpenAI, The Boring Company, Thud (media company), Astra Nova School, Zip2, X Corp., PayPal, America PAC, XAI (company), X.com (bank), SpaceX
 
 # METADATA: {"query_id": "award_Q38104_2010_2023_easy_107"}
 Context:
-Shuji Nakamura (Japanese: 中村 修二, romanized: Nakamura Shūji; born May 22, 1954) is a Japanese–American electronic engineer and co-inventor of the blue LED, a major breakthrough in lighting technology. He specializes in the field of semiconductor technology. He is Professor of Materials and of Electrical and Computer Engineering at the University of California, Santa Barbara (UCSB) since 1999. Together with Isamu Akasaki and Hiroshi Amano, Nakamura received the 2014 Nobel Prize in Physics "for the invention of efficient blue light-emitting diodes, which has enabled bright and energy-saving white light sources."
+Hiroshi Amano (天野 浩, Amano Hiroshi; born September 11, 1960) is a Japanese physicist, engineer and inventor specializing in the field of semiconductor technology. He was the co-inventor of the blue LED, for which he was awarded the 2014 Nobel Prize in Physics together with Isamu Akasaki and Shuji Nakamura.
+Amano was elected as a member of the National Academy of Engineering in 2016 for the development of p-type gallium nitride (GaN) doping, enabling blue semiconductor LEDs.
+
+Peter Ware Higgs (29 May 1929 – 8 April 2024) was a British theoretical physicist, professor at the University of Edinburgh, and Nobel laureate in Physics for his work on the mass of subatomic particles.
+In 1964, Higgs was the single author of one of the three milestone papers published in Physical Review Letters (PRL) that proposed that spontaneous symmetry breaking in electroweak theory could explain the origin of mass of elementary particles in general and of the W and Z bosons in particular. This Higgs mechanism predicted the existence of a new particle, the Higgs boson, the detection of which became one of the great goals of physics. In 2012, CERN announced the discovery of the Higgs boson at the Large Hadron Collider. The Higgs mechanism is generally accepted as an important ingredient in the Standard Model of particle physics, without which certain particles would have no mass.
+For this work, Higgs received the Nobel Prize in Physics, which he shared with François Englert in 2013.
+
+John Michael Kosterlitz (born June 22, 1943) is a British-American physicist. He is a professor of physics at Brown University and the son of biochemist Hans Kosterlitz. He was awarded the 2016 Nobel Prize in physics along with David Thouless and Duncan Haldane for work on condensed matter physics.
+
+Frederick Duncan Michael Haldane  (born 14 September 1951) is a British physicist who is currently the Sherman Fairchild University Professor of Physics at Princeton University. He is a co-recipient of the 2016 Nobel Prize in Physics, along with David J. Thouless and J. Michael Kosterlitz.
 
 David James Thouless (; 21 September 1934 – 6 April 2019) was a British condensed-matter physicist. He was awarded the 1990 Wolf Prize and a laureate of the 2016 Nobel Prize for physics along with F. Duncan M. Haldane and J. Michael Kosterlitz for theoretical discoveries of topological phase transitions and topological phases of matter.
+
+Shuji Nakamura (Japanese: 中村 修二, romanized: Nakamura Shūji; born May 22, 1954) is a Japanese–American electronic engineer and co-inventor of the blue LED, a major breakthrough in lighting technology. He specializes in the field of semiconductor technology. He is Professor of Materials and of Electrical and Computer Engineering at the University of California, Santa Barbara (UCSB) since 1999.
+Together with Isamu Akasaki and Hiroshi Amano, Nakamura received the 2014 Nobel Prize in Physics "for the invention of efficient blue light-emitting diodes, which has enabled bright and energy-saving white light sources."
+
+Sir Andre Konstantin Geim (Russian: Андре́й Константи́нович Гейм; born 21 October 1958; IPA1 pronunciation: ɑːndreɪ gaɪm) is a Russian-born British physicist working in England in the School of Physics and Astronomy at the University of Manchester.
+Geim was awarded the 2010 Nobel Prize in Physics jointly with Konstantin Novoselov for his work on graphene. At that time he was a Dutch citizen. He later became a British citizen to accept a knighthood and considered himself Dutch-British. Geim is Regius Professor of Physics and Royal Society Research Professor at the National Graphene Institute. Geim was previously awarded an Ig Nobel Prize in 2000 for levitating a frog using its intrinsic magnetism. He is the first and only individual, as of 2025, to have received both Nobel and Ig Nobel prizes, for which he holds a Guinness World Record.
+
+Sir Konstantin Sergeevich Novoselov (Russian: Константи́н Серге́евич Новосёлов, IPA: [kənstɐnʲˈtʲin sʲɪrˈɡʲe(j)ɪvʲɪtɕ nəvɐˈsʲɵləf]; born 23 August 1974) is a Russian–British physicist. His work on graphene with Andre Geim earned them the Nobel Prize in Physics in 2010. Novoselov is a professor at the Centre for Advanced 2D Materials, National University of Singapore and is also the Langworthy Professor of the School of Physics and Astronomy at the University of Manchester.
+
+Adam Guy Riess (born December 16, 1969) is an American astrophysicist and Bloomberg Distinguished Professor at Johns Hopkins University and the Space Telescope Science Institute. He is known for his research in using supernovae as cosmological probes. Riess shared both the 2006 Shaw Prize in Astronomy and the 2011 Nobel Prize in Physics with Saul Perlmutter and Brian Schmidt for providing evidence that the expansion of the universe is accelerating.
+Riess has been at the center of a growing scientific debate about the so-called “Hubble tension” — a discrepancy between measurements of the universe’s expansion rate using nearby supernovae, and measurements inferred from the cosmic microwave background radiation using the Standard Model of cosmology. Riess’s data has prompted questions and further testing to determine if the Standard Model still adequately describes the universe.
+
+David Jeffery Wineland (born February 24, 1944) is an American physicist at the Physical Measurement Laboratory of the National Institute of Standards and Technology (NIST). His most notable contributions include the laser cooling of trapped ions and the use of ions for quantum-computing operations. He received the 2012 Nobel Prize in Physics, jointly with Serge Haroche, for "ground-breaking experimental methods that enable measuring and manipulation of individual quantum systems."
 
 Arthur Bruce McDonald  P.Eng (born August 29, 1943) is a Canadian astrophysicist. McDonald is the director of the Sudbury Neutrino Observatory Collaboration and held the Gordon and Patricia Gray Chair in Particle Astrophysics at Queen's University in Kingston, Ontario from 2006 to 2013. He was awarded the 2015 Nobel Prize in Physics jointly with Japanese physicist Takaaki Kajita.
 
 Brian Paul Schmidt (born 24 February 1967) is an American Australian astrophysicist at the Australian National University's Mount Stromlo Observatory and Research School of Astronomy and Astrophysics. He was the Vice-Chancellor of the Australian National University (ANU) from January 2016 to January 2024. He is known for his research in using supernovae as cosmological probes. He previously held a Federation Fellowship and a Laureate Fellowship from the Australian Research Council, and was elected a Fellow of the Royal Society (FRS) in 2012. Schmidt shared both the 2006 Shaw Prize in Astronomy and the 2011 Nobel Prize in Physics with Saul Perlmutter and Adam Riess for providing evidence that the expansion of the universe is accelerating.
 
+Isamu Akasaki (Japanese: 赤﨑 勇, romanized: Akasaki Isamu; January 30, 1929 – April 1, 2021) was a Japanese electronic engineer specializing in the field of semiconductor technology, best known for co-inventing the bright gallium nitride (GaN) p–n junction blue LED in 1989 and subsequently the high-brightness GaN blue LED as well.
+Akasaki was awarded the 2014 Nobel Prize in Physics, together with Hiroshi Amano and Shuji Nakamura, "for the invention of efficient blue light-emitting diodes, which has enabled bright and energy-saving white light sources."
+
+Serge Haroche (born 11 September 1944) is a French physicist who was awarded the 2012 Nobel Prize for Physics jointly with David J. Wineland for "ground-breaking experimental methods that enable measuring and manipulation of individual quantum systems", a study of the particle of light, the photon. This and his other works developed laser spectroscopy. Since 2001, Haroche is a professor at the Collège de France and holds the chair of quantum physics and in 2022 he had the Fermi Chair of Physics at University of Rome La Sapienza.
+In 1971 he defended his doctoral thesis in physics at the University of Paris VI: his research had been conducted under the direction of Claude Cohen-Tannoudji.
+
+Saul Perlmutter (born September 22, 1959) is an American astrophysicist who is a professor of physics at the University of California, Berkeley, where he holds the Franklin W. and Karen Weber Dabby Chair, and is head of the International Supernova Cosmology Project at the Lawrence Berkeley National Laboratory. He is a member of both the American Academy of Arts & Sciences and the American Philosophical Society, and was elected a Fellow of the American Association for the Advancement of Science in 2003.  He is a member of the National Academy of Sciences. Perlmutter shared the 2006 Shaw Prize in Astronomy, the 2011 Nobel Prize in Physics, and the 2015 Breakthrough Prize in Fundamental Physics with Brian P. Schmidt and Adam Riess for providing evidence that the expansion of the universe is accelerating. Since 2021, he has been a member of the President’s Council of Advisors on Science and Technology (PCAST).
+
 Q: Who received the Nobel Prize in Physics from 2010 to 2016?
-A: Shuji Nakamura, David Thouless, Arthur McDonald, Brian Schmidt
+A: Hiroshi Amano, Peter Higgs, J. Michael Kosterlitz, Duncan Haldane, David Thouless, Shuji Nakamura, Andre Geim, Konstantin Novoselov, Adam Riess, David J. Wineland, Arthur B. McDonald, Brian Schmidt, Isamu Akasaki, Serge Haroche, Saul Perlmutter
 
 # METADATA: {"query_id": "capitals_Q46_easy_121"}
 Context:
+Rome is the capital city and most populated comune (municipality) of Italy. It is also the administrative centre of the Lazio region and of the Metropolitan City of Rome. A special comune named Roma Capitale with 2,746,984 residents in 1,287.36 km2 (497.1 mi2), Rome is the third most populous city in the European Union by population within city limits. The Metropolitan City of Rome Capital, with a population of 4,223,885 residents, is the most populous metropolitan city in Italy. Its metropolitan area is the third-most populous within Italy. Rome is located in the central-western portion of the Italian Peninsula, within Lazio (Latium), along the shores of the Tiber Valley. Vatican City (the smallest country in the world and headquarters of the worldwide Catholic Church under the governance
+
+Valletta ( ; Maltese: il-Belt Valletta, lit. 'the city [of] Valletta', pronounced [ɪlˈbɛlt vɐˈlːɛtːɐ]), also known as Città Umilissima (transl. the Humblest City), is the capital city of Malta and one of its 68 council areas. Located between the Grand Harbour to the east and Marsamxett Harbour to the west, its population as of 2021 was 5,157. As Malta’s capital city, it is a commercial centre for shopping, bars, dining, and café life. It is also the southernmost capital of Europe, and, at just 0.61 square kilometres (0.24 sq mi), it is the European Union's smallest capital city.
+Valletta's 16th-century buildings were constructed by the Knights Hospitaller. The city was named after the Frenchman Jean Parisot de Valette, who succeeded in defending the island against an Ottoman invasion
+
+Astana is the capital city of Kazakhstan. With a population of 1,423,726 within the city limits, it is the second-largest in the country after Almaty, which was the national capital until 1997. The city lies on the banks of the Ishim river in the north of Kazakhstan. It is located within the Akmola Region but administers itself. Initially founded as Aqmoly in 1830, the city was later renamed Akmolinsk, Tselinograd, and Aqmola before adopting the name Astana in 1998, which means "capital city" in Kazakh. In 2019, the city briefly adopted the name Nur-Sultan in honor of former president Nursultan Nazarbayev, but it reverted to the name Astana in 2022.
+Astana's history is marked by rapid growth, especially after becoming the capital. Its transformation into a modern and planned city was
+
+Moscow is the capital and largest city of Russia, standing on the Moskva River in Central Russia. It has a population estimated at over 13 million residents within the city limits, over 19.1 million residents in the urban area, and over 21.5 million residents in its metropolitan area. The city covers an area of 2,511 square kilometers (970 mi2), while the urban area covers 5,891 square kilometers (2,275 mi2), and the metropolitan area covers over 26,000 square kilometers (10,000 mi2). Moscow is among the world's largest cities, being the most populous city entirely in Europe, the largest urban and metropolitan area in Europe, and the largest city by land area on the European continent.
+First documented in 1147, Moscow became the capital of the Grand Principality of Moscow, which led the
+
+Amsterdam (Dutch: [ˌɑmstərˈdɑm] ; lit. 'Dam in the Amstel') is the capital and largest city of the Netherlands. It has a population of 933,680 in June 2024 within the city proper, 1,457,018 in the urban area and 2,480,394 in the metropolitan area. Located in the Dutch province of North Holland, Amsterdam is colloquially referred to as the "Venice of the North", for its large number of canals, now a UNESCO World Heritage Site.
+Amsterdam was founded at the mouth of the Amstel River, which was dammed to control flooding. Originally a small fishing village in the 12th century, Amsterdam became a major world port during the Dutch Golden Age of the 17th century, when the Netherlands was an economic powerhouse. Amsterdam was the leading centre for finance and trade, as well as a hub of secular
+
+Zagreb ( ZAH-greb Croatian: [zǎːɡreb] ) is the capital and largest city of Croatia. It is in the north of the country, along the Sava river, at the southern slopes of the Medvednica mountain. Zagreb stands near the international border between Croatia and Slovenia at an elevation of approximately 158 m (518 ft) above sea level. At the 2021 census, the city itself had a population of 767,131, while the population of Zagreb metropolitan area is 1,086,528.
+The oldest settlement in the vicinity of the city was the Roman Andautonia, in today's Šćitarjevo. The historical record of the name "Zagreb" dates from 1134, in reference to the foundation of the settlement at Kaptol in 1094. Zagreb became a free royal city in 1242. In 1851, Janko Kamauf became Zagreb's first mayor. Zagreb has special
+
+Bern (Swiss Standard German: [bɛrn] ), or Berne (French: [bɛʁn] ), is the de facto capital of Switzerland, referred to as the "federal city". With a population of about 146,000 (as of 2024), Bern is the fifth-most populous city in Switzerland, behind Zürich, Geneva, Basel and Lausanne. The Bern agglomeration, which includes 36 municipalities, had a population of 406,900 in 2014. The metropolitan area had a population of 660,000 in 2000.
+Bern is also the capital of the canton of Bern, the second-most populous of Switzerland's cantons. The city's official language is German. The main spoken language is the local variant of the Alemannic Swiss German dialect, Bernese German. In 1983, the historic old town (in German: Altstadt) in the centre of Bern became a UNESCO World Heritage Site. It is
+
+Stockholm (; Swedish: [ˈstɔ̂kː(h)ɔlm] ) is the capital and most populous city of Sweden, as well as the largest urban area in the Nordic countries. Approximately 1 million people live in the municipality, with 1.6 million in the urban area, and 2.5 million in the metropolitan area. The city stretches across fourteen islands where Lake Mälaren flows into the Baltic Sea. Outside the city to the east, and along the coast, is the island chain of the Stockholm archipelago. The area has been settled since the Stone Age, in the 6th millennium BC, and was founded as a city in 1252 by Swedish statesman Birger Jarl. The city serves as the county seat of Stockholm County.
+Stockholm is the cultural, media, political, and economic centre of Sweden. The Stockholm region alone accounts for over a third
+
 Oslo is the capital and most populous city of Norway. It constitutes both a county and a municipality. The municipality of Oslo had a population of 709,037 in 2022, while the city's greater urban area had a population of 1,064,235 in 2022, and the metropolitan area had an estimated population of 1,546,706 in 2021.
+During the Viking Age, the area was part of Viken. Oslo was founded as a city at the end of the Viking Age in 1040 under the name Ánslo, and established as a kaupstad or trading place in 1048 by Harald Hardrada. The city was elevated to a bishopric in 1070 and a capital under Haakon V of Norway around the year 1300. Personal unions with Denmark from 1397 to 1523 and again from 1536 to 1814 reduced its influence. After being destroyed by a fire in 1624, during the reign of King
 
-Skopje is the capital and largest city of North Macedonia. It lies in the northern part of the country, in the Skopje Valley along the Vardar River, and is the political, economic, and cultural centre of the country. As of the 2021 census, the city had a population of 526,502.
+Paris is the capital and largest city of France, with an estimated city population of 2,048,472 in an area of 105.4 km2 (40.7 sq mi), and a metropolitan population of 13,171,056 as of January 2025. Located on the river Seine in the centre of the Île-de-France region, it is the largest metropolitan area and fourth-most populous city in the European Union (EU). Nicknamed the City of Light, partly because of its role in the Age of Enlightenment, Paris has been one of the world's major centres of finance, diplomacy, commerce, culture, fashion, and gastronomy since the 17th century.
+Administratively, Paris is divided into twenty arrondissements (districts), each having their own cultural identity. Haussmann's renovation of Paris, which created new boulevards, parks, and public works, gave birth
 
-Bucharest (UK:   BOO-kə-REST, US:  -⁠rest; Romanian: București [bukuˈreʃtʲ] ) is the capital and largest city of Romania. The metropolis stands on the River Dâmbovița in south-eastern Romania. Its population is officially estimated at 1.71 million residents within a greater metropolitan area of 2.31 million residents, which makes Bucharest the 8th most-populous city by population within city limits in the European Union.
+Sofia is the capital and largest city of Bulgaria. It is situated in the Sofia Valley at the foot of the Vitosha mountain, in the western part of the country. The city is built west of the Iskar river and has many mineral springs, such as the Sofia Central Mineral Baths. It has a humid continental climate.
+Known as Serdica in antiquity, Sofia has been an area of human habitation since at least 7000 BC. The recorded history of the city begins with the attestation of the conquest of Serdica by the Roman Republic in 29 BC from the Celtic tribe Serdi. During the decline of the Roman Empire, the city was raided by Huns, Visigoths, Avars, and Slavs. In 809, Serdica was incorporated into the First Bulgarian Empire by Khan Krum and became known as Sredets. In 1018, the Byzantines ended Bulgarian
+
+Skopje is the capital and largest city of North Macedonia. It lies in the northern part of the country, in the Skopje Valley along the Vardar River, and is the political, economic, and cultural centre of the country. As of the 2021 census, the city had a population of 526,502. Skopje covers 571.46 km2 (220.64 mi2) and includes both urban and rural areas, bordered by several municipalities and close to the borders of Kosovo and Serbia.
+The area of Skopje has been continuously inhabited since at least the Chalcolithic period. The city — known as Scupi at the time — was founded in the late 1st century during the rule of Domitian, and abandoned in 518 after an earthquake destroyed the city. It was rebuilt under Justinian I. It became a significant settlement under the First Bulgarian Empire,
+
+Cetinje (Montenegrin Cyrillic: Цетиње, pronounced [t͡sětiɲe]) is a town in Montenegro. It is the former royal capital (Montenegrin: prijestonica / приjестоница) of Montenegro and is the location of several national institutions, including the official residence of the president of Montenegro.
+According to the 2023 census, the town had a population of 12,460 while the Cetinje Municipality had 14,465 residents. Cetinje is the centre of Cetinje Municipality. The city rests on a small karst plain surrounded by limestone mountains, including Mount Lovćen, the legendary mountain in Montenegrin historiography. Cetinje was founded in the 15th century and became a cradle of the culture of Montenegro. Its status as the honorary capital of Montenegro is due to its heritage as a long-serving former capital of Montenegro.
+
+Pamplona (Spanish: [pamˈplona] ; Basque: Iruñea [i.ɾuɲea]; officially in its bilingual form: Pamplona-Iruña), historically also known as Pampeluna in English, is the capital city of the Chartered Community of Navarre in Spain. As of 2024, with a population of 208,243, it is the 29th largest city in Spain.
+Lying at near 450 m (1,480 ft) above sea level, the city (and the wider Cuenca de Pamplona) is located on the flood plain of the Arga river, a second-order tributary of the Ebro. Precipitation-wise, it is located in a transitional location between the rainy Atlantic northern façade of the Iberian Peninsula and its drier inland. Early population in the settlement traces back to the late Bronze to early Iron Age, even if the traditional inception date refers to the foundation of Pompaelo by
+
+Prague ( PRAHG; Czech: Praha [ˈpraɦa] ) is the capital and largest city of the Czech Republic and the historical capital of Bohemia. Prague, located on the Vltava River, has a population of about 1.4 million, while its metropolitan area is home to approximately 2.3 million people.
+Prague is a historical city with Romanesque, Gothic, Renaissance, and Baroque architecture. It was the capital of the Kingdom of Bohemia and residence of several Holy Roman Emperors, most notably Charles IV (r. 1346–1378) and Rudolf II (r. 1575–1611). It was an important city to the Habsburg monarchy and Austria-Hungary. The city played major roles in the Bohemian and the Protestant Reformation, the Thirty Years' War, and in 20th-century history as the capital of Czechoslovakia between the World Wars and the
+
+Monaco City (French: Monaco-Ville [mɔnakɔ vil]; Monégasque: Mùnegu Autu) is the southcentral ward in the Principality of Monaco. Located on a headland that extends into the Mediterranean Sea, it is nicknamed The Rock (French: Le Rocher; Monégasque: A Roca). The name "Monaco City" is misleading: it is not itself a city, but a historical and statistical district. It holds most of the country's political and judicial institutions: the Prince's Palace, the town hall, the government, the National Council (parliament of Monaco), the Municipal Council, the courts and a prison (hanging on The Rock).
 
 Q: What capitals are located in Europe?
-A: Oslo, Skopje, Bucharest
-
-# METADATA: {"query_id": "filmography_Q8877_easy_0"}
-Context:
-Steven Spielberg is a renowned American film director. Between 1964 and 1972, he directed several films that contributed to his early reputation in the industry, including Firelight and Amblin'.
-
-Q: What films did Steven Spielberg direct from 1964 to 1972?
-A: Firelight, Amblin'
-
-# METADATA: {"query_id": "position_Q14211_all_all_easy_1"}
-Context:
-The Prime Minister of Great Britain is the head of government in the United Kingdom. From 1721 to 1742, the office was held by Robert Walpole and Spencer Compton, who shaped early British parliamentary history.
-
-Q: Who are the Prime Ministers of Great Britain from 1721 to 1742?
-A: Robert Walpole, Spencer Compton
-
-# METADATA: {"query_id": "cast_Q44578_easy_2"}
-Context:
-A creative ensemble refers to a group of actors who collaborate on a theatrical or cinematic production. The following actors are recognized for their roles in such ensembles: John Smith, Jane Doe, Alice Johnson, Bob Lee, and Carol White.
-
-Q: Who are the actors in the creative ensemble?
-A: John Smith, Jane Doe, Alice Johnson, Bob Lee, Carol White
-
-# METADATA: {"query_id": "filmography_Q2001_easy_3"}
-Context:
-Stanley Kubrick was an influential film director. Between 1953 and 1957, he released several films that are now considered classics, including Fear and Desire, Killer's Kiss, and The Killing.
-
-Q: What films did Stanley Kubrick release from 1953 to 1957?
-A: Fear and Desire, Killer's Kiss, The Killing
-
-# METADATA: {"query_id": "capitals_Q15_easy_4"}
-Context:
-Gabon, the Democratic Republic of the Congo, Eritrea, and Tanzania are African countries, each with its own capital city: Libreville, Kinshasa, Asmara, and Dodoma, respectively.
-
-Q: What capital cities are located in Gabon, the Democratic Republic of the Congo, Eritrea, and Tanzania?
-A: Libreville, Kinshasa, Asmara, Dodoma
-
-# METADATA: {"query_id": "series_Q642878_easy_5"}
-Context:
-"Spider-Man: Far From Home" is a superhero film featuring a cast of talented actors, including Tom Holland and Jake Gyllenhaal.
-
-Q: Who are the actors in Spider-Man: Far From Home?
-A: Tom Holland, Jake Gyllenhaal
-
-# METADATA: {"query_id": "series_Q2484680_easy_6"}
-Context:
-"GoldenEye" is a James Bond film known for its ensemble cast, including Pierce Brosnan, Sean Bean, Izabella Scorupco, and Famke Janssen.
-
-Q: Who are the actors in GoldenEye?
-A: Pierce Brosnan, Sean Bean, Izabella Scorupco, Famke Janssen
-
-# METADATA: {"query_id": "award_Q80061_all_all_easy_8"}
-Context:
-The Nobel Prize in Physiology or Medicine is awarded annually to individuals who have made significant contributions to the field. Recipients from 1901 to 1905 include Emil von Behring, Ronald Ross, Niels Ryberg Finsen, Ivan Pavlov, and Robert Koch.
-
-Q: Who received the Nobel Prize in Physiology or Medicine from 1901 to 1905?
-A: Emil von Behring, Ronald Ross, Niels Ryberg Finsen, Ivan Pavlov, Robert Koch
-
-# METADATA: {"query_id": "award_Q103360_2000_2023_easy_9"}
-Context:
-The Academy Award for Best Picture is one of the most prestigious awards in the film industry. The winning films from 2000 to 2001 were Gladiator and A Beautiful Mind.
-
-Q: Who received the Academy Award for Best Picture from 2000 to 2001?
-A: Gladiator, A Beautiful Mind
-
-# METADATA: {"query_id": "capitals_Q46_easy_10"}
-Context:
-Northern Europe is home to several capital cities, including Stockholm, Oslo, Copenhagen, and Helsinki.
-
-Q: What capitals are located in Northern Europe?
-A: Stockholm, Oslo, Copenhagen, Helsinki
-
+A: Rome, Valletta, Astana, Moscow, Amsterdam, Zagreb, Bern, Stockholm, Oslo, Paris, Sofia, Skopje, Cetinje, Pamplona, Prague, Monaco City
