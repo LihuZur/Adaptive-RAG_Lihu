@@ -196,7 +196,7 @@ class GPT3Generator:
             handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(name)s - %(message)s'))
             logger.addHandler(handler)
         logger.setLevel(logging.INFO)
-        logger.info(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt_trunc} ...")
+        logger.debug(f"[EMBEDDING] Starting embedding for prompt (truncated): {prompt_trunc} ...")
         """
         :param input_text:
         :return: returns a sequence of tuples (string, score) where lower score is better
@@ -236,10 +236,10 @@ class GPT3Generator:
 
         for index in range(500):
             try:
-                logger.info(f"[EMBEDDING] Attempt {index+1} for embedding.")
+                logger.debug(f"[EMBEDDING] Attempt {index+1} for embedding.")
                 response = openai_call(**arguments)
                 success = True
-                logger.info(f"[EMBEDDING] Embedding call succeeded on attempt {index+1}.")
+                logger.debug(f"[EMBEDDING] Embedding call succeeded on attempt {index+1}.")
                 break
             except Exception as exception:
                 success = False
@@ -279,7 +279,7 @@ class GPT3Generator:
                 interesting_content = choice["message"]["content"]
             elif "text" in choice:
                 interesting_content = choice["text"]
-        print("[LLM RESPONSE CONTENT]", interesting_content)
+        logger.debug(f"[LLM RESPONSE CONTENT] {interesting_content}")
 
         output_seq_score = []
 
@@ -306,7 +306,7 @@ class GPT3Generator:
                 output_seq_score.append((choice["text"], index))
 
         output_trunc = output_seq_score[0][0][:120].replace('\n', ' ') if output_seq_score else ''
-        logger.info(f"[EMBEDDING] Embedding complete. Output: {output_trunc} ...")
-        logger.info(f"[EMBEDDING] Successfully finished embedding for prompt.")
+        logger.debug(f"[EMBEDDING] Embedding complete. Output: {output_trunc} ...")
+        logger.debug(f"[EMBEDDING] Successfully finished embedding for prompt.")
         return sorted(output_seq_score, key=lambda x: x[1])
 

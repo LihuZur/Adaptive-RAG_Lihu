@@ -210,10 +210,31 @@ class QuestionSearchBase(object):
             except ValueError:
                 # Not a valid json ignore
                 pass
-            # Print the extracted/generated QIDs for runtime transparency
-            print(f"[QID: {example['qid']}] Extracted/generated QIDs: {final_answer}")
+            
+            # Print organized summary for the query
             if not silent:
-                print("\n")
+                print("\n" + "="*80)
+                print(f"QUERY ID: {example['qid']}")
+                print(f"QUERY: {example.get('question', example.get('query_text', 'N/A'))}")
+                print("-"*80)
+                
+                # Extract retrieved passage IDs if available
+                retrieved_pids = []
+                if hasattr(data, 'paragraphs') and data.paragraphs:
+                    retrieved_pids = [p.get('pid', p.get('title', 'unknown')) for p in data.paragraphs[:5]]
+                if retrieved_pids:
+                    print(f"RETRIEVED PASSAGES: {', '.join(retrieved_pids)}")
+                    print("-"*80)
+                
+                print(f"LLM RESPONSE: {final_answer}")
+                
+                # Show ground truth if available
+                if 'ground_truth' in example:
+                    print("-"*80)
+                    print(f"GROUND TRUTH: {example['ground_truth']}")
+                
+                print("="*80 + "\n")
+            
             return (example["qid"], final_answer, chain)
 
 
