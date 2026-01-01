@@ -103,17 +103,21 @@ def evaluate_by_dicts(
     
     # Get fetched passage counts from the saved passage_counts file
     fetched_passage_counts = {}
+    print(f"[DEBUG evaluate_by_dicts] dataset={dataset}, prediction_file_path={prediction_file_path}")
     if dataset.lower() == "crossentityqa" and prediction_file_path:
         passage_counts_path = prediction_file_path.replace(".json", "_passage_counts.json")
+        print(f"[DEBUG] Looking for passage counts at: {passage_counts_path}")
         if os.path.exists(passage_counts_path):
             try:
                 with open(passage_counts_path) as f:
                     fetched_passage_counts = json.load(f)
-                print(f"[DEBUG] Loaded fetched passage counts for {len(fetched_passage_counts)} queries from {passage_counts_path}")
+                print(f"[DEBUG] Loaded fetched passage counts for {len(fetched_passage_counts)} queries")
             except Exception as e:
                 print(f"[DEBUG] Could not load passage counts file: {e}")
         else:
-            print(f"[DEBUG] Passage counts file not found: {passage_counts_path}")
+            print(f"[DEBUG] Passage counts file not found - predictions need to be re-run to generate this file")
+    else:
+        print(f"[DEBUG] Skipping passage counts: dataset={dataset.lower()}, has_path={bool(prediction_file_path)}")
     
     # Queries with broken/incompatible ground truth (GT shows movies instead of actors, etc.)
     BROKEN_QUERY_IDS = {
