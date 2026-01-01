@@ -227,10 +227,11 @@ class QuestionSearchBase(object):
             
             print(f"LLM RESPONSE: {final_answer}")
             
-            # Show ground truth if available
-            if 'ground_truth' in example:
+            # Show ground truth if available (check multiple possible field names)
+            gt = example.get('ground_truth') or example.get('answer') or example.get('answers')
+            if gt:
                 print("-"*80)
-                print(f"GROUND TRUTH: {example['ground_truth']}")
+                print(f"GROUND TRUTH: {gt}")
             
             print("="*80 + "\n")
             

@@ -100,6 +100,9 @@ def evaluate_by_dicts(
         # For CrossEntityQA, treat as regular answer comparison (ground_truth is a string)
         if dataset.lower() == "crossentityqa":
             prediction = [answer_extractor(_prediction) for _prediction in prediction]
+            # Ensure ground_truth is a string (unwrap if accidentally wrapped in list)
+            if isinstance(ground_truth, list):
+                ground_truth = ground_truth[0] if ground_truth else ""
             metrics[0](prediction[0] if prediction else "", [ground_truth])
         elif prediction_type == "answer":
             prediction = [answer_extractor(_prediction) for _prediction in prediction]  # Temporary.
