@@ -813,8 +813,8 @@ instantiation_schemes = {
         "distractor_count": ['"1"'],
     },
     "hc_qa": {
-        "bm25_retrieval_count": ["150", "200"],  # More candidates for HC to select from
-        "gamma": ["0.6", "0.7", "0.8"],  # Aggressive: force HC to select more passages (targeting 9-12)
+        "bm25_retrieval_count": ["150"],  # Good balance of candidates
+        "gamma": ["0.5", "0.6", "0.7"],  # With new null dist (mean=12.40), should select 9-11 passages
         "min_hc": ["0.0"],  # Standard gating threshold
     }
 }

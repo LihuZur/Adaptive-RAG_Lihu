@@ -72,22 +72,6 @@ Warsaw traces its origins to a small fishing town in Masovia. The city rose to p
 Q: What capitals are located in Northern Europe?
 A: City of Brussels, Stockholm, Helsinki, Warsaw
 
-# METADATA: {"query_id": "award_Q80061_all_all_easy_8"}
-Context:
-Ivan Petrovich Pavlov (Russian: Иван Петрович Павлов, IPA: [ɪˈvan pʲɪˈtrovʲɪtɕ ˈpavləf] ; 26 September [O.S. 14 September] 1849 – 27 February 1936) was a Russian and Soviet experimental neurologist and physiologist known for his discovery of classical conditioning through his experiments with dogs. Pavlov also conducted significant research on the physiology of digestion, for which he was awarded the Nobel Prize in Physiology or Medicine in 1904.
-
-Emil von Behring (German: [ˈeːmiːl fɔn ˈbeːʁɪŋ] ; Emil Adolf von Behring: born Emil Adolf Behring; 15 March 1854 – 31 March 1917), was a German physiologist who received the 1901 Nobel Prize in Physiology or Medicine, the first one awarded in that field, for his discovery of a diphtheria antitoxin. He was widely known as a "saviour of children", as diphtheria used to be a major cause of child death. His work with the disease, as well as tetanus, has come to bring him most of his fame and acknowledgment. He was honoured with Prussian nobility in 1901, henceforth being known by the surname "von Behring".
-
-Heinrich Hermann Robert Koch ( KOKH; German: [ˈʁoːbɛʁt kɔx] ; 11 December 1843 – 27 May 1910) was a German physician and microbiologist. As the discoverer of the specific causative agents of deadly infectious diseases including tuberculosis, cholera and anthrax, he is regarded as one of the main founders of modern bacteriology. As such he is popularly nicknamed the father of microbiology (with Louis Pasteur), and as the father of medical bacteriology. His discovery of the anthrax bacterium (Bacillus anthracis) in 1876 is considered as the birth of modern bacteriology. Koch used his discoveries to establish that germs "could cause a specific disease" and directly provided proofs for the germ theory of diseases, therefore creating the scientific basis of public health, saving millions of
-
-Sir Ronald Ross  (13 May 1857 – 16 September 1932) was a British medical doctor who received the Nobel Prize for Physiology or Medicine in 1902 for his work on the transmission of malaria, becoming the first British Nobel laureate, and the first born outside Europe. His discovery of the malarial parasite in the gastrointestinal tract of a mosquito in 1897 proved that malaria was transmitted by mosquitoes, and laid the foundation for the method of combating the disease.
-Ross was a polymath, writing a number of poems, publishing several novels, and composing songs. He was also an amateur artist and mathematician. He worked in the Indian Medical Service for 25 years. It was during his service that he made the groundbreaking medical discovery. After resigning from his service in India, he joined the faculty of Liverpool School of Tropical Medicine, and continued as Professor and Chairman of Tropical Medicine of the institute for 10 years. In 1926, he became Director-in-Chief of the Ross Institute and Hospital for Tropical Diseases, which was established in honour of his works. He remained there until his death.
-
-Niels Ryberg Finsen (15 December 1860 – 24 September 1904) was a physician and scientist. In 1903, he was awarded the Nobel Prize in Medicine and Physiology "in recognition of his contribution to the treatment of diseases, especially lupus vulgaris, with concentrated light radiation, whereby he has opened a new avenue for medical science."
-
-Q: Who received the Nobel Prize in Physiology or Medicine from 1901 to 1905?
-A: Ivan Pavlov, Emil von Behring, Robert Koch, Ronald Ross, Niels Ryberg Finsen
-
 # METADATA: {"query_id": "filmography_Q2001_easy_103"}
 Context:
 Barry Lyndon is a 1975 historical drama film written, directed, and produced by Stanley Kubrick, based on the 1844 novel The Luck of Barry Lyndon by William Makepeace Thackeray. Narrated by Michael Hordern, and starring Ryan O'Neal, Marisa Berenson, Patrick Magee, Leonard Rossiter and Hardy Krüger, the film recounts the early exploits and later unravelling of an 18th-century Irish rogue and gold digger who marries a rich widow in order to attempt to climb the social ladder and assume her late husband's aristocratic position.
@@ -155,48 +139,6 @@ SpaceX was founded by Elon Musk in 2002 with a vision of decreasing the costs of
 Q: What companies did Elon Musk found?
 A: Neuralink, OpenAI, The Boring Company, Thud (media company), Astra Nova School, Zip2, X Corp., PayPal, America PAC, XAI (company), X.com (bank), SpaceX
 
-# METADATA: {"query_id": "award_Q38104_2010_2023_easy_107"}
-Context:
-Hiroshi Amano (天野 浩, Amano Hiroshi; born September 11, 1960) is a Japanese physicist, engineer and inventor specializing in the field of semiconductor technology. He was the co-inventor of the blue LED, for which he was awarded the 2014 Nobel Prize in Physics together with Isamu Akasaki and Shuji Nakamura.
-Amano was elected as a member of the National Academy of Engineering in 2016 for the development of p-type gallium nitride (GaN) doping, enabling blue semiconductor LEDs.
-
-Peter Ware Higgs (29 May 1929 – 8 April 2024) was a British theoretical physicist, professor at the University of Edinburgh, and Nobel laureate in Physics for his work on the mass of subatomic particles.
-In 1964, Higgs was the single author of one of the three milestone papers published in Physical Review Letters (PRL) that proposed that spontaneous symmetry breaking in electroweak theory could explain the origin of mass of elementary particles in general and of the W and Z bosons in particular. This Higgs mechanism predicted the existence of a new particle, the Higgs boson, the detection of which became one of the great goals of physics. In 2012, CERN announced the discovery of the Higgs boson at the Large Hadron Collider. The Higgs mechanism is generally accepted as an important ingredient in the Standard Model of particle physics, without which certain particles would have no mass.
-For this work, Higgs received the Nobel Prize in Physics, which he shared with François Englert in 2013.
-
-John Michael Kosterlitz (born June 22, 1943) is a British-American physicist. He is a professor of physics at Brown University and the son of biochemist Hans Kosterlitz. He was awarded the 2016 Nobel Prize in physics along with David Thouless and Duncan Haldane for work on condensed matter physics.
-
-Frederick Duncan Michael Haldane  (born 14 September 1951) is a British physicist who is currently the Sherman Fairchild University Professor of Physics at Princeton University. He is a co-recipient of the 2016 Nobel Prize in Physics, along with David J. Thouless and J. Michael Kosterlitz.
-
-David James Thouless (; 21 September 1934 – 6 April 2019) was a British condensed-matter physicist. He was awarded the 1990 Wolf Prize and a laureate of the 2016 Nobel Prize for physics along with F. Duncan M. Haldane and J. Michael Kosterlitz for theoretical discoveries of topological phase transitions and topological phases of matter.
-
-Shuji Nakamura (Japanese: 中村 修二, romanized: Nakamura Shūji; born May 22, 1954) is a Japanese–American electronic engineer and co-inventor of the blue LED, a major breakthrough in lighting technology. He specializes in the field of semiconductor technology. He is Professor of Materials and of Electrical and Computer Engineering at the University of California, Santa Barbara (UCSB) since 1999.
-Together with Isamu Akasaki and Hiroshi Amano, Nakamura received the 2014 Nobel Prize in Physics "for the invention of efficient blue light-emitting diodes, which has enabled bright and energy-saving white light sources."
-
-Sir Andre Konstantin Geim (Russian: Андре́й Константи́нович Гейм; born 21 October 1958; IPA1 pronunciation: ɑːndreɪ gaɪm) is a Russian-born British physicist working in England in the School of Physics and Astronomy at the University of Manchester.
-Geim was awarded the 2010 Nobel Prize in Physics jointly with Konstantin Novoselov for his work on graphene. At that time he was a Dutch citizen. He later became a British citizen to accept a knighthood and considered himself Dutch-British. Geim is Regius Professor of Physics and Royal Society Research Professor at the National Graphene Institute. Geim was previously awarded an Ig Nobel Prize in 2000 for levitating a frog using its intrinsic magnetism. He is the first and only individual, as of 2025, to have received both Nobel and Ig Nobel prizes, for which he holds a Guinness World Record.
-
-Sir Konstantin Sergeevich Novoselov (Russian: Константи́н Серге́евич Новосёлов, IPA: [kənstɐnʲˈtʲin sʲɪrˈɡʲe(j)ɪvʲɪtɕ nəvɐˈsʲɵləf]; born 23 August 1974) is a Russian–British physicist. His work on graphene with Andre Geim earned them the Nobel Prize in Physics in 2010. Novoselov is a professor at the Centre for Advanced 2D Materials, National University of Singapore and is also the Langworthy Professor of the School of Physics and Astronomy at the University of Manchester.
-
-Adam Guy Riess (born December 16, 1969) is an American astrophysicist and Bloomberg Distinguished Professor at Johns Hopkins University and the Space Telescope Science Institute. He is known for his research in using supernovae as cosmological probes. Riess shared both the 2006 Shaw Prize in Astronomy and the 2011 Nobel Prize in Physics with Saul Perlmutter and Brian Schmidt for providing evidence that the expansion of the universe is accelerating.
-Riess has been at the center of a growing scientific debate about the so-called “Hubble tension” — a discrepancy between measurements of the universe’s expansion rate using nearby supernovae, and measurements inferred from the cosmic microwave background radiation using the Standard Model of cosmology. Riess’s data has prompted questions and further testing to determine if the Standard Model still adequately describes the universe.
-
-David Jeffery Wineland (born February 24, 1944) is an American physicist at the Physical Measurement Laboratory of the National Institute of Standards and Technology (NIST). His most notable contributions include the laser cooling of trapped ions and the use of ions for quantum-computing operations. He received the 2012 Nobel Prize in Physics, jointly with Serge Haroche, for "ground-breaking experimental methods that enable measuring and manipulation of individual quantum systems."
-
-Arthur Bruce McDonald  P.Eng (born August 29, 1943) is a Canadian astrophysicist. McDonald is the director of the Sudbury Neutrino Observatory Collaboration and held the Gordon and Patricia Gray Chair in Particle Astrophysics at Queen's University in Kingston, Ontario from 2006 to 2013. He was awarded the 2015 Nobel Prize in Physics jointly with Japanese physicist Takaaki Kajita.
-
-Brian Paul Schmidt (born 24 February 1967) is an American Australian astrophysicist at the Australian National University's Mount Stromlo Observatory and Research School of Astronomy and Astrophysics. He was the Vice-Chancellor of the Australian National University (ANU) from January 2016 to January 2024. He is known for his research in using supernovae as cosmological probes. He previously held a Federation Fellowship and a Laureate Fellowship from the Australian Research Council, and was elected a Fellow of the Royal Society (FRS) in 2012. Schmidt shared both the 2006 Shaw Prize in Astronomy and the 2011 Nobel Prize in Physics with Saul Perlmutter and Adam Riess for providing evidence that the expansion of the universe is accelerating.
-
-Isamu Akasaki (Japanese: 赤﨑 勇, romanized: Akasaki Isamu; January 30, 1929 – April 1, 2021) was a Japanese electronic engineer specializing in the field of semiconductor technology, best known for co-inventing the bright gallium nitride (GaN) p–n junction blue LED in 1989 and subsequently the high-brightness GaN blue LED as well.
-Akasaki was awarded the 2014 Nobel Prize in Physics, together with Hiroshi Amano and Shuji Nakamura, "for the invention of efficient blue light-emitting diodes, which has enabled bright and energy-saving white light sources."
-
-Serge Haroche (born 11 September 1944) is a French physicist who was awarded the 2012 Nobel Prize for Physics jointly with David J. Wineland for "ground-breaking experimental methods that enable measuring and manipulation of individual quantum systems", a study of the particle of light, the photon. This and his other works developed laser spectroscopy. Since 2001, Haroche is a professor at the Collège de France and holds the chair of quantum physics and in 2022 he had the Fermi Chair of Physics at University of Rome La Sapienza.
-In 1971 he defended his doctoral thesis in physics at the University of Paris VI: his research had been conducted under the direction of Claude Cohen-Tannoudji.
-
-Saul Perlmutter (born September 22, 1959) is an American astrophysicist who is a professor of physics at the University of California, Berkeley, where he holds the Franklin W. and Karen Weber Dabby Chair, and is head of the International Supernova Cosmology Project at the Lawrence Berkeley National Laboratory. He is a member of both the American Academy of Arts & Sciences and the American Philosophical Society, and was elected a Fellow of the American Association for the Advancement of Science in 2003.  He is a member of the National Academy of Sciences. Perlmutter shared the 2006 Shaw Prize in Astronomy, the 2011 Nobel Prize in Physics, and the 2015 Breakthrough Prize in Fundamental Physics with Brian P. Schmidt and Adam Riess for providing evidence that the expansion of the universe is accelerating. Since 2021, he has been a member of the President’s Council of Advisors on Science and Technology (PCAST).
-
-Q: Who received the Nobel Prize in Physics from 2010 to 2016?
-A: Hiroshi Amano, Peter Higgs, J. Michael Kosterlitz, Duncan Haldane, David Thouless, Shuji Nakamura, Andre Geim, Konstantin Novoselov, Adam Riess, David J. Wineland, Arthur B. McDonald, Brian Schmidt, Isamu Akasaki, Serge Haroche, Saul Perlmutter
 
 # METADATA: {"query_id": "capitals_Q46_easy_121"}
 Context:
