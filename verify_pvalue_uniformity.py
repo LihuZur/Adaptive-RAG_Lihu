@@ -45,6 +45,8 @@ def load_queries(dataset: str, n_queries: int = 50) -> List[dict]:
 
 def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarray:
     """Retrieve random documents and get their BM25 scores."""
+    # Fetch a large random pool (e.g., 2000) and select up to n_docs negatives after filtering
+    LARGE_POOL = max(2000, n_docs * 10)
     response = requests.post(
         f'http://127.0.0.1:9200/{corpus}/_search',
         headers={'Content-Type': 'application/json'},
@@ -56,16 +58,12 @@ def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarra
                     'boost_mode': 'replace'
                 }
             },
-            'size': n_docs
+            'size': LARGE_POOL
         }
     )
-    
     if response.status_code != 200:
         raise Exception(f"ES query failed: {response.status_code}")
-    
-    # Now get BM25 scores for these docs with actual query
     doc_ids = [hit['_id'] for hit in response.json()['hits']['hits']]
-    
     response2 = requests.post(
         f'http://127.0.0.1:9200/{corpus}/_search',
         headers={'Content-Type': 'application/json'},
@@ -76,18 +74,21 @@ def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarra
                     'fields': ['title', 'paragraph_text']
                 }
             },
-            'size': n_docs * 2  # Get more to ensure we have our random docs
+            'size': LARGE_POOL * 2
         }
     )
-    
-    # Extract scores for our random docs
-    scores = []
     score_map = {hit['_id']: hit['_score'] for hit in response2.json()['hits']['hits']}
+    # Include all sampled docs, assigning zero score if not present in score_map
+    scores = []
     for doc_id in doc_ids:
-        if doc_id in score_map:
-            scores.append(score_map[doc_id])
-    
-    return np.array(scores) if scores else np.array([])
+        score = score_map.get(doc_id, 0.0)
+        scores.append(score)
+    # Sort by BM25 score (lowest first, i.e., farthest negatives)
+    if scores:
+        sorted_scores = sorted(scores)
+        return np.array(sorted_scores[:n_docs])
+    else:
+        return np.array([])
 
 
 def test_global_null(dataset: str, n_queries: int = 50) -> Tuple[np.ndarray, dict]:
