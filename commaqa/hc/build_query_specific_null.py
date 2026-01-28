@@ -170,27 +170,56 @@ def build_query_specific_null(
         return doc_ids
 
     # Build entity -> set(all relevant doc ids for that entity)
+    # Also build entity -> set(all top-K retrieved doc ids for that entity)
     entity_to_reldocs = {}
-    for q in queries:
+    entity_to_topkdocs = {}
+    TOP_K = 100  # You can adjust this value for how "deep" negatives should be
+    for q in tqdm(queries, desc="Precomputing entity doc sets"):
         entities = extract_entities(q)
         rel_docs = extract_relevant_doc_ids(q)
+        # Get top-K retrieved doc ids for this query
+        query_text = q.get('question', q.get('query_text', ''))
+        try:
+            response = requests.post(
+                f'{retriever_host}:{retriever_port}/{corpus_name}/_search',
+                headers={'Content-Type': 'application/json'},
+                json={
+                    'query': {
+                        'multi_match': {
+                            'query': query_text,
+                            'fields': ['title', 'paragraph_text']
+                        }
+                    },
+                    '_source': False,
+                    'size': TOP_K
+                },
+                timeout=30
+            )
+            hits = response.json()['hits']['hits']
+            topk_doc_ids = set(hit['_id'] for hit in hits)
+        except Exception as e:
+            logger.warning(f"Error retrieving top-K docs for entity set: {entities} : {e}")
+            topk_doc_ids = set()
         for ent in entities:
             if ent not in entity_to_reldocs:
                 entity_to_reldocs[ent] = set()
             entity_to_reldocs[ent].update(rel_docs)
+            if ent not in entity_to_topkdocs:
+                entity_to_topkdocs[ent] = set()
+            entity_to_topkdocs[ent].update(topk_doc_ids)
 
     query_null_stats = {}
     for query_data in tqdm(queries, desc="Building query-specific nulls (entity-disjoint)"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         query_text = query_data.get('question', query_data.get('query_text', ''))
         entities = extract_entities(query_data)
-        # For this query, collect all relevant doc ids for all queries about the same entity/entities
+        # For this query, collect all forbidden doc ids for all queries about the same entity/entities
         forbidden_doc_ids = set()
         for ent in entities:
             forbidden_doc_ids.update(entity_to_reldocs.get(ent, set()))
+            forbidden_doc_ids.update(entity_to_topkdocs.get(ent, set()))
 
-        # Sample random docs, excluding forbidden_doc_ids
-        # Try up to 10x the needed samples to get enough non-matching docs
+        # Sample random docs, excluding forbidden_doc_ids and top-K docs for any query about the same entity
         n_attempts = 0
         null_scores = []
         while len(null_scores) < null_samples_per_query and n_attempts < 20:
@@ -201,7 +230,6 @@ def build_query_specific_null(
                 retriever_host=retriever_host,
                 retriever_port=retriever_port
             )
-            # Need to get doc IDs for these candidates
             try:
                 response = requests.post(
                     f'{retriever_host}:{retriever_port}/{corpus_name}/_search',
@@ -224,7 +252,6 @@ def build_query_specific_null(
             except Exception as e:
                 logger.warning(f"Error getting random doc ids for {qid}: {e}")
                 break
-            # Filter out forbidden doc ids
             for idx, doc_id in enumerate(doc_ids):
                 if doc_id not in forbidden_doc_ids and idx < len(candidate_scores):
                     null_scores.append(candidate_scores[idx])
@@ -232,7 +259,7 @@ def build_query_specific_null(
                     break
             n_attempts += 1
         if len(null_scores) < 10:
-            logger.warning(f"Query {qid}: Only got {len(null_scores)} entity-disjoint null scores, skipping")
+            logger.warning(f"Query {qid}: Only got {len(null_scores)} deep negative null scores, skipping")
             continue
         null_scores = null_scores[:null_samples_per_query]
         mu = float(np.mean(null_scores))
