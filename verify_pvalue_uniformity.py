@@ -194,6 +194,7 @@ def test_query_specific_null(dataset: str, n_queries: int = 50, n_null_samples: 
 
     all_pvalues = []
     low_test_doc_queries = []
+
     for i, query_data in enumerate(queries):
         query_text = query_data.get('question', query_data.get('query_text', ''))
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
@@ -220,6 +221,12 @@ def test_query_specific_null(dataset: str, n_queries: int = 50, n_null_samples: 
         if sigma_q == 0:
             print("  Zero std in precomputed null, skipping")
             continue
+
+        # Debug: print null stats and test scores for first few queries
+        if i < 5:
+            print(f"    [DEBUG] Null μ={mu_q:.4f}, σ={sigma_q:.4f}")
+            print(f"    [DEBUG] Test BM25 scores (first 10): {test_scores[:10]}")
+            print(f"    [DEBUG] Test BM25 min={np.min(test_scores):.4f}, max={np.max(test_scores):.4f}, mean={np.mean(test_scores):.4f}")
 
         # Z-score normalize the test scores using precomputed null
         z_scores = (test_scores - mu_q) / sigma_q
