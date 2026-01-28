@@ -55,6 +55,9 @@ def get_random_doc_scores(
     2. Query these docs with actual BM25 to get scores
     """
     # Step 1: Get random doc IDs
+    if not isinstance(query_text, str) or not query_text.strip():
+        logger.warning(f"Empty or invalid query_text: {query_text!r}, skipping BM25 scoring.")
+        return np.array([])
     try:
         response = requests.post(
             f'{retriever_host}:{retriever_port}/{corpus}/_search',
@@ -72,13 +75,10 @@ def get_random_doc_scores(
             },
             timeout=30
         )
-        
         if response.status_code != 200:
             logger.warning(f"Random docs fetch failed: {response.status_code}")
             return np.array([])
-        
         random_doc_ids = [hit['_id'] for hit in response.json()['hits']['hits']]
-        
     except Exception as e:
         logger.warning(f"Error getting random docs: {e}")
         return np.array([])
@@ -211,6 +211,9 @@ def build_query_specific_null(
     for query_data in tqdm(queries, desc="Building brute-force farthest nulls"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         query_text = query_data.get('question', query_data.get('query_text', ''))
+        if not isinstance(query_text, str) or not query_text.strip():
+            logger.warning(f"Query {qid}: Empty or invalid query_text, skipping.")
+            continue
         entities = extract_entities(query_data)
         forbidden_doc_ids = set()
         for ent in entities:
