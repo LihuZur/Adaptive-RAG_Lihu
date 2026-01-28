@@ -44,8 +44,9 @@ def load_queries(dataset: str, n_queries: int = 50) -> List[dict]:
 
 
 def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarray:
-    """Retrieve random documents and get their BM25 scores."""
-    # Fetch a large random pool (e.g., 2000) and select up to n_docs negatives after filtering
+    """Retrieve random documents and get their BM25 scores, filtering by BM25 threshold."""
+    # Use global variable for threshold if set, else default
+    bm25_threshold = globals().get('BM25_THRESHOLD', 0.1)
     LARGE_POOL = max(2000, n_docs * 10)
     response = requests.post(
         f'http://127.0.0.1:9200/{corpus}/_search',
@@ -78,11 +79,12 @@ def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarra
         }
     )
     score_map = {hit['_id']: hit['_score'] for hit in response2.json()['hits']['hits']}
-    # Include all sampled docs, assigning zero score if not present in score_map
+    # Only include docs with BM25 > threshold
     scores = []
     for doc_id in doc_ids:
         score = score_map.get(doc_id, 0.0)
-        scores.append(score)
+        if score > bm25_threshold:
+            scores.append(score)
     # Sort by BM25 score (lowest first, i.e., farthest negatives)
     if scores:
         sorted_scores = sorted(scores)
@@ -297,20 +299,25 @@ def main():
     parser.add_argument('--method', type=str, choices=['global', 'query_specific', 'both'], default='both')
     parser.add_argument('--n_queries', type=int, default=50, help='Number of queries to test')
     parser.add_argument('--n_null_samples', type=int, default=500, help='Null samples per query (query_specific only)')
-    
+    parser.add_argument('--bm25_threshold', type=float, default=0.1, help='BM25 threshold for negatives (default 0.1)')
+
     args = parser.parse_args()
-    
+
+    # Set global threshold for use in retrieve_random_docs
+    global BM25_THRESHOLD
+    BM25_THRESHOLD = args.bm25_threshold
+
     pvalues_dict = {}
-    
+
     if args.method in ['global', 'both']:
         pvalues, stats_res = test_global_null(args.dataset, args.n_queries)
         if len(pvalues) > 0:
             pvalues_dict['Global Null'] = pvalues
-    
+
     if args.method in ['query_specific', 'both']:
         pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
         pvalues_dict['Query-Specific Null'] = pvalues
-    
+
     # Plot
     plot_results(pvalues_dict)
 

@@ -45,7 +45,8 @@ def get_random_doc_scores(
     corpus: str,
     n_docs: int,
     retriever_host: str = "http://127.0.0.1",
-    retriever_port: int = 9200
+    retriever_port: int = 9200,
+    bm25_threshold: float = 0.1
 ) -> np.ndarray:
     """
     Get BM25 scores for random documents.
@@ -107,11 +108,12 @@ def get_random_doc_scores(
             return np.array([])
         # Build score map
         score_map = {hit['_id']: hit['_score'] for hit in response.json()['hits']['hits']}
-        # Extract scores for our random docs
+        # Extract scores for our random docs, only if BM25 > threshold
         scores = []
         for doc_id in random_doc_ids:
-            if doc_id in score_map:
-                scores.append(score_map[doc_id])
+            score = score_map.get(doc_id, 0.0)
+            if score > bm25_threshold:
+                scores.append(score)
         return np.array(scores)
     except Exception as e:
         logger.warning(f"Error getting BM25 scores: {e}")
@@ -125,6 +127,7 @@ def build_query_specific_null(
     null_samples_per_query: int = 500,
     retriever_host: str = "http://127.0.0.1",
     retriever_port: int = 9200,
+    bm25_threshold: float = 0.1,
 ) -> Dict[str, Dict[str, float]]:
     """
     Build query-specific null distribution statistics.
@@ -194,7 +197,8 @@ def build_query_specific_null(
                 corpus=corpus_name,
                 n_docs=LARGE_POOL,
                 retriever_host=retriever_host,
-                retriever_port=retriever_port
+                retriever_port=retriever_port,
+                bm25_threshold=bm25_threshold
             )
             try:
                 response = requests.post(
@@ -293,9 +297,10 @@ def main():
     parser.add_argument('--retriever_host', type=str, default='http://127.0.0.1')
     parser.add_argument('--retriever_port', type=int, default=9200)
     parser.add_argument('--output_dir', type=str, default='processed_data/hc_null_distributions')
-    
+    parser.add_argument('--bm25_threshold', type=float, default=0.1, help='BM25 threshold for negatives (default 0.1)')
+
     args = parser.parse_args()
-    
+
     # Build query-specific null
     query_null_stats = build_query_specific_null(
         corpus_name=args.corpus_name,
@@ -304,6 +309,7 @@ def main():
         null_samples_per_query=args.null_samples_per_query,
         retriever_host=args.retriever_host,
         retriever_port=args.retriever_port,
+        bm25_threshold=args.bm25_threshold,
     )
     
     # Save to file
