@@ -99,7 +99,7 @@ def get_random_doc_scores(
                     }
                 },
                 '_source': False,
-                'size': n_docs * 3  # Get more to ensure we cover our random docs
+                'size': n_docs
             },
             timeout=30
         )
