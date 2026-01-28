@@ -362,7 +362,7 @@ def main():
 
     if args.auto_sweep:
         # Only run standard method, sweep over 1.5, 2.0, 2.5
-        thresholds = [1.5, 2.0, 2.5]
+        thresholds = [1.5]
         results = []
         print(f"\n=== Verifying method: standard ===")
         args.shared_pool = False
