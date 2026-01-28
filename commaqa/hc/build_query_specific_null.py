@@ -236,13 +236,12 @@ def build_query_specific_null(
             logger.warning(f"Query {qid}: Only got {len(all_scores)} null scores, skipping")
             skipped_queries.append(qid)
             continue
-        # Take the bottom-N (lowest BM25) scores as the null, but if not enough, use all
-        sorted_idx = np.argsort(all_scores)
+        # Use all sampled negatives above threshold (no sorting)
         n_take = min(null_samples_per_query, len(all_scores))
-        farthest_scores = [all_scores[i] for i in sorted_idx[:n_take]]
-        mu = float(np.mean(farthest_scores))
-        sigma = float(np.std(farthest_scores))
-        logger.info(f"Query {qid}: null min={np.min(farthest_scores):.3f}, max={np.max(farthest_scores):.3f}, mean={mu:.3f}, std={sigma:.3f}, n={len(farthest_scores)}")
+        used_scores = all_scores[:n_take]
+        mu = float(np.mean(used_scores))
+        sigma = float(np.std(used_scores))
+        logger.info(f"Query {qid}: null min={np.min(used_scores):.3f}, max={np.max(used_scores):.3f}, mean={mu:.3f}, std={sigma:.3f}, n={len(used_scores)}")
         if sigma == 0:
             logger.warning(f"Query {qid}: Zero std deviation, skipping")
             skipped_queries.append(qid)
@@ -250,12 +249,12 @@ def build_query_specific_null(
         query_null_stats[qid] = {
             "mu": mu,
             "sigma": sigma,
-            "n_samples": len(farthest_scores),
-            "min": float(np.min(farthest_scores)),
-            "max": float(np.max(farthest_scores)),
+            "n_samples": len(used_scores),
+            "min": float(np.min(used_scores)),
+            "max": float(np.max(used_scores)),
         }
-        if len(farthest_scores) < null_samples_per_query:
-            low_sample_queries.append((qid, len(farthest_scores)))
+        if len(used_scores) < null_samples_per_query:
+            low_sample_queries.append((qid, len(used_scores)))
         if len(query_null_stats) % 50 == 0:
             logger.info(f"Processed {len(query_null_stats)} queries")
 

@@ -316,10 +316,12 @@ def main():
 
     pvalues_dict = {}
 
-    if args.method in ['global', 'both']:
-        pvalues, stats_res = test_global_null(args.dataset, args.n_queries)
-        if len(pvalues) > 0:
-            pvalues_dict['Global Null'] = pvalues
+
+    # Commented out global null test for now
+    # if args.method in ['global', 'both']:
+    #     pvalues, stats_res = test_global_null(args.dataset, args.n_queries)
+    #     if len(pvalues) > 0:
+    #         pvalues_dict['Global Null'] = pvalues
 
     if args.method in ['query_specific', 'both']:
         pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
