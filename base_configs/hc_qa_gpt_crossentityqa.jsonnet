@@ -18,6 +18,7 @@ local bm25_retrieval_count = std.extVar("bm25_retrieval_count");
 local gamma = std.parseJson(std.extVar("gamma"));
 local min_hc = std.parseJson(std.extVar("min_hc"));
 local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "_null_dist.pkl";
+local query_specific_null_path = "processed_data/hc_null_distributions/" + corpus_name + "_query_specific_null.pkl";
 
 {
   "start_state": "copy_question",
@@ -37,6 +38,7 @@ local null_dist_path = "processed_data/hc_null_distributions/" + corpus_name + "
       "gamma": gamma,
       "min_hc": min_hc,
       "null_dist_path": null_dist_path,
+      "query_specific_null_path": query_specific_null_path,
       "source_corpus_name": corpus_name,
       "document_type": "title_paragraph_text",
       "query_source": "original_question",

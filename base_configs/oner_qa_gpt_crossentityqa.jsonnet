@@ -13,7 +13,7 @@ local prompt_reader_args = {
 # (Potentially) Hyper-parameters:
 local llm_retrieval_count = null;
 local llm_map_count = null;
-local bm25_retrieval_count = 5;
+local bm25_retrieval_count = 10;
 local rc_context_type_ = "gold_with_n_distractors";
 local distractor_count = "1";
 local rc_context_type = (

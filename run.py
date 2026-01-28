@@ -813,8 +813,8 @@ instantiation_schemes = {
         "distractor_count": ['"1"'],
     },
     "hc_qa": {
-        "bm25_retrieval_count": ["150"],  # Good balance of candidates
-        "gamma": ["0.5", "0.6", "0.7"],  # With new null dist (mean=12.40), should select 9-11 passages
+        "bm25_retrieval_count": ["10000"],  # Retrieve max - let HC decide everything
+        "gamma": ["0.01", "0.05", "0.1"],  # Search top 100/500/1000 docs (relevant docs in top 200)
         "min_hc": ["0.0"],  # Standard gating threshold
     }
 }

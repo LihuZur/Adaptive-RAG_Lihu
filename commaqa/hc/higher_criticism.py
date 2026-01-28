@@ -5,7 +5,8 @@ Adapted from HC-RAG implementation for BM25-based retrieval.
 """
 
 import numpy as np
-from typing import Optional, Tuple, NamedTuple
+from typing import Optional, Tuple, NamedTuple, Dict
+from scipy import stats
 import logging
 
 logger = logging.getLogger(__name__)
@@ -35,34 +36,63 @@ class HigherCriticism:
     Adapted for BM25 scores from Elasticsearch retrieval.
     """
 
-    def __init__(self, null_distribution: Optional['NullDistribution'] = None):
+    def __init__(
+        self, 
+        null_distribution: Optional['NullDistribution'] = None,
+        query_specific_null: Optional[Dict[str, Dict[str, float]]] = None
+    ):
         """
         Initialize Higher Criticism module.
 
         Args:
-            null_distribution: Pre-computed null distribution for BM25 scores
+            null_distribution: Pre-computed global null distribution for BM25 scores (legacy)
+            query_specific_null: Dict mapping qid -> {"mu": float, "sigma": float} (preferred)
         """
         self.null_distribution = null_distribution
+        self.query_specific_null = query_specific_null
         logger.debug("HigherCriticism module initialized")
 
         if null_distribution is not None:
-            logger.debug(f"  Loaded null distribution with {null_distribution.n_samples} samples")
+            logger.debug(f"  Loaded global null distribution with {null_distribution.n_samples} samples")
+        
+        if query_specific_null is not None:
+            logger.debug(f"  Loaded query-specific null for {len(query_specific_null)} queries")
 
-    def compute_p_values(self, scores: np.ndarray) -> np.ndarray:
+    def compute_p_values(
+        self, 
+        scores: np.ndarray,
+        query_id: Optional[str] = None
+    ) -> np.ndarray:
         """
-        Compute p-values for BM25 scores using the null distribution.
-
-        P-value = P(null score >= observed score)
+        Compute p-values for BM25 scores.
+        
+        If query_specific_null is available and query_id is provided, uses
+        Z-score normalization: Z = (score - μ_q) / σ_q, then p = 1 - Φ(Z).
+        
+        Otherwise falls back to global null distribution.
 
         Args:
             scores: Array of observed BM25 scores
+            query_id: Query identifier (required for query-specific null)
 
         Returns:
             Array of p-values (same shape as scores)
         """
+        # Try query-specific null first (preferred)
+        if self.query_specific_null is not None and query_id is not None:
+            if query_id not in self.query_specific_null:
+                logger.warning(f"Query {query_id} not in query-specific null, falling back to global")
+            else:
+                return self._compute_p_values_query_specific(scores, query_id)
+        
+        # Fall back to global null distribution
         if self.null_distribution is None:
-            raise ValueError("No null distribution available.")
-
+            raise ValueError("No null distribution available (neither query-specific nor global).")
+        
+        return self._compute_p_values_global(scores)
+    
+    def _compute_p_values_global(self, scores: np.ndarray) -> np.ndarray:
+        """Compute p-values using global null distribution (legacy method)."""
         null_scores = self.null_distribution.scores
         N_null = len(null_scores)
 
@@ -81,11 +111,39 @@ class HigherCriticism:
         p_values = np.clip(p_values, eps, 1.0 - eps)
 
         return p_values
+    
+    def _compute_p_values_query_specific(self, scores: np.ndarray, query_id: str) -> np.ndarray:
+        """
+        Compute p-values using query-specific null (Z-score normalization).
+        
+        For query Q with null statistics μ_q and σ_q:
+        1. Z-score normalize: Z = (score - μ_q) / σ_q
+        2. Convert to p-value: p = 1 - Φ(Z) where Φ is standard normal CDF
+        
+        This ensures p-values are uniform under H0 (null hypothesis).
+        """
+        query_stats = self.query_specific_null[query_id]
+        mu = query_stats['mu']
+        sigma = query_stats['sigma']
+        
+        # Z-score normalization
+        z_scores = (scores - mu) / sigma
+        
+        # Convert to p-values using standard normal CDF
+        # p = P(Z > z) = 1 - Φ(z)
+        p_values = 1.0 - stats.norm.cdf(z_scores)
+        
+        # Clip to prevent numerical issues in HC denominator
+        eps = 1e-10
+        p_values = np.clip(p_values, eps, 1.0 - eps)
+        
+        return p_values
 
     def compute_hc_statistic(
         self,
         scores: np.ndarray,
-        gamma: float = 0.1
+        gamma: float = 0.1,
+        query_id: Optional[str] = None
     ) -> Tuple[float, int]:
         """
         Compute Higher Criticism statistic.
@@ -96,6 +154,7 @@ class HigherCriticism:
         Args:
             scores: Array of BM25 scores (will be sorted descending)
             gamma: Fraction of top scores to search for HC maximum (0 < gamma <= 1)
+            query_id: Query identifier (for query-specific null)
 
         Returns:
             Tuple of (hc_statistic, best_index)
@@ -110,7 +169,7 @@ class HigherCriticism:
         sorted_scores = np.sort(scores)[::-1]
 
         # Compute p-values for sorted scores
-        p_values = self.compute_p_values(sorted_scores)
+        p_values = self.compute_p_values(sorted_scores, query_id=query_id)
 
         n = len(p_values)
         n_gamma = min(n, max(1, int(np.floor(gamma * n))))
@@ -143,7 +202,8 @@ class HigherCriticism:
         scores: np.ndarray,
         gamma: float = 0.1,
         min_hc: float = 0.0,
-        allow_empty: bool = True
+        allow_empty: bool = True,
+        query_id: Optional[str] = None
     ) -> HCThresholdResult:
         """
         Compute HC-based threshold for adaptive retrieval.
@@ -156,6 +216,7 @@ class HigherCriticism:
             gamma: Fraction of top scores to search for HC maximum
             min_hc: Minimum HC statistic to accept any documents
             allow_empty: If True, can return empty set when HC < min_hc
+            query_id: Query identifier (for query-specific null)
 
         Returns:
             HCThresholdResult with threshold, hc_statistic, and k
@@ -168,7 +229,7 @@ class HigherCriticism:
         n = len(sorted_scores)
 
         # Compute HC statistic and find best cutoff
-        hc_stat, best_idx = self.compute_hc_statistic(sorted_scores, gamma=gamma)
+        hc_stat, best_idx = self.compute_hc_statistic(sorted_scores, gamma=gamma, query_id=query_id)
 
         # Check HC gate: if below minimum, return empty set
         if allow_empty and hc_stat < min_hc:

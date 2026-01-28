@@ -30,6 +30,7 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
         gamma=0.1,  # HC search window parameter
         min_hc=0.0,  # Minimum HC statistic threshold
         null_dist_path=None,  # Path to pre-computed null distribution
+        query_specific_null_path=None,  # Path to query-specific null (.pkl file)
         query_source="original_question",
         source_corpus_name=None,
         document_type="title_paragraph_text",
@@ -49,7 +50,8 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
             retrieval_count: Number of candidate documents to retrieve (e.g., 30)
             gamma: HC search window (fraction of candidates to consider)
             min_hc: Minimum HC statistic to select any documents
-            null_dist_path: Path to saved null distribution (.pkl file)
+            null_dist_path: Path to saved global null distribution (.pkl file, legacy)
+            query_specific_null_path: Path to query-specific null (.pkl file, preferred)
             query_source: Source of query ('original_question')
             source_corpus_name: Corpus name (e.g., 'hotpotqa')
             document_type: Type of documents to retrieve
@@ -97,18 +99,36 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
         if return_pids and return_paras:
             raise ValueError("Only one of return_pids or return_paras should be true")
 
-        # Load null distribution
+        # Load null distribution (global, legacy)
         self.null_distribution = None
         if null_dist_path:
             null_dist_path = Path(null_dist_path)
             if null_dist_path.exists():
                 self.null_distribution = NullDistribution.load(str(null_dist_path))
-                logger.info(f"Loaded null distribution from {null_dist_path}")
+                logger.info(f"Loaded global null distribution from {null_dist_path}")
             else:
-                logger.warning(f"Null distribution not found at {null_dist_path}, HC will not work!")
+                logger.warning(f"Global null distribution not found at {null_dist_path}")
+        
+        # Load query-specific null (preferred)
+        self.query_specific_null = None
+        if query_specific_null_path:
+            query_specific_null_path = Path(query_specific_null_path)
+            if query_specific_null_path.exists():
+                import pickle
+                with open(query_specific_null_path, 'rb') as f:
+                    self.query_specific_null = pickle.load(f)
+                logger.info(f"Loaded query-specific null for {len(self.query_specific_null)} queries from {query_specific_null_path}")
+            else:
+                logger.warning(f"Query-specific null not found at {query_specific_null_path}")
+        
+        if self.null_distribution is None and self.query_specific_null is None:
+            logger.warning("No null distribution (global or query-specific) loaded, HC will not work!")
 
         # Initialize HC module
-        self.hc = HigherCriticism(null_distribution=self.null_distribution)
+        self.hc = HigherCriticism(
+            null_distribution=self.null_distribution,
+            query_specific_null=self.query_specific_null
+        )
 
         self.retrieval_failures_so_far = 0
         self.retrieval_failures_max = 9
@@ -223,8 +243,11 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
             candidate_scores.append(score)
             candidate_docs.append(retrieval_item)
 
+        # Get query ID for query-specific null
+        query_id = state.data.get("qid", state.data.get("_id", None))
+
         # Apply HC if we have a null distribution
-        if self.null_distribution is not None and len(candidate_scores) > 0:
+        if (self.null_distribution is not None or self.query_specific_null is not None) and len(candidate_scores) > 0:
             scores_array = np.array(candidate_scores, dtype=np.float32)
 
             # Compute HC threshold
@@ -232,7 +255,8 @@ class HCRetrieveAndSelectParticipant(ParticipantModel):
                 scores_array,
                 gamma=self.gamma,
                 min_hc=self.min_hc,
-                allow_empty=True
+                allow_empty=True,
+                query_id=query_id
             )
 
             k_selected = hc_result.k
