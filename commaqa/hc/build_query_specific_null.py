@@ -209,24 +209,25 @@ def build_query_specific_null(
             entity_to_topkdocs[ent].update(topk_doc_ids)
 
     query_null_stats = {}
-    for query_data in tqdm(queries, desc="Building query-specific nulls (entity-disjoint)"):
+    for query_data in tqdm(queries, desc="Building brute-force farthest nulls"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         query_text = query_data.get('question', query_data.get('query_text', ''))
         entities = extract_entities(query_data)
-        # For this query, collect all forbidden doc ids for all queries about the same entity/entities
         forbidden_doc_ids = set()
         for ent in entities:
             forbidden_doc_ids.update(entity_to_reldocs.get(ent, set()))
             forbidden_doc_ids.update(entity_to_topkdocs.get(ent, set()))
 
-        # Sample random docs, excluding forbidden_doc_ids and top-K docs for any query about the same entity
+        # Brute force: retrieve a large pool of random docs (e.g., 2000+)
+        LARGE_POOL = max(2000, null_samples_per_query * 10)
+        all_scores = []
+        all_doc_ids = []
         n_attempts = 0
-        null_scores = []
-        while len(null_scores) < null_samples_per_query and n_attempts < 20:
+        while len(all_scores) < LARGE_POOL and n_attempts < 20:
             candidate_scores = get_random_doc_scores(
                 query_text=query_text,
                 corpus=corpus_name,
-                n_docs=null_samples_per_query * 2,
+                n_docs=LARGE_POOL,
                 retriever_host=retriever_host,
                 retriever_port=retriever_port
             )
@@ -243,7 +244,7 @@ def build_query_specific_null(
                             }
                         },
                         '_source': False,
-                        'size': null_samples_per_query * 2
+                        'size': LARGE_POOL
                     },
                     timeout=30
                 )
@@ -254,25 +255,29 @@ def build_query_specific_null(
                 break
             for idx, doc_id in enumerate(doc_ids):
                 if doc_id not in forbidden_doc_ids and idx < len(candidate_scores):
-                    null_scores.append(candidate_scores[idx])
-                if len(null_scores) >= null_samples_per_query:
+                    all_scores.append(candidate_scores[idx])
+                    all_doc_ids.append(doc_id)
+                if len(all_scores) >= LARGE_POOL:
                     break
             n_attempts += 1
-        if len(null_scores) < 10:
-            logger.warning(f"Query {qid}: Only got {len(null_scores)} deep negative null scores, skipping")
+        if len(all_scores) < 10:
+            logger.warning(f"Query {qid}: Only got {len(all_scores)} brute-force farthest null scores, skipping")
             continue
-        null_scores = null_scores[:null_samples_per_query]
-        mu = float(np.mean(null_scores))
-        sigma = float(np.std(null_scores))
+        # Take the bottom-N (lowest BM25) scores as the null
+        sorted_idx = np.argsort(all_scores)
+        farthest_scores = [all_scores[i] for i in sorted_idx[:null_samples_per_query]]
+        mu = float(np.mean(farthest_scores))
+        sigma = float(np.std(farthest_scores))
+        logger.info(f"Query {qid}: null min={np.min(farthest_scores):.3f}, max={np.max(farthest_scores):.3f}, mean={mu:.3f}, std={sigma:.3f}, n={len(farthest_scores)}")
         if sigma == 0:
             logger.warning(f"Query {qid}: Zero std deviation, skipping")
             continue
         query_null_stats[qid] = {
             "mu": mu,
             "sigma": sigma,
-            "n_samples": len(null_scores),
-            "min": float(np.min(null_scores)),
-            "max": float(np.max(null_scores)),
+            "n_samples": len(farthest_scores),
+            "min": float(np.min(farthest_scores)),
+            "max": float(np.max(farthest_scores)),
         }
         if len(query_null_stats) % 50 == 0:
             logger.info(f"Processed {len(query_null_stats)} queries")

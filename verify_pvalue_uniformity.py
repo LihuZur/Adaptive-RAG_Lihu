@@ -183,36 +183,42 @@ def test_query_specific_null(dataset: str, n_queries: int = 50, n_null_samples: 
     # Load queries
     queries = load_queries(dataset, n_queries)
     print(f"Loaded {len(queries)} queries")
-    print(f"Will use {n_null_samples} random docs per query for null\n")
-    
+    # Load precomputed per-query nulls
+    null_path = f"processed_data/hc_null_distributions/{dataset}_query_specific_null.pkl"
+    with open(null_path, 'rb') as f:
+        query_null_stats = pickle.load(f)
+    print(f"Loaded precomputed query-specific nulls from {null_path}\n")
+
     all_pvalues = []
-    
+
     for i, query_data in enumerate(queries):
         query_text = query_data.get('question', query_data.get('query_text', ''))
+        qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         print(f"Query {i+1}/{len(queries)}: {query_text[:50]}...")
-        
-        # Get N random docs to build query-specific null
-        null_scores = retrieve_random_docs(query_text, n_docs=n_null_samples, corpus=dataset)
-        
-        if len(null_scores) < 10:
-            print("  Too few null scores, skipping")
+
+        # Get N random docs to test null
+        test_scores = retrieve_random_docs(query_text, n_docs=n_null_samples, corpus=dataset)
+
+        if len(test_scores) < 10:
+            print("  Too few test scores, skipping")
             continue
-        
-        # Calculate query-specific μ and σ
-        mu_q = np.mean(null_scores)
-        sigma_q = np.std(null_scores)
-        
+
+        # Use precomputed μ, σ for this query
+        null_stats = query_null_stats.get(qid)
+        if null_stats is None:
+            print(f"  No precomputed null for qid={qid}, skipping")
+            continue
+        mu_q = null_stats['mu']
+        sigma_q = null_stats['sigma']
         if sigma_q == 0:
-            print("  Zero std, skipping")
+            print("  Zero std in precomputed null, skipping")
             continue
-        
-        # Z-score normalize the null scores themselves
-        z_scores = (null_scores - mu_q) / sigma_q
-        
-        # Convert to p-values using standard normal CDF
+
+        # Z-score normalize the test scores using precomputed null
+        z_scores = (test_scores - mu_q) / sigma_q
         p_values = 1 - stats.norm.cdf(z_scores)
         all_pvalues.extend(p_values)
-        
+
         print(f"  μ={mu_q:.2f}, σ={sigma_q:.2f}, p-values range: [{p_values.min():.3f}, {p_values.max():.3f}]")
     
     all_pvalues = np.array(all_pvalues)
