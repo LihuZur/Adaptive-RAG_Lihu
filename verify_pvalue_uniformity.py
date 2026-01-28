@@ -47,7 +47,7 @@ def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarra
     """Retrieve random documents and get their BM25 scores, filtering by BM25 threshold."""
     # Use global variable for threshold if set, else default
     bm25_threshold = globals().get('BM25_THRESHOLD', 0.1)
-    LARGE_POOL = max(2000, int(n_docs * 1.5))
+    LARGE_POOL = min(max(2000, int(n_docs * 1.5)), 10000)
     response = requests.post(
         f'http://127.0.0.1:9200/{corpus}/_search',
         headers={'Content-Type': 'application/json'},
