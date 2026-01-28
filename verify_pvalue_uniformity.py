@@ -306,7 +306,7 @@ def main():
     parser.add_argument('--dataset', type=str, default='crossentityqa', help='Dataset name')
     parser.add_argument('--method', type=str, choices=['global', 'query_specific', 'both'], default='both')
     parser.add_argument('--n_queries', type=int, default=50, help='Number of queries to test')
-    parser.add_argument('--n_null_samples', type=int, default=3000, help='Null samples per query (query_specific only, default: 3000)')
+    parser.add_argument('--n_null_samples', type=int, default=8000, help='Null samples per query (query_specific only, default: 8000)')
     parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
     parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
     parser.add_argument('--shared_pool', action='store_true', help='Use shared random pool for null and test (split 2N into N for null, N for test)')

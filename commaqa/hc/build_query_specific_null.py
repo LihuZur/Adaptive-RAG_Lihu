@@ -124,7 +124,7 @@ def build_query_specific_null(
     corpus_name: str,
     split: str = "dev_500",
     num_queries: int = None,
-    null_samples_per_query: int = 3000,
+    null_samples_per_query: int = 8000,
     retriever_host: str = "http://127.0.0.1",
     retriever_port: int = 9200,
     bm25_threshold: float = 0.1,
@@ -292,8 +292,8 @@ def main():
     parser.add_argument('corpus_name', type=str, help='Corpus name (e.g., crossentityqa)')
     parser.add_argument('split', type=str, default='dev_500', help='Dataset split')
     parser.add_argument('--num_queries', type=int, default=None, help='Number of queries (default: all)')
-    parser.add_argument('--null_samples_per_query', type=int, default=3000, 
-                       help='Random docs to sample per query (default: 3000)')
+    parser.add_argument('--null_samples_per_query', type=int, default=8000, 
+                       help='Random docs to sample per query (default: 8000)')
     parser.add_argument('--retriever_host', type=str, default='http://127.0.0.1')
     parser.add_argument('--retriever_port', type=int, default=9200)
     parser.add_argument('--output_dir', type=str, default='processed_data/hc_null_distributions')
