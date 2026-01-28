@@ -309,6 +309,7 @@ def main():
     parser.add_argument('--n_null_samples', type=int, default=500, help='Null samples per query (query_specific only)')
     parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
     parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
+    parser.add_argument('--shared_pool', action='store_true', help='Use shared random pool for null and test (split 2N into N for null, N for test)')
 
     args = parser.parse_args()
 
@@ -316,26 +317,64 @@ def main():
         global BM25_THRESHOLD
         BM25_THRESHOLD = bm25_threshold
         pvalues_dict = {}
-        if args.method in ['query_specific', 'both']:
-            pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
-            pvalues_dict[f'BM25>{bm25_threshold}'] = pvalues
-        # Plot
-        plot_results(pvalues_dict, output_path=f'pvalue_uniformity_test_bm25_{bm25_threshold}.png')
-        print(f"\n[BM25>{bm25_threshold}] Mean: {np.mean(pvalues):.3f}, Std: {np.std(pvalues):.3f}, KS p-value: {stats_res['ks_pvalue']:.4f}")
-        return stats_res['ks_pvalue'], np.mean(pvalues), np.std(pvalues)
+        if args.shared_pool:
+            # Load shared-pool nulls and test scores
+            null_path = f"processed_data/hc_null_distributions/{args.dataset}_sharedpool_null_bm25_{bm25_threshold}.pkl"
+            test_path = f"processed_data/hc_null_distributions/{args.dataset}_sharedpool_test_bm25_{bm25_threshold}.pkl"
+            with open(null_path, 'rb') as f:
+                query_null_stats = pickle.load(f)
+            with open(test_path, 'rb') as f:
+                test_scores_dict = pickle.load(f)
+            all_pvalues = []
+            for qid, test_scores in test_scores_dict.items():
+                null_stats = query_null_stats.get(qid)
+                if null_stats is None:
+                    continue
+                mu_q = null_stats['mu']
+                sigma_q = null_stats['sigma']
+                if sigma_q == 0:
+                    continue
+                z_scores = (np.array(test_scores) - mu_q) / sigma_q
+                p_values = 1 - stats.norm.cdf(z_scores)
+                all_pvalues.extend(p_values)
+            all_pvalues = np.array(all_pvalues)
+            stats_results = {
+                'n_samples': len(all_pvalues),
+                'mean': float(np.mean(all_pvalues)),
+                'std': float(np.std(all_pvalues)),
+                'ks_statistic': None,
+                'ks_pvalue': None,
+            }
+            ks_stat, ks_pval = stats.kstest(all_pvalues, 'uniform')
+            stats_results['ks_statistic'] = float(ks_stat)
+            stats_results['ks_pvalue'] = float(ks_pval)
+            pvalues_dict[f'SharedPool BM25>{bm25_threshold}'] = all_pvalues
+            plot_results(pvalues_dict, output_path=f'pvalue_uniformity_sharedpool_bm25_{bm25_threshold}.png')
+            print(f"\n[SharedPool BM25>{bm25_threshold}] Mean: {np.mean(all_pvalues):.3f}, Std: {np.std(all_pvalues):.3f}, KS p-value: {ks_pval:.4f}")
+            return ks_pval, np.mean(all_pvalues), np.std(all_pvalues), 'sharedpool'
+        else:
+            if args.method in ['query_specific', 'both']:
+                pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
+                pvalues_dict[f'BM25>{bm25_threshold}'] = pvalues
+            plot_results(pvalues_dict, output_path=f'pvalue_uniformity_test_bm25_{bm25_threshold}.png')
+            print(f"\n[BM25>{bm25_threshold}] Mean: {np.mean(pvalues):.3f}, Std: {np.std(pvalues):.3f}, KS p-value: {stats_res['ks_pvalue']:.4f}")
+            return stats_res['ks_pvalue'], np.mean(pvalues), np.std(pvalues), 'standard'
 
     if args.auto_sweep:
-        thresholds = [0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        thresholds = [0.5, 1.0, 1.5, 2.0, 2.5]
         results = []
-        for thresh in thresholds:
-            print(f"\n=== Running for BM25 threshold {thresh} ===")
-            ks_pval, mean, std = run_and_report(thresh)
-            results.append({'threshold': thresh, 'ks_pval': ks_pval, 'mean': mean, 'std': std})
-        print("\n=== Summary of BM25 threshold sweep ===")
+        for method in ['standard', 'sharedpool']:
+            print(f"\n=== Verifying method: {method} ===")
+            args.shared_pool = (method == 'sharedpool')
+            for thresh in thresholds:
+                print(f"\n--- BM25 threshold {thresh} ---")
+                ks_pval, mean, std, method_name = run_and_report(thresh)
+                results.append({'threshold': thresh, 'ks_pval': ks_pval, 'mean': mean, 'std': std, 'method': method_name})
+        print("\n=== Summary of BM25 threshold/method sweep ===")
         for r in results:
-            print(f"BM25>{r['threshold']}: KS p-value={r['ks_pval']:.4f}, mean={r['mean']:.3f}, std={r['std']:.3f}")
+            print(f"{r['method']} | BM25>{r['threshold']}: KS p-value={r['ks_pval']:.4f}, mean={r['mean']:.3f}, std={r['std']:.3f}")
         best = max(results, key=lambda r: r['ks_pval'])
-        print(f"\nBest threshold by KS p-value: BM25>{best['threshold']} (KS p-value={best['ks_pval']:.4f})")
+        print(f"\nBest by KS p-value: {best['method']} | BM25>{best['threshold']} (KS p-value={best['ks_pval']:.4f})")
     else:
         # Set global threshold for use in retrieve_random_docs
         global BM25_THRESHOLD

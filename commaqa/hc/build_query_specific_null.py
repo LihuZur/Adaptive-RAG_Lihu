@@ -299,47 +299,91 @@ def main():
     parser.add_argument('--output_dir', type=str, default='processed_data/hc_null_distributions')
     parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
     parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
+    parser.add_argument('--shared_pool', action='store_true', help='Use shared random pool for null and test (split 2N into N for null, N for test)')
 
     args = parser.parse_args()
 
     def run_and_report(thresh):
-        query_null_stats = build_query_specific_null(
-            corpus_name=args.corpus_name,
-            split=args.split,
-            num_queries=args.num_queries,
-            null_samples_per_query=args.null_samples_per_query,
-            retriever_host=args.retriever_host,
-            retriever_port=args.retriever_port,
-            bm25_threshold=thresh,
-        )
-        output_dir = Path(args.output_dir)
-        output_dir.mkdir(parents=True, exist_ok=True)
-        output_file = output_dir / f"{args.corpus_name}_query_specific_null_bm25_{thresh}.pkl"
-        with open(output_file, 'wb') as f:
-            pickle.dump(query_null_stats, f)
-        json_file = output_dir / f"{args.corpus_name}_query_specific_null_bm25_{thresh}.json"
-        with open(json_file, 'w') as f:
-            json.dump(query_null_stats, f, indent=2)
-        all_mus = [stats['mu'] for stats in query_null_stats.values()]
-        all_sigmas = [stats['sigma'] for stats in query_null_stats.values()]
-        mean_mu = np.mean(all_mus)
-        mean_sigma = np.mean(all_sigmas)
-        ratio = mean_sigma / mean_mu if mean_mu != 0 else 0
-        print(f"BM25>{thresh}: mean μ={mean_mu:.3f}, mean σ={mean_sigma:.3f}, σ/μ={ratio:.3f}")
-        return {'threshold': thresh, 'mean_mu': mean_mu, 'mean_sigma': mean_sigma, 'ratio': ratio}
+        if args.shared_pool:
+            # Shared-pool: for each query, sample 2N, split into null and test, save both
+            null_stats = {}
+            test_scores_dict = {}
+            queries = load_queries(args.corpus_name, args.num_queries or 1000000)
+            for q in tqdm(queries, desc=f"Shared-pool nulls (BM25>{thresh})"):
+                qid = q.get('qid', q.get('query_id', q.get('_id', 'unknown')))
+                query_text = q.get('question', q.get('query_text', ''))
+                scores = get_random_doc_scores(query_text, args.corpus_name, args.null_samples_per_query * 2, bm25_threshold=thresh)
+                if len(scores) < args.null_samples_per_query * 2:
+                    continue
+                np.random.shuffle(scores)
+                null_scores = scores[:args.null_samples_per_query]
+                test_scores = scores[args.null_samples_per_query:args.null_samples_per_query*2]
+                mu = float(np.mean(null_scores))
+                sigma = float(np.std(null_scores))
+                null_stats[qid] = {"mu": mu, "sigma": sigma, "n_samples": len(null_scores)}
+                test_scores_dict[qid] = test_scores.tolist()
+            # Save nulls
+            output_dir = Path(args.output_dir)
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_file = output_dir / f"{args.corpus_name}_sharedpool_null_bm25_{thresh}.pkl"
+            with open(output_file, 'wb') as f:
+                pickle.dump(null_stats, f)
+            # Save test scores for verification
+            test_file = output_dir / f"{args.corpus_name}_sharedpool_test_bm25_{thresh}.pkl"
+            with open(test_file, 'wb') as f:
+                pickle.dump(test_scores_dict, f)
+            all_mus = [stats['mu'] for stats in null_stats.values()]
+            all_sigmas = [stats['sigma'] for stats in null_stats.values()]
+            mean_mu = np.mean(all_mus)
+            mean_sigma = np.mean(all_sigmas)
+            ratio = mean_sigma / mean_mu if mean_mu != 0 else 0
+            print(f"[SharedPool] BM25>{thresh}: mean μ={mean_mu:.3f}, mean σ={mean_sigma:.3f}, σ/μ={ratio:.3f}")
+            return {'threshold': thresh, 'mean_mu': mean_mu, 'mean_sigma': mean_sigma, 'ratio': ratio, 'method': 'sharedpool'}
+        else:
+            query_null_stats = build_query_specific_null(
+                corpus_name=args.corpus_name,
+                split=args.split,
+                num_queries=args.num_queries,
+                null_samples_per_query=args.null_samples_per_query,
+                retriever_host=args.retriever_host,
+                retriever_port=args.retriever_port,
+                bm25_threshold=thresh,
+            )
+            output_dir = Path(args.output_dir)
+            output_dir.mkdir(parents=True, exist_ok=True)
+            output_file = output_dir / f"{args.corpus_name}_query_specific_null_bm25_{thresh}.pkl"
+            with open(output_file, 'wb') as f:
+                pickle.dump(query_null_stats, f)
+            json_file = output_dir / f"{args.corpus_name}_query_specific_null_bm25_{thresh}.json"
+            with open(json_file, 'w') as f:
+                json.dump(query_null_stats, f, indent=2)
+            all_mus = [stats['mu'] for stats in query_null_stats.values()]
+            all_sigmas = [stats['sigma'] for stats in query_null_stats.values()]
+            mean_mu = np.mean(all_mus)
+            mean_sigma = np.mean(all_sigmas)
+            ratio = mean_sigma / mean_mu if mean_mu != 0 else 0
+            print(f"BM25>{thresh}: mean μ={mean_mu:.3f}, mean σ={mean_sigma:.3f}, σ/μ={ratio:.3f}")
+            return {'threshold': thresh, 'mean_mu': mean_mu, 'mean_sigma': mean_sigma, 'ratio': ratio, 'method': 'standard'}
 
     if args.auto_sweep:
-        thresholds = [0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        thresholds = [0.5, 1.0, 1.5, 2.0, 2.5]
         results = []
-        for thresh in thresholds:
-            print(f"\n=== Building null for BM25 threshold {thresh} ===")
-            res = run_and_report(thresh)
-            results.append(res)
-        print("\n=== Summary of BM25 threshold sweep ===")
+        for method in ['standard', 'sharedpool']:
+            print(f"\n=== Building nulls for method: {method} ===")
+            for thresh in thresholds:
+                print(f"\n--- BM25 threshold {thresh} ---")
+                if method == 'sharedpool':
+                    args.shared_pool = True
+                else:
+                    args.shared_pool = False
+                res = run_and_report(thresh)
+                res['method'] = method
+                results.append(res)
+        print("\n=== Summary of BM25 threshold/method sweep ===")
         for r in results:
-            print(f"BM25>{r['threshold']}: mean μ={r['mean_mu']:.3f}, mean σ={r['mean_sigma']:.3f}, σ/μ={r['ratio']:.3f}")
+            print(f"{r['method']} | BM25>{r['threshold']}: mean μ={r['mean_mu']:.3f}, mean σ={r['mean_sigma']:.3f}, σ/μ={r['ratio']:.3f}")
         best = max(results, key=lambda r: r['ratio'])
-        print(f"\nBest threshold by σ/μ ratio: BM25>{best['threshold']} (σ/μ={best['ratio']:.3f})")
+        print(f"\nBest by σ/μ ratio: {best['method']} | BM25>{best['threshold']} (σ/μ={best['ratio']:.3f})")
     else:
         # Build query-specific null
         query_null_stats = build_query_specific_null(
