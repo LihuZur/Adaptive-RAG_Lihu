@@ -75,7 +75,7 @@ def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarra
                     'fields': ['title', 'paragraph_text']
                 }
             },
-            'size': LARGE_POOL * 2
+            'size': LARGE_POOL
         }
     )
     score_map = {hit['_id']: hit['_score'] for hit in response2.json()['hits']['hits']}
