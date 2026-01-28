@@ -190,18 +190,22 @@ def test_query_specific_null(dataset: str, n_queries: int = 50, n_null_samples: 
     print(f"Loaded precomputed query-specific nulls from {null_path}\n")
 
     all_pvalues = []
-
+    low_test_doc_queries = []
     for i, query_data in enumerate(queries):
         query_text = query_data.get('question', query_data.get('query_text', ''))
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         print(f"Query {i+1}/{len(queries)}: {query_text[:50]}...")
 
-        # Get N random docs to test null
+        # Get as many test docs as possible (up to n_null_samples)
         test_scores = retrieve_random_docs(query_text, n_docs=n_null_samples, corpus=dataset)
-
-        if len(test_scores) < 10:
-            print("  Too few test scores, skipping")
+        print(f"  Got {len(test_scores)} test docs for this query.")
+        if len(test_scores) == 0:
+            print("  No test docs, skipping.")
+            low_test_doc_queries.append((qid, 0))
             continue
+        if len(test_scores) < n_null_samples:
+            print(f"  Warning: Only {len(test_scores)} test docs (requested {n_null_samples})")
+            low_test_doc_queries.append((qid, len(test_scores)))
 
         # Use precomputed μ, σ for this query
         null_stats = query_null_stats.get(qid)
@@ -220,6 +224,9 @@ def test_query_specific_null(dataset: str, n_queries: int = 50, n_null_samples: 
         all_pvalues.extend(p_values)
 
         print(f"  μ={mu_q:.2f}, σ={sigma_q:.2f}, p-values range: [{p_values.min():.3f}, {p_values.max():.3f}]")
+
+    if low_test_doc_queries:
+        print(f"\nSummary: Queries with low test doc counts (qid, count): {low_test_doc_queries}")
     
     all_pvalues = np.array(all_pvalues)
     

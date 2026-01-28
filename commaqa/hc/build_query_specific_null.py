@@ -208,11 +208,14 @@ def build_query_specific_null(
             entity_to_topkdocs[ent].update(topk_doc_ids)
 
     query_null_stats = {}
+    skipped_queries = []
+    low_sample_queries = []
     for query_data in tqdm(queries, desc="Building brute-force farthest nulls"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         query_text = query_data.get('question', query_data.get('query_text', ''))
         if not isinstance(query_text, str) or not query_text.strip():
             logger.warning(f"Query {qid}: Empty or invalid query_text, skipping.")
+            skipped_queries.append(qid)
             continue
         entities = extract_entities(query_data)
         forbidden_doc_ids = set()
@@ -220,8 +223,9 @@ def build_query_specific_null(
             forbidden_doc_ids.update(entity_to_reldocs.get(ent, set()))
             forbidden_doc_ids.update(entity_to_topkdocs.get(ent, set()))
 
-        # Brute force: retrieve a large pool of random docs (e.g., 2000+)
+        # Try to get as many null samples as possible, fallback to smaller sample size if needed
         LARGE_POOL = max(2000, null_samples_per_query * 10)
+        MIN_NULL_SAMPLES = 3
         all_scores = []
         all_doc_ids = []
         n_attempts = 0
@@ -262,17 +266,21 @@ def build_query_specific_null(
                 if len(all_scores) >= LARGE_POOL:
                     break
             n_attempts += 1
-        if len(all_scores) < 10:
-            logger.warning(f"Query {qid}: Only got {len(all_scores)} brute-force farthest null scores, skipping")
+        # Fallback: if not enough, try with smaller sample size
+        if len(all_scores) < MIN_NULL_SAMPLES:
+            logger.warning(f"Query {qid}: Only got {len(all_scores)} null scores, skipping")
+            skipped_queries.append(qid)
             continue
-        # Take the bottom-N (lowest BM25) scores as the null
+        # Take the bottom-N (lowest BM25) scores as the null, but if not enough, use all
         sorted_idx = np.argsort(all_scores)
-        farthest_scores = [all_scores[i] for i in sorted_idx[:null_samples_per_query]]
+        n_take = min(null_samples_per_query, len(all_scores))
+        farthest_scores = [all_scores[i] for i in sorted_idx[:n_take]]
         mu = float(np.mean(farthest_scores))
         sigma = float(np.std(farthest_scores))
         logger.info(f"Query {qid}: null min={np.min(farthest_scores):.3f}, max={np.max(farthest_scores):.3f}, mean={mu:.3f}, std={sigma:.3f}, n={len(farthest_scores)}")
         if sigma == 0:
             logger.warning(f"Query {qid}: Zero std deviation, skipping")
+            skipped_queries.append(qid)
             continue
         query_null_stats[qid] = {
             "mu": mu,
@@ -281,8 +289,17 @@ def build_query_specific_null(
             "min": float(np.min(farthest_scores)),
             "max": float(np.max(farthest_scores)),
         }
+        if len(farthest_scores) < null_samples_per_query:
+            low_sample_queries.append((qid, len(farthest_scores)))
         if len(query_null_stats) % 50 == 0:
             logger.info(f"Processed {len(query_null_stats)} queries")
+
+    logger.info(f"\n{'='*80}")
+    logger.info(f"Built query-specific null statistics for {len(query_null_stats)} queries")
+    if skipped_queries:
+        logger.warning(f"Skipped {len(skipped_queries)} queries due to too few/null samples: {skipped_queries}")
+    if low_sample_queries:
+        logger.warning(f"Queries with low null samples (< requested): {low_sample_queries}")
     
     logger.info(f"\n{'='*80}")
     logger.info(f"Built query-specific null statistics for {len(query_null_stats)} queries")
