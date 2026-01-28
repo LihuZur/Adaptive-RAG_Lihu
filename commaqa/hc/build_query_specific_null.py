@@ -160,32 +160,25 @@ def build_query_specific_null(
         qid = q.get('qid', q.get('query_id', q.get('_id', 'unknown')))
         qid_to_entities[qid] = extract_entities(q)
 
-    decoys_per_query = 10  # You can make this a parameter if desired
     query_null_stats = {}
     for query_data in tqdm(queries, desc="Building query-specific nulls"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         entities = qid_to_entities[qid]
-        # Find decoy queries with disjoint entities
-        decoy_candidates = [q for q in queries if len(entities.intersection(extract_entities(q))) == 0]
-        if len(decoy_candidates) < decoys_per_query:
-            logger.warning(f"Query {qid}: Only {len(decoy_candidates)} decoy candidates, skipping")
-            continue
-        import random
-        decoys = random.sample(decoy_candidates, decoys_per_query)
-        # For each decoy, retrieve BM25 scores
+        # Find all other queries with disjoint entities
+        null_queries = [q for q in queries if q.get('qid', q.get('query_id', q.get('_id', 'unknown'))) != qid and len(entities.intersection(extract_entities(q))) == 0]
         all_scores = []
-        for decoy in decoys:
-            decoy_text = decoy.get('question', decoy.get('query_text', ''))
+        for nq in null_queries:
+            nq_text = nq.get('question', nq.get('query_text', ''))
             scores = get_random_doc_scores(
-                query_text=decoy_text,
+                query_text=nq_text,
                 corpus=corpus_name,
-                n_docs=null_samples_per_query // decoys_per_query,
+                n_docs=10,  # You can increase this if you want more samples per null-query
                 retriever_host=retriever_host,
                 retriever_port=retriever_port
             )
             all_scores.extend(scores.tolist())
         if len(all_scores) < 10:
-            logger.warning(f"Query {qid}: Only got {len(all_scores)} decoy scores, skipping")
+            logger.warning(f"Query {qid}: Only got {len(all_scores)} null scores, skipping")
             continue
         mu = float(np.mean(all_scores))
         sigma = float(np.std(all_scores))
