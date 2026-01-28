@@ -151,46 +151,72 @@ def build_query_specific_null(
     
     logger.info(f"Loaded {len(queries)} queries")
     
-    # Build null stats for each query using decoy queries with disjoint entities
-    def extract_entities(q):
-        return set(q.get('entity_coverage', []) or q.get('sub_cluster_entities', []))
-
-    qid_to_entities = {}
-    for q in queries:
-        qid = q.get('qid', q.get('query_id', q.get('_id', 'unknown')))
-        qid_to_entities[qid] = extract_entities(q)
+    # Build null stats for each query using the lowest BM25 scores from its own retrieval (excluding relevant docs)
+    def extract_relevant_doc_ids(q):
+        # Try to extract all possible relevant doc ids from the query dict
+        rel_keys = ["positive_ctxs", "positive_paragraphs", "relevant_docs", "answers", "answer_paragraphs"]
+        doc_ids = set()
+        for k in rel_keys:
+            if k in q and isinstance(q[k], list):
+                for item in q[k]:
+                    if isinstance(item, dict) and ("_id" in item or "id" in item):
+                        doc_ids.add(item.get("_id", item.get("id")))
+                    elif isinstance(item, str):
+                        doc_ids.add(item)
+        # Also try 'gt_doc_ids' or similar
+        if "gt_doc_ids" in q:
+            doc_ids.update(q["gt_doc_ids"])
+        return doc_ids
 
     query_null_stats = {}
     for query_data in tqdm(queries, desc="Building query-specific nulls"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
-        entities = qid_to_entities[qid]
-        # Find all other queries with disjoint entities
-        null_queries = [q for q in queries if q.get('qid', q.get('query_id', q.get('_id', 'unknown'))) != qid and len(entities.intersection(extract_entities(q))) == 0]
-        all_scores = []
-        for nq in null_queries:
-            nq_text = nq.get('question', nq.get('query_text', ''))
-            scores = get_random_doc_scores(
-                query_text=nq_text,
-                corpus=corpus_name,
-                n_docs=10,  # You can increase this if you want more samples per null-query
-                retriever_host=retriever_host,
-                retriever_port=retriever_port
+        query_text = query_data.get('question', query_data.get('query_text', ''))
+        # Retrieve top K docs for this query
+        try:
+            response = requests.post(
+                f'{retriever_host}:{retriever_port}/{corpus_name}/_search',
+                headers={'Content-Type': 'application/json'},
+                json={
+                    'query': {
+                        'multi_match': {
+                            'query': query_text,
+                            'fields': ['title', 'paragraph_text']
+                        }
+                    },
+                    '_source': False,
+                    'size': max(null_samples_per_query, 100)
+                },
+                timeout=30
             )
-            all_scores.extend(scores.tolist())
-        if len(all_scores) < 10:
-            logger.warning(f"Query {qid}: Only got {len(all_scores)} null scores, skipping")
+            if response.status_code != 200:
+                logger.warning(f"BM25 query failed for {qid}: {response.status_code}")
+                continue
+            hits = response.json()['hits']['hits']
+        except Exception as e:
+            logger.warning(f"Error retrieving docs for {qid}: {e}")
             continue
-        mu = float(np.mean(all_scores))
-        sigma = float(np.std(all_scores))
+
+        # Exclude relevant docs
+        rel_doc_ids = extract_relevant_doc_ids(query_data)
+        null_scores = [hit['_score'] for hit in hits if hit['_id'] not in rel_doc_ids]
+
+        if len(null_scores) < 10:
+            logger.warning(f"Query {qid}: Only got {len(null_scores)} null scores after excluding relevant docs, skipping")
+            continue
+        # Take the bottom null_samples_per_query scores (lowest BM25)
+        null_scores = sorted(null_scores)[:null_samples_per_query]
+        mu = float(np.mean(null_scores))
+        sigma = float(np.std(null_scores))
         if sigma == 0:
             logger.warning(f"Query {qid}: Zero std deviation, skipping")
             continue
         query_null_stats[qid] = {
             "mu": mu,
             "sigma": sigma,
-            "n_samples": len(all_scores),
-            "min": float(np.min(all_scores)),
-            "max": float(np.max(all_scores)),
+            "n_samples": len(null_scores),
+            "min": float(np.min(null_scores)),
+            "max": float(np.max(null_scores)),
         }
         if len(query_null_stats) % 50 == 0:
             logger.info(f"Processed {len(query_null_stats)} queries")
