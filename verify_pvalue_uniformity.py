@@ -306,7 +306,7 @@ def main():
     parser.add_argument('--dataset', type=str, default='crossentityqa', help='Dataset name')
     parser.add_argument('--method', type=str, choices=['global', 'query_specific', 'both'], default='both')
     parser.add_argument('--n_queries', type=int, default=50, help='Number of queries to test')
-    parser.add_argument('--n_null_samples', type=int, default=500, help='Null samples per query (query_specific only)')
+    parser.add_argument('--n_null_samples', type=int, default=1000, help='Null samples per query (query_specific only, default: 1000)')
     parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
     parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
     parser.add_argument('--shared_pool', action='store_true', help='Use shared random pool for null and test (split 2N into N for null, N for test)')
@@ -361,20 +361,33 @@ def main():
             return stats_res['ks_pvalue'], np.mean(pvalues), np.std(pvalues), 'standard'
 
     if args.auto_sweep:
-        thresholds = [0.5, 1.0, 1.5, 2.0, 2.5]
+        # Only run standard method, sweep over 1.5, 2.0, 2.5
+        thresholds = [1.5, 2.0, 2.5]
         results = []
-        for method in ['standard', 'sharedpool']:
-            print(f"\n=== Verifying method: {method} ===")
-            args.shared_pool = (method == 'sharedpool')
-            for thresh in thresholds:
-                print(f"\n--- BM25 threshold {thresh} ---")
-                ks_pval, mean, std, method_name = run_and_report(thresh)
-                results.append({'threshold': thresh, 'ks_pval': ks_pval, 'mean': mean, 'std': std, 'method': method_name})
-        print("\n=== Summary of BM25 threshold/method sweep ===")
+        print(f"\n=== Verifying method: standard ===")
+        args.shared_pool = False
+        for thresh in thresholds:
+            print(f"\n--- BM25 threshold {thresh} ---")
+            ks_pval, mean, std, method_name = run_and_report(thresh)
+            results.append({'threshold': thresh, 'ks_pval': ks_pval, 'mean': mean, 'std': std, 'method': method_name})
+        print("\n=== Summary of BM25 threshold sweep (standard) ===")
         for r in results:
-            print(f"{r['method']} | BM25>{r['threshold']}: KS p-value={r['ks_pval']:.4f}, mean={r['mean']:.3f}, std={r['std']:.3f}")
+            print(f"standard | BM25>{r['threshold']}: KS p-value={r['ks_pval']:.4f}, mean={r['mean']:.3f}, std={r['std']:.3f}")
         best = max(results, key=lambda r: r['ks_pval'])
-        print(f"\nBest by KS p-value: {best['method']} | BM25>{best['threshold']} (KS p-value={best['ks_pval']:.4f})")
+        print(f"\nBest by KS p-value: standard | BM25>{best['threshold']} (KS p-value={best['ks_pval']:.4f})")
+        # Shared pool sweep is commented out due to issues
+        # for method in ['sharedpool']:
+        #     print(f"\n=== Verifying method: {method} ===")
+        #     args.shared_pool = True
+        #     for thresh in thresholds:
+        #         print(f"\n--- BM25 threshold {thresh} ---")
+        #         ks_pval, mean, std, method_name = run_and_report(thresh)
+        #         results.append({'threshold': thresh, 'ks_pval': ks_pval, 'mean': mean, 'std': std, 'method': method_name})
+        # print("\n=== Summary of BM25 threshold/method sweep ===")
+        # for r in results:
+        #     print(f"{r['method']} | BM25>{r['threshold']}: KS p-value={r['ks_pval']:.4f}, mean={r['mean']:.3f}, std={r['std']:.3f}")
+        # best = max(results, key=lambda r: r['ks_pval'])
+        # print(f"\nBest by KS p-value: {best['method']} | BM25>{best['threshold']} (KS p-value={best['ks_pval']:.4f})")
     else:
         # Set global threshold for use in retrieve_random_docs
         global BM25_THRESHOLD

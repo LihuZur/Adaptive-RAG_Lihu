@@ -292,8 +292,8 @@ def main():
     parser.add_argument('corpus_name', type=str, help='Corpus name (e.g., crossentityqa)')
     parser.add_argument('split', type=str, default='dev_500', help='Dataset split')
     parser.add_argument('--num_queries', type=int, default=None, help='Number of queries (default: all)')
-    parser.add_argument('--null_samples_per_query', type=int, default=500, 
-                       help='Random docs to sample per query')
+    parser.add_argument('--null_samples_per_query', type=int, default=1000, 
+                       help='Random docs to sample per query (default: 1000)')
     parser.add_argument('--retriever_host', type=str, default='http://127.0.0.1')
     parser.add_argument('--retriever_port', type=int, default=9200)
     parser.add_argument('--output_dir', type=str, default='processed_data/hc_null_distributions')
@@ -366,24 +366,35 @@ def main():
             return {'threshold': thresh, 'mean_mu': mean_mu, 'mean_sigma': mean_sigma, 'ratio': ratio, 'method': 'standard'}
 
     if args.auto_sweep:
-        thresholds = [0.5, 1.0, 1.5, 2.0, 2.5]
+        # Only run standard method, sweep over 1.5, 2.0, 2.5
+        thresholds = [1.5, 2.0, 2.5]
         results = []
-        for method in ['standard', 'sharedpool']:
-            print(f"\n=== Building nulls for method: {method} ===")
-            for thresh in thresholds:
-                print(f"\n--- BM25 threshold {thresh} ---")
-                if method == 'sharedpool':
-                    args.shared_pool = True
-                else:
-                    args.shared_pool = False
-                res = run_and_report(thresh)
-                res['method'] = method
-                results.append(res)
-        print("\n=== Summary of BM25 threshold/method sweep ===")
+        print(f"\n=== Building nulls for method: standard ===")
+        args.shared_pool = False
+        for thresh in thresholds:
+            print(f"\n--- BM25 threshold {thresh} ---")
+            res = run_and_report(thresh)
+            res['method'] = 'standard'
+            results.append(res)
+        print("\n=== Summary of BM25 threshold sweep (standard) ===")
         for r in results:
-            print(f"{r['method']} | BM25>{r['threshold']}: mean μ={r['mean_mu']:.3f}, mean σ={r['mean_sigma']:.3f}, σ/μ={r['ratio']:.3f}")
+            print(f"standard | BM25>{r['threshold']}: mean μ={r['mean_mu']:.3f}, mean σ={r['mean_sigma']:.3f}, σ/μ={r['ratio']:.3f}")
         best = max(results, key=lambda r: r['ratio'])
-        print(f"\nBest by σ/μ ratio: {best['method']} | BM25>{best['threshold']} (σ/μ={best['ratio']:.3f})")
+        print(f"\nBest by σ/μ ratio: standard | BM25>{best['threshold']} (σ/μ={best['ratio']:.3f})")
+        # Shared pool sweep is commented out due to issues
+        # for method in ['sharedpool']:
+        #     print(f"\n=== Building nulls for method: {method} ===")
+        #     args.shared_pool = True
+        #     for thresh in thresholds:
+        #         print(f"\n--- BM25 threshold {thresh} ---")
+        #         res = run_and_report(thresh)
+        #         res['method'] = method
+        #         results.append(res)
+        # print("\n=== Summary of BM25 threshold/method sweep ===")
+        # for r in results:
+        #     print(f"{r['method']} | BM25>{r['threshold']}: mean μ={r['mean_mu']:.3f}, mean σ={r['mean_sigma']:.3f}, σ/μ={r['ratio']:.3f}")
+        # best = max(results, key=lambda r: r['ratio'])
+        # print(f"\nBest by σ/μ ratio: {best['method']} | BM25>{best['threshold']} (σ/μ={best['ratio']:.3f})")
     else:
         # Build query-specific null
         query_null_stats = build_query_specific_null(
