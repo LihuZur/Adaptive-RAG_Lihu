@@ -47,7 +47,7 @@ def retrieve_random_docs(query_text: str, n_docs: int, corpus: str) -> np.ndarra
     """Retrieve random documents and get their BM25 scores, filtering by BM25 threshold."""
     # Use global variable for threshold if set, else default
     bm25_threshold = globals().get('BM25_THRESHOLD', 0.1)
-    LARGE_POOL = max(2000, n_docs * 3)
+    LARGE_POOL = max(2000, int(n_docs * 1.5))
     response = requests.post(
         f'http://127.0.0.1:9200/{corpus}/_search',
         headers={'Content-Type': 'application/json'},
@@ -306,7 +306,7 @@ def main():
     parser.add_argument('--dataset', type=str, default='crossentityqa', help='Dataset name')
     parser.add_argument('--method', type=str, choices=['global', 'query_specific', 'both'], default='both')
     parser.add_argument('--n_queries', type=int, default=50, help='Number of queries to test')
-    parser.add_argument('--n_null_samples', type=int, default=1000, help='Null samples per query (query_specific only, default: 1000)')
+    parser.add_argument('--n_null_samples', type=int, default=3000, help='Null samples per query (query_specific only, default: 3000)')
     parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
     parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
     parser.add_argument('--shared_pool', action='store_true', help='Use shared random pool for null and test (split 2N into N for null, N for test)')
