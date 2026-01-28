@@ -148,10 +148,7 @@ def build_query_specific_null(
     
     logger.info(f"Loaded {len(queries)} queries")
     
-    # Step 1: Map each entity to all relevant doc IDs for all queries about that entity
-    def extract_entities(q):
-        return set(q.get('entity_coverage', []) or q.get('sub_cluster_entities', []))
-
+    # Only exclude direct ground-truth docs for each query
     def extract_relevant_doc_ids(q):
         rel_keys = ["positive_ctxs", "positive_paragraphs", "relevant_docs", "answers", "answer_paragraphs"]
         doc_ids = set()
@@ -166,46 +163,12 @@ def build_query_specific_null(
             doc_ids.update(q["gt_doc_ids"])
         return doc_ids
 
-    # Build entity -> set(all relevant doc ids for that entity)
-    # Also build entity -> set(all top-K retrieved doc ids for that entity)
-    entity_to_reldocs = {}
-    entity_to_topkdocs = {}
-    TOP_K = 100  # You can adjust this value for how "deep" negatives should be
-    for q in tqdm(queries, desc="Precomputing entity doc sets"):
-        entities = extract_entities(q)
+    # Precompute relevant doc ids for each query
+    query_to_reldocs = {}
+    for q in tqdm(queries, desc="Precomputing relevant doc sets"):
+        qid = q.get('qid', q.get('query_id', q.get('_id', 'unknown')))
         rel_docs = extract_relevant_doc_ids(q)
-        # Get top-K retrieved doc ids for this query
-        query_text = q.get('question', q.get('query_text', ''))
-        try:
-            response = requests.post(
-                f'{retriever_host}:{retriever_port}/{corpus_name}/_search',
-                headers={'Content-Type': 'application/json'},
-                json={
-                    'query': {
-                        'bool': {
-                            'should': [
-                                {'match': {'title': query_text}},
-                                {'match': {'paragraph_text': query_text}}
-                            ]
-                        }
-                    },
-                    '_source': False,
-                    'size': TOP_K
-                },
-                timeout=30
-            )
-            hits = response.json()['hits']['hits']
-            topk_doc_ids = set(hit['_id'] for hit in hits)
-        except Exception as e:
-            logger.warning(f"Error retrieving top-K docs for entity set: {entities} : {e}")
-            topk_doc_ids = set()
-        for ent in entities:
-            if ent not in entity_to_reldocs:
-                entity_to_reldocs[ent] = set()
-            entity_to_reldocs[ent].update(rel_docs)
-            if ent not in entity_to_topkdocs:
-                entity_to_topkdocs[ent] = set()
-            entity_to_topkdocs[ent].update(topk_doc_ids)
+        query_to_reldocs[qid] = rel_docs
 
     query_null_stats = {}
     skipped_queries = []
@@ -217,11 +180,7 @@ def build_query_specific_null(
             logger.warning(f"Query {qid}: Empty or invalid query_text, skipping.")
             skipped_queries.append(qid)
             continue
-        entities = extract_entities(query_data)
-        forbidden_doc_ids = set()
-        for ent in entities:
-            forbidden_doc_ids.update(entity_to_reldocs.get(ent, set()))
-            forbidden_doc_ids.update(entity_to_topkdocs.get(ent, set()))
+        forbidden_doc_ids = query_to_reldocs.get(qid, set())
 
         # Try to get as many null samples as possible, fallback to smaller sample size if needed
         LARGE_POOL = max(2000, null_samples_per_query * 10)
@@ -259,6 +218,8 @@ def build_query_specific_null(
             except Exception as e:
                 logger.warning(f"Error getting random doc ids for {qid}: {e}")
                 break
+            candidate_pool_size = len([doc_id for doc_id in doc_ids if doc_id not in forbidden_doc_ids])
+            logger.info(f"Query {qid}: candidate negative pool size after filtering: {candidate_pool_size}")
             for idx, doc_id in enumerate(doc_ids):
                 if doc_id not in forbidden_doc_ids and idx < len(candidate_scores):
                     all_scores.append(candidate_scores[idx])
