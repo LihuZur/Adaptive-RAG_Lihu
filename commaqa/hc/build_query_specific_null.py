@@ -90,9 +90,11 @@ def get_random_doc_scores(
             headers={'Content-Type': 'application/json'},
             json={
                 'query': {
-                    'multi_match': {
-                        'query': query_text,
-                        'fields': ['title', 'paragraph_text']
+                    'bool': {
+                        'should': [
+                            {'match': {'title': query_text}},
+                            {'match': {'paragraph_text': query_text}}
+                        ]
                     }
                 },
                 '_source': False,
@@ -100,22 +102,17 @@ def get_random_doc_scores(
             },
             timeout=30
         )
-        
         if response.status_code != 200:
             logger.warning(f"BM25 query failed: {response.status_code}")
             return np.array([])
-        
         # Build score map
         score_map = {hit['_id']: hit['_score'] for hit in response.json()['hits']['hits']}
-        
         # Extract scores for our random docs
         scores = []
         for doc_id in random_doc_ids:
             if doc_id in score_map:
                 scores.append(score_map[doc_id])
-        
         return np.array(scores)
-        
     except Exception as e:
         logger.warning(f"Error getting BM25 scores: {e}")
         return np.array([])
@@ -185,9 +182,11 @@ def build_query_specific_null(
                 headers={'Content-Type': 'application/json'},
                 json={
                     'query': {
-                        'multi_match': {
-                            'query': query_text,
-                            'fields': ['title', 'paragraph_text']
+                        'bool': {
+                            'should': [
+                                {'match': {'title': query_text}},
+                                {'match': {'paragraph_text': query_text}}
+                            ]
                         }
                     },
                     '_source': False,
