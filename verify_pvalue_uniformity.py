@@ -301,34 +301,51 @@ def plot_results(pvalues_dict: dict, output_path: str = "pvalue_uniformity_test.
 
 
 def main():
+
     parser = argparse.ArgumentParser(description='Verify p-value uniformity')
     parser.add_argument('--dataset', type=str, default='crossentityqa', help='Dataset name')
     parser.add_argument('--method', type=str, choices=['global', 'query_specific', 'both'], default='both')
     parser.add_argument('--n_queries', type=int, default=50, help='Number of queries to test')
     parser.add_argument('--n_null_samples', type=int, default=500, help='Null samples per query (query_specific only)')
-    parser.add_argument('--bm25_threshold', type=float, default=0.1, help='BM25 threshold for negatives (default 0.1)')
+    parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
+    parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
 
     args = parser.parse_args()
 
-    # Set global threshold for use in retrieve_random_docs
-    global BM25_THRESHOLD
-    BM25_THRESHOLD = args.bm25_threshold
+    def run_and_report(bm25_threshold):
+        global BM25_THRESHOLD
+        BM25_THRESHOLD = bm25_threshold
+        pvalues_dict = {}
+        if args.method in ['query_specific', 'both']:
+            pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
+            pvalues_dict[f'BM25>{bm25_threshold}'] = pvalues
+        # Plot
+        plot_results(pvalues_dict, output_path=f'pvalue_uniformity_test_bm25_{bm25_threshold}.png')
+        print(f"\n[BM25>{bm25_threshold}] Mean: {np.mean(pvalues):.3f}, Std: {np.std(pvalues):.3f}, KS p-value: {stats_res['ks_pvalue']:.4f}")
+        return stats_res['ks_pvalue'], np.mean(pvalues), np.std(pvalues)
 
-    pvalues_dict = {}
-
-
-    # Commented out global null test for now
-    # if args.method in ['global', 'both']:
-    #     pvalues, stats_res = test_global_null(args.dataset, args.n_queries)
-    #     if len(pvalues) > 0:
-    #         pvalues_dict['Global Null'] = pvalues
-
-    if args.method in ['query_specific', 'both']:
-        pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
-        pvalues_dict['Query-Specific Null'] = pvalues
-
-    # Plot
-    plot_results(pvalues_dict)
+    if args.auto_sweep:
+        thresholds = [0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        results = []
+        for thresh in thresholds:
+            print(f"\n=== Running for BM25 threshold {thresh} ===")
+            ks_pval, mean, std = run_and_report(thresh)
+            results.append({'threshold': thresh, 'ks_pval': ks_pval, 'mean': mean, 'std': std})
+        print("\n=== Summary of BM25 threshold sweep ===")
+        for r in results:
+            print(f"BM25>{r['threshold']}: KS p-value={r['ks_pval']:.4f}, mean={r['mean']:.3f}, std={r['std']:.3f}")
+        best = max(results, key=lambda r: r['ks_pval'])
+        print(f"\nBest threshold by KS p-value: BM25>{best['threshold']} (KS p-value={best['ks_pval']:.4f})")
+    else:
+        # Set global threshold for use in retrieve_random_docs
+        global BM25_THRESHOLD
+        BM25_THRESHOLD = args.bm25_threshold
+        pvalues_dict = {}
+        if args.method in ['query_specific', 'both']:
+            pvalues, stats_res = test_query_specific_null(args.dataset, args.n_queries, args.n_null_samples)
+            pvalues_dict['Query-Specific Null'] = pvalues
+        # Plot
+        plot_results(pvalues_dict)
 
 
 if __name__ == "__main__":

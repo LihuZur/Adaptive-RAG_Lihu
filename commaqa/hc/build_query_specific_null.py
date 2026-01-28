@@ -287,6 +287,7 @@ def build_query_specific_null(
 
 
 def main():
+
     parser = argparse.ArgumentParser(description='Build query-specific null distributions')
     parser.add_argument('corpus_name', type=str, help='Corpus name (e.g., crossentityqa)')
     parser.add_argument('split', type=str, default='dev_500', help='Dataset split')
@@ -296,37 +297,72 @@ def main():
     parser.add_argument('--retriever_host', type=str, default='http://127.0.0.1')
     parser.add_argument('--retriever_port', type=int, default=9200)
     parser.add_argument('--output_dir', type=str, default='processed_data/hc_null_distributions')
-    parser.add_argument('--bm25_threshold', type=float, default=0.1, help='BM25 threshold for negatives (default 0.1)')
+    parser.add_argument('--bm25_threshold', type=float, default=2.0, help='BM25 threshold for negatives (default 2.0, try higher for stronger negatives)')
+    parser.add_argument('--auto_sweep', action='store_true', help='Try multiple BM25 thresholds and report best')
 
     args = parser.parse_args()
 
-    # Build query-specific null
-    query_null_stats = build_query_specific_null(
-        corpus_name=args.corpus_name,
-        split=args.split,
-        num_queries=args.num_queries,
-        null_samples_per_query=args.null_samples_per_query,
-        retriever_host=args.retriever_host,
-        retriever_port=args.retriever_port,
-        bm25_threshold=args.bm25_threshold,
-    )
-    
-    # Save to file
-    output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    output_file = output_dir / f"{args.corpus_name}_query_specific_null.pkl"
-    with open(output_file, 'wb') as f:
-        pickle.dump(query_null_stats, f)
-    
-    logger.info(f"Saved query-specific null to: {output_file}")
-    
-    # Also save as JSON for inspection
-    json_file = output_dir / f"{args.corpus_name}_query_specific_null.json"
-    with open(json_file, 'w') as f:
-        json.dump(query_null_stats, f, indent=2)
-    
-    logger.info(f"Saved JSON version to: {json_file}")
+    def run_and_report(thresh):
+        query_null_stats = build_query_specific_null(
+            corpus_name=args.corpus_name,
+            split=args.split,
+            num_queries=args.num_queries,
+            null_samples_per_query=args.null_samples_per_query,
+            retriever_host=args.retriever_host,
+            retriever_port=args.retriever_port,
+            bm25_threshold=thresh,
+        )
+        output_dir = Path(args.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_file = output_dir / f"{args.corpus_name}_query_specific_null_bm25_{thresh}.pkl"
+        with open(output_file, 'wb') as f:
+            pickle.dump(query_null_stats, f)
+        json_file = output_dir / f"{args.corpus_name}_query_specific_null_bm25_{thresh}.json"
+        with open(json_file, 'w') as f:
+            json.dump(query_null_stats, f, indent=2)
+        all_mus = [stats['mu'] for stats in query_null_stats.values()]
+        all_sigmas = [stats['sigma'] for stats in query_null_stats.values()]
+        mean_mu = np.mean(all_mus)
+        mean_sigma = np.mean(all_sigmas)
+        ratio = mean_sigma / mean_mu if mean_mu != 0 else 0
+        print(f"BM25>{thresh}: mean μ={mean_mu:.3f}, mean σ={mean_sigma:.3f}, σ/μ={ratio:.3f}")
+        return {'threshold': thresh, 'mean_mu': mean_mu, 'mean_sigma': mean_sigma, 'ratio': ratio}
+
+    if args.auto_sweep:
+        thresholds = [0.1, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0]
+        results = []
+        for thresh in thresholds:
+            print(f"\n=== Building null for BM25 threshold {thresh} ===")
+            res = run_and_report(thresh)
+            results.append(res)
+        print("\n=== Summary of BM25 threshold sweep ===")
+        for r in results:
+            print(f"BM25>{r['threshold']}: mean μ={r['mean_mu']:.3f}, mean σ={r['mean_sigma']:.3f}, σ/μ={r['ratio']:.3f}")
+        best = max(results, key=lambda r: r['ratio'])
+        print(f"\nBest threshold by σ/μ ratio: BM25>{best['threshold']} (σ/μ={best['ratio']:.3f})")
+    else:
+        # Build query-specific null
+        query_null_stats = build_query_specific_null(
+            corpus_name=args.corpus_name,
+            split=args.split,
+            num_queries=args.num_queries,
+            null_samples_per_query=args.null_samples_per_query,
+            retriever_host=args.retriever_host,
+            retriever_port=args.retriever_port,
+            bm25_threshold=args.bm25_threshold,
+        )
+        # Save to file
+        output_dir = Path(args.output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_file = output_dir / f"{args.corpus_name}_query_specific_null.pkl"
+        with open(output_file, 'wb') as f:
+            pickle.dump(query_null_stats, f)
+        logger.info(f"Saved query-specific null to: {output_file}")
+        # Also save as JSON for inspection
+        json_file = output_dir / f"{args.corpus_name}_query_specific_null.json"
+        with open(json_file, 'w') as f:
+            json.dump(query_null_stats, f, indent=2)
+        logger.info(f"Saved JSON version to: {json_file}")
 
 
 if __name__ == "__main__":
