@@ -186,7 +186,7 @@ def build_query_specific_null(
         forbidden_doc_ids = query_to_reldocs.get(qid, set())
 
         # Try to get as many null samples as possible, fallback to smaller sample size if needed
-        LARGE_POOL = max(2000, null_samples_per_query * 10)
+        LARGE_POOL = max(2000, null_samples_per_query * 3)
         MIN_NULL_SAMPLES = 3
         all_scores = []
         all_doc_ids = []
