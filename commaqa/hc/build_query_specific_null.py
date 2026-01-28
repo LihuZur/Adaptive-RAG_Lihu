@@ -151,9 +151,11 @@ def build_query_specific_null(
     
     logger.info(f"Loaded {len(queries)} queries")
     
-    # Build null stats for each query using the lowest BM25 scores from its own retrieval (excluding relevant docs)
+    # Step 1: Map each entity to all relevant doc IDs for all queries about that entity
+    def extract_entities(q):
+        return set(q.get('entity_coverage', []) or q.get('sub_cluster_entities', []))
+
     def extract_relevant_doc_ids(q):
-        # Try to extract all possible relevant doc ids from the query dict
         rel_keys = ["positive_ctxs", "positive_paragraphs", "relevant_docs", "answers", "answer_paragraphs"]
         doc_ids = set()
         for k in rel_keys:
@@ -163,49 +165,76 @@ def build_query_specific_null(
                         doc_ids.add(item.get("_id", item.get("id")))
                     elif isinstance(item, str):
                         doc_ids.add(item)
-        # Also try 'gt_doc_ids' or similar
         if "gt_doc_ids" in q:
             doc_ids.update(q["gt_doc_ids"])
         return doc_ids
 
+    # Build entity -> set(all relevant doc ids for that entity)
+    entity_to_reldocs = {}
+    for q in queries:
+        entities = extract_entities(q)
+        rel_docs = extract_relevant_doc_ids(q)
+        for ent in entities:
+            if ent not in entity_to_reldocs:
+                entity_to_reldocs[ent] = set()
+            entity_to_reldocs[ent].update(rel_docs)
+
     query_null_stats = {}
-    for query_data in tqdm(queries, desc="Building query-specific nulls"):
+    for query_data in tqdm(queries, desc="Building query-specific nulls (entity-disjoint)"):
         qid = query_data.get('qid', query_data.get('query_id', query_data.get('_id', 'unknown')))
         query_text = query_data.get('question', query_data.get('query_text', ''))
-        # Retrieve top K docs for this query
-        try:
-            response = requests.post(
-                f'{retriever_host}:{retriever_port}/{corpus_name}/_search',
-                headers={'Content-Type': 'application/json'},
-                json={
-                    'query': {
-                        'multi_match': {
-                            'query': query_text,
-                            'fields': ['title', 'paragraph_text']
-                        }
-                    },
-                    '_source': False,
-                    'size': max(null_samples_per_query, 100)
-                },
-                timeout=30
+        entities = extract_entities(query_data)
+        # For this query, collect all relevant doc ids for all queries about the same entity/entities
+        forbidden_doc_ids = set()
+        for ent in entities:
+            forbidden_doc_ids.update(entity_to_reldocs.get(ent, set()))
+
+        # Sample random docs, excluding forbidden_doc_ids
+        # Try up to 10x the needed samples to get enough non-matching docs
+        n_attempts = 0
+        null_scores = []
+        while len(null_scores) < null_samples_per_query and n_attempts < 20:
+            candidate_scores = get_random_doc_scores(
+                query_text=query_text,
+                corpus=corpus_name,
+                n_docs=null_samples_per_query * 2,
+                retriever_host=retriever_host,
+                retriever_port=retriever_port
             )
-            if response.status_code != 200:
-                logger.warning(f"BM25 query failed for {qid}: {response.status_code}")
-                continue
-            hits = response.json()['hits']['hits']
-        except Exception as e:
-            logger.warning(f"Error retrieving docs for {qid}: {e}")
-            continue
-
-        # Exclude relevant docs
-        rel_doc_ids = extract_relevant_doc_ids(query_data)
-        null_scores = [hit['_score'] for hit in hits if hit['_id'] not in rel_doc_ids]
-
+            # Need to get doc IDs for these candidates
+            try:
+                response = requests.post(
+                    f'{retriever_host}:{retriever_port}/{corpus_name}/_search',
+                    headers={'Content-Type': 'application/json'},
+                    json={
+                        'query': {
+                            'function_score': {
+                                'query': {'match_all': {}},
+                                'random_score': {'seed': np.random.randint(1000000)},
+                                'boost_mode': 'replace'
+                            }
+                        },
+                        '_source': False,
+                        'size': null_samples_per_query * 2
+                    },
+                    timeout=30
+                )
+                hits = response.json()['hits']['hits']
+                doc_ids = [hit['_id'] for hit in hits]
+            except Exception as e:
+                logger.warning(f"Error getting random doc ids for {qid}: {e}")
+                break
+            # Filter out forbidden doc ids
+            for idx, doc_id in enumerate(doc_ids):
+                if doc_id not in forbidden_doc_ids and idx < len(candidate_scores):
+                    null_scores.append(candidate_scores[idx])
+                if len(null_scores) >= null_samples_per_query:
+                    break
+            n_attempts += 1
         if len(null_scores) < 10:
-            logger.warning(f"Query {qid}: Only got {len(null_scores)} null scores after excluding relevant docs, skipping")
+            logger.warning(f"Query {qid}: Only got {len(null_scores)} entity-disjoint null scores, skipping")
             continue
-        # Take the bottom null_samples_per_query scores (lowest BM25)
-        null_scores = sorted(null_scores)[:null_samples_per_query]
+        null_scores = null_scores[:null_samples_per_query]
         mu = float(np.mean(null_scores))
         sigma = float(np.std(null_scores))
         if sigma == 0:
